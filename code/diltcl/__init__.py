@@ -108,7 +108,7 @@ from .task_calibration import (
 from .training import train_diltcl, train_ewc, train_lwf
 from .utils import get_device, set_seed
 
-__version__ = "3.0.7"
+__version__ = "3.0.8"
 
 __all__ = [
     "ExperimentConfig",

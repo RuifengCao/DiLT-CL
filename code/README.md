@@ -1,4 +1,4 @@
-# DiLT-CL v3.0.7: research code
+# DiLT-CL v3.0.8: research code
 
 Disentangled Lottery-Ticket Continual Learning (DiLT-CL) and the baselines,
 protocols and infrastructure used to evaluate it. `diltcl.__version__` is the
@@ -19,7 +19,7 @@ records, are in `../evidence/results_20260906/`.
 | Runners | `run_task_il.py` (task-IL), `run_class_il.py` (class-IL) |
 | Launcher | `run_suite.py`: resumable, parallel job suite with provenance (`run_v21_experiment_suite.py` is a forwarding shim for old command lines) |
 | Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, paired statistics, results package and release builders, environment check, wall-time summary |
-| Tests | `tests/`, 32 files, 303 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
+| Tests | `tests/`, 32 files, 304 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
 | Metadata | `pyproject.toml` (version read from `diltcl.__version__`), `requirements.txt` (ranges), `requirements-lock.txt` (the exact recorded stack), `Dockerfile` |
 | Reproduction | `REPRODUCE.md`: verify the released artifacts on a CPU, re-evaluate released checkpoints, re-run training and audit the regeneration |
 
@@ -69,7 +69,7 @@ code/
 │   ├── execution.py              ExecutionOptions: data backend, numerics mode, TF32, threads (recorded in artifacts)
 │   ├── metrics.py, stats.py, task_inference.py, task_calibration.py, profiling.py
 │   ├── compact_export.py, preflight.py, runner_common.py, config.py, utils.py
-│   └── __init__.py               __version__ = "3.0.7"
+│   └── __init__.py               __version__ = "3.0.8"
 └── tests/
 ```
 
@@ -153,7 +153,9 @@ its verified semantics are in `PROTOCOL.md`.
   (with `--invalidate-methods` naming methods whose finished results the
   change makes invalid), and the verifier reports the acknowledgement as a
   warning. Any other change to the plan, including `--threads-per-job` or an
-  execution option, needs a new run directory.
+  execution option, needs a new run directory. A launcher holds a lock on
+  its run directory while it runs, so resuming a run that is in fact still
+  running stops at once instead of launching its jobs a second time.
 
 ## Protocols in one paragraph each
 

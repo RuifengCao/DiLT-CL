@@ -20,6 +20,9 @@ v3 adds the throughput layer that a small model on a large GPU needs:
 * **Execution options** (``--data-backend``, ``--numerics``, ``--tf32``,
   ``--eval-batch-size``) are forwarded to every child and are part of the
   plan identity, so a run directory can never mix settings.
+* **One suite per run directory.** The launcher holds an exclusive lock on
+  its run directory (``.run_suite.lock``); a second launcher started on the
+  same directory stops before writing anything.
 
 Per-job results are merged across seeds and methods with
 ``tools/merge_results.py``.
@@ -1256,6 +1259,47 @@ def plan_payload(jobs: list[Job], run_dir: Path, data_root: Path | None,
     }
 
 
+_HELD_RUN_LOCKS: list[Any] = []
+
+
+def lock_run_dir(run_dir: Path) -> bool:
+    """Hold an exclusive lock on ``run_dir`` until :func:`main` returns.
+
+    Two suites in one run directory would launch the same pending jobs twice,
+    write the same artifacts and share the GPU (which can change cuDNN's
+    algorithm choice); the second one stops here, before writing anything.
+    The kernel releases the lock when the process exits, however it exits.
+    Returns ``False`` (and the run proceeds unlocked) where the filesystem
+    does not support locks.
+    """
+    try:
+        import fcntl
+    except ImportError:  # pragma: no cover - non-POSIX platform
+        return False
+    handle = open(run_dir / ".run_suite.lock", "a", encoding="utf-8")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        raise SystemExit(
+            f"another run_suite.py is already running in {run_dir}; wait for it "
+            "to finish (check with: pgrep -af run_suite.py) before starting again")
+    except OSError as exc:
+        handle.close()
+        print(f"[run lock] cannot lock {run_dir} ({exc}); continuing without the "
+              "lock. Do not start a second suite in this run directory.",
+              file=sys.stderr)
+        return False
+    _HELD_RUN_LOCKS.append(handle)
+    return True
+
+
+def release_run_dir_locks(keep: int = 0) -> None:
+    """Release the run-directory locks taken after the first ``keep`` ones."""
+    while len(_HELD_RUN_LOCKS) > keep:
+        _HELD_RUN_LOCKS.pop().close()
+
+
 def write_pip_freeze(run_dir: Path) -> None:
     """Record ``pip freeze``; a different earlier record is kept under
     ``pip_freezes/<sha256>.txt``, like the environment and source records."""
@@ -1370,6 +1414,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    held = len(_HELD_RUN_LOCKS)
+    try:
+        return _main(argv)
+    finally:
+        release_run_dir_locks(keep=held)
+
+
+def _main(argv: list[str] | None) -> int:
     args = parse_args(argv)
     if args.invalidate_methods and not args.accept_source_change:
         raise SystemExit("--invalidate-methods requires --accept-source-change")
@@ -1436,6 +1488,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not dry:
         run_dir.mkdir(parents=True, exist_ok=True)
+        lock_run_dir(run_dir)          # one suite per run directory
     save_checkpoints = not args.no_save_checkpoints
     source = source_manifest()
     plan = plan_payload(jobs, run_dir, data_root, args.allow_download,

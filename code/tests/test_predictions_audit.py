@@ -357,6 +357,17 @@ def test_runner_persists_verifiable_predictions(calibration):
         assert any("SHA-256" in e for e in errors)
 
 
+def _runner_device():
+    """The device ``run_class_il.run`` trains and evaluates on (CUDA when present).
+
+    Re-evaluation must run there too: CPU and GPU kernels round differently,
+    so the recorded float32 scores are reproduced exactly only on the device
+    that produced them (as on the server, where both run on the GPU).
+    """
+    from diltcl.utils import get_device
+    return get_device()
+
+
 @pytest.mark.parametrize("calibration", ["none", "score-logreg"])
 def test_checkpoints_reevaluate_bit_identically(calibration):
     """Released checkpoints alone regenerate every routed and oracle result."""
@@ -367,7 +378,7 @@ def test_checkpoints_reevaluate_bit_identically(calibration):
         _run_runner(str(out), str(out.parent / "predictions"),
                     ("packnet", "supsup", "wsn", "diltcl"), calibration=calibration,
                     checkpoint_dir=str(out.parent / "checkpoints"))
-        entries = evaluator.evaluate_job(out.with_suffix(".json"), device="cpu",
+        entries = evaluator.evaluate_job(out.with_suffix(".json"), device=_runner_device(),
                                          methods=evaluator.ISOLATION,
                                          setup_fn=_fake_isolation_setup())
         assert sorted(e["method"] for e in entries) == sorted(evaluator.ISOLATION)
@@ -383,7 +394,7 @@ def test_checkpoints_reevaluate_bit_identically(calibration):
         key = next(k for k, v in state["model"].items() if v.is_floating_point())
         state["model"][key] = state["model"][key] + 1.0
         torch.save(state, victim)
-        entries = evaluator.evaluate_job(out.with_suffix(".json"), device="cpu",
+        entries = evaluator.evaluate_job(out.with_suffix(".json"), device=_runner_device(),
                                          methods=("wsn",), setup_fn=_fake_isolation_setup())
         assert any("SHA-256" in e for e in entries[0]["errors"])
         assert any("content" in e for e in entries[0]["errors"])
@@ -412,16 +423,16 @@ def test_reevaluation_fails_on_any_difference_in_exact_mode():
         np.savez(ppath, **arrays)
         record["predictions"]["sha256"] = hashlib.sha256(ppath.read_bytes()).hexdigest()
         result_json.write_text(json.dumps(payload))
-        entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+        entries = evaluator.evaluate_job(result_json, device=_runner_device(), methods=("wsn",),
                                          setup_fn=_fake_isolation_setup())
         assert any("route_by_stage: 1 per-example" in e for e in entries[0]["errors"])
-        tolerant = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+        tolerant = evaluator.evaluate_job(result_json, device=_runner_device(), methods=("wsn",),
                                           atol=0.05, setup_fn=_fake_isolation_setup())
         assert tolerant[0]["errors"] == [] and not tolerant[0]["exact"]
         assert tolerant[0]["per_example_differences"] == {"route_by_stage": 1}
         # 2. A referenced predictions file that is missing is an error, not a skip.
         ppath.unlink()
-        entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+        entries = evaluator.evaluate_job(result_json, device=_runner_device(), methods=("wsn",),
                                          setup_fn=_fake_isolation_setup())
         assert any("missing" in e for e in entries[0]["errors"])
         # 3. A NaN in the artifact never passes, whatever the tolerance.
@@ -433,7 +444,7 @@ def test_reevaluation_fails_on_any_difference_in_exact_mode():
         del record["predictions"]
         result_json.write_text(json.dumps(payload))
         for atol in (0.0, 100.0):
-            entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+            entries = evaluator.evaluate_job(result_json, device=_runner_device(), methods=("wsn",),
                                              atol=atol, setup_fn=_fake_isolation_setup())
             assert any("non-finite" in e for e in entries[0]["errors"])
 

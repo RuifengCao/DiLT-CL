@@ -261,6 +261,36 @@ class ExecutorTests(unittest.TestCase):
             else:
                 os.environ["CUDA_VISIBLE_DEVICES"] = saved
 
+    def test_a_second_suite_in_the_same_run_directory_stops(self):
+        import errno
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            data_root = pathlib.Path(tmp) / "data"
+            run_dir.mkdir()
+            data_root.mkdir()
+            args = ["--profile", "smoke", "--run-dir", str(run_dir), "--max-parallel", "1"]
+            self.assertTrue(suite.lock_run_dir(run_dir))     # a suite is running here
+            try:
+                with self.assertRaises(SystemExit) as stopped:
+                    _prepare(args, data_root)
+                self.assertIn("already running", str(stopped.exception))
+                # It stopped before writing anything...
+                self.assertEqual([p.name for p in run_dir.iterdir()], [".run_suite.lock"])
+                # ...and a dry run, which only reads the directory, is not blocked.
+                self.assertEqual(suite.main([*args, "--dry-run", "--dataset-hash", "none",
+                                             "--data-root", str(data_root)]), 0)
+            finally:
+                suite.release_run_dir_locks()
+            self.assertEqual(_prepare(args, data_root), 0)   # released: the run starts
+            self.assertTrue((run_dir / "plan.json").is_file())
+            self.assertTrue(suite.lock_run_dir(run_dir))     # main released its own lock
+            suite.release_run_dir_locks()
+            # A filesystem without lock support warns and runs unlocked.
+            with mock.patch("fcntl.flock", side_effect=OSError(errno.ENOLCK, "no locks")):
+                self.assertFalse(suite.lock_run_dir(run_dir))
+                self.assertEqual(_prepare(args, data_root), 0)
+
     def test_main_acknowledges_a_source_change_only_when_asked(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = pathlib.Path(tmp) / "run"

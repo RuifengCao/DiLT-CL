@@ -31,8 +31,8 @@ with a run's recorded `environment.json`.
 or, with Docker and the NVIDIA Container Toolkit:
 
 ```bash
-docker build -t diltcl:3.0.7 .
-docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.7
+docker build -t diltcl:3.0.8 .
+docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.8
 ```
 
 Levels 1 and 2 also work with any recent PyTorch/NumPy/SciPy; only exact
@@ -202,7 +202,8 @@ backend of every recorded run. The original jobs ran with
 (the suite sets the latter unless the shell already does).
 
 The suite runs up to eight jobs in parallel on one 32 GB GPU, resumes after an
-interruption, verifies every job, and records the environment, the code
+interruption (a second launcher on a run directory that is still in use
+stops at once), verifies every job, and records the environment, the code
 (`source_manifest.json`) and the data fingerprint. `compare_runs.py` compares
 the new run with the released one: trained-state content hashes, every NPZ
 array and every per-seed metric, plus the SHA-256 of the state files, and
