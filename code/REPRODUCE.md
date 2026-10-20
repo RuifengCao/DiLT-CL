@@ -212,10 +212,12 @@ present in the new run and identical; a run that is missing anything is
 `incomplete`. Given run directories on both sides, it also reports whether
 every job read the same data (content hashes) and ran with the same launch
 controls. The 170 P0 jobs launched under v3.0.0 recorded only a hash of the
-whole data root; `--fingerprints DIR` names a folder holding that
-fingerprint with its per-file list (an original run directory or its
-`dataset_fingerprints/`), from which their per-benchmark hashes are derived;
-without it they are reported as not comparable. The environment comparison
+whole data root. Their per-benchmark hashes are derived from the archived
+fingerprint with that root hash: the copy in `../evidence/` carries
+per-entry hashes computed from its per-file list, and `--fingerprints DIR`
+names further folders to search (an original run directory or its
+`dataset_fingerprints/`); without either they are reported as not
+comparable. The environment comparison
 lists every recorded field that differs; `platform` (the kernel string) and,
 in the Docker image, the Python build differ from the recorded Anaconda
 installation without affecting the numerics. Its last line reads, for a

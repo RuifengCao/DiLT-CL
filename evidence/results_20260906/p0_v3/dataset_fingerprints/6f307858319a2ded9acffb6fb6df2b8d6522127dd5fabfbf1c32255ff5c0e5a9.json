@@ -5,5 +5,73 @@
   "root": "/root/autodl-tmp/data",
   "total_bytes": 1509794790,
   "tree_sha256": "6f307858319a2ded9acffb6fb6df2b8d6522127dd5fabfbf1c32255ff5c0e5a9",
+  "entries": {
+    ".ipynb_checkpoints": {
+      "sha256": "8cef33d8d6978f554f9f6ce8c3c309da91e94c7e42cf9d4811fa6c2498f45fc2",
+      "files": 1,
+      "bytes": 1714
+    },
+    "FashionMNIST": {
+      "sha256": "d496001d3dcde817f2f678ccbaef18732b6d50c3d67480414490217a9d095be8",
+      "files": 4,
+      "bytes": 30878645
+    },
+    "KMNIST": {
+      "sha256": "6b0906f9bca6e8ecdf9395776cef1344024302f773c2994183e6bbe6a7de2eff",
+      "files": 4,
+      "bytes": 21240888
+    },
+    "MNIST": {
+      "sha256": "b66ef60cc8902f46c016a0e00df6eb0c53b441739475cb11f9f171dec08bdd98",
+      "files": 4,
+      "bytes": 11592558
+    },
+    "cifar-10-batches-py": {
+      "sha256": "30636da6290ce4fc7bfe78819bcc75eafcc197bc3463ece83dcb89d4837b45db",
+      "files": 8,
+      "bytes": 186214114
+    },
+    "cifar-10-python.tar.gz": {
+      "sha256": "d229ebe260a5da075d57a9e3c30dc7c1901984313ee43dbd3924d55d01bba23b",
+      "files": 1,
+      "bytes": 170498071
+    },
+    "cifar-100-python": {
+      "sha256": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72",
+      "files": 4,
+      "bytes": 186301098
+    },
+    "cifar-100-python.tar.gz": {
+      "sha256": "fb781af77602fa452bed8ef167a6dd23c428dfe4567abbdbb0a179d8d004c8e2",
+      "files": 1,
+      "bytes": 169001437
+    },
+    "download.sh": {
+      "sha256": "1e6c861c73bab2a8a79f72dbf295069207e3889801c87b695e4bbaa9d6b839a0",
+      "files": 1,
+      "bytes": 1714
+    },
+    "test_32x32.mat": {
+      "sha256": "02fbc7aac8606eaa44c1ff8143267af46115a733a76f9617190d8ca31bfca53f",
+      "files": 1,
+      "bytes": 64275384
+    },
+    "tiny-imagenet-200": {
+      "sha256": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919",
+      "files": 120203,
+      "bytes": 239648330
+    },
+    "tiny-imagenet-200.zip": {
+      "sha256": "187ac5a1bbc5f74252d6f3dff8f8b064006793b625159ac0d599c9063ad7ca24",
+      "files": 1,
+      "bytes": 248100043
+    },
+    "train_32x32.mat": {
+      "sha256": "88383fdf641f2567b10d65daa17f66c2f5468b687d450e8853c9579b0741a2b1",
+      "files": 1,
+      "bytes": 182040794
+    }
+  },
+  "entries_derived_from_files": true,
   "note": "per-file records removed for the package; the tree_sha256 and entries identify the data exactly"
 }

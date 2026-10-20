@@ -46,6 +46,11 @@ verification report (`verification_report.json`), what ran and how long
 (`plan.json`, `statuses/`, `suite_summary.json`), and the provenance of code,
 environment and data (`source_manifest*.json`, `environment*.json`,
 `pip_freeze.txt`, `dataset_fingerprint*.json`, per-file lists removed).
+The fingerprint used by the 170 P0 jobs launched on 2026-09-04
+(`p0_v3/dataset_fingerprints/6f307858*.json`) predates per-entry hashes;
+they were added on 2026-10-20, computed from its archived per-file list
+(`entries_derived_from_files`), so those jobs' data can be compared
+benchmark by benchmark.
 `p0_v3/paper/wall_minutes.txt` was written before SupSup and WSN were rerun
 under v3.0.2, so its rows for those two methods time the invalidated runs;
 `code/tools/wall_times.py` recomputes the summary from `statuses/`.
