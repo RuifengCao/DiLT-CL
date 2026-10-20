@@ -1,0 +1,106 @@
+{
+  "attempt": 2,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "3"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "3",
+    "--methods",
+    "wsn",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-logreg",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-c",
+    "1.0",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "tinyimagenet",
+    "entries": {
+      "tiny-imagenet-200": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "ended_at": "2026-09-05T18:10:43.886902+00:00",
+  "execution_source_sha256": "404c756e027331c43195da31516f217dcf497ca1b386c884adfd3eb53a317152",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-logreg",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-c",
+      "1.0",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__wsn",
+    "methods": "wsn",
+    "priority": "P0",
+    "purpose": "90%-train matched raw entropy versus score-logreg",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 3
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_class_entropy_cal__tinyimagenet__seed3__wsn.attempt2.log",
+  "outputs": [
+    {
+      "bytes": 69263,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/result.json",
+      "sha256": "4bf7533ed4499184a5f163dabc6d0a0c8152cfef3d960b5d90606acbbc2f7f9b"
+    },
+    {
+      "bytes": 8856,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/result.npz",
+      "sha256": "d5179a2d34e21422215e4a67c922360674edc14f3ebaeee2f4b44c5c6587fefe"
+    },
+    {
+      "bytes": 27406767,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/checkpoints/tinyimagenet/wsn/seed3.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/checkpoints/tinyimagenet/wsn/seed3.pt",
+      "sha256": "129aac528dabeb3d68d71305d513ca38b28e7b04d3f9808c97dfda987d085684"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-05T17:53:16.783058+00:00",
+  "state": "succeeded",
+  "wall_seconds": 1047.0292600877583
+}

@@ -1,0 +1,11 @@
+torch>=1.10
+torchvision>=0.11
+numpy>=1.21
+scipy>=1.7
+# Optional: preferred solver for the score-logistic router. Without it the
+# router falls back to a built-in SciPy L-BFGS-B fit of the same objective.
+# Optimizer tolerances can differ; the backend is recorded as 'scipy-lbfgs'.
+scikit-learn>=1.0
+# Optional: only needed for Experiment 6 (Gromov-Wasserstein analysis).
+# The suite runs fine without it - the GW step is skipped if POT is absent.
+POT>=0.8

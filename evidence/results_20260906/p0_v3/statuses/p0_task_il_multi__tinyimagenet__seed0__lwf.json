@@ -1,0 +1,86 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "0"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_task_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "0",
+    "--methods",
+    "lwf",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/result",
+    "--head-mode",
+    "multi",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/checkpoints"
+  ],
+  "dataset_identity": {
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "6f307858319a2ded9acffb6fb6df2b8d6522127dd5fabfbf1c32255ff5c0e5a9"
+  },
+  "ended_at": "2026-09-04T12:29:25.374302+00:00",
+  "execution_source_sha256": "dca137eb99398b9ca91169dee9ecd9792dd9de14ffc5d62efd7731bf7f5475f2",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--head-mode",
+      "multi"
+    ],
+    "fast": false,
+    "job_id": "p0_task_il_multi__tinyimagenet__seed0__lwf",
+    "methods": "lwf",
+    "priority": "P0",
+    "purpose": "corrected Task-IL main rerun (multi heads)",
+    "repeat_of": null,
+    "runner": "run_task_il.py",
+    "seed": 0
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_task_il_multi__tinyimagenet__seed0__lwf.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 25101,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/result.json",
+      "sha256": "a3ebf52cd32055390e7b9df5b2461c1f3d51085ce6d5ebf240a88e93588d856d"
+    },
+    {
+      "bytes": 1098,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/result.npz",
+      "sha256": "9c8456c89d35229d16d6ca6a3f73146f83a70089503f53c1296917e9399b3baa"
+    },
+    {
+      "bytes": 2684879,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/checkpoints/tinyimagenet/lwf/seed0.pt",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__tinyimagenet__seed0__lwf/checkpoints/tinyimagenet/lwf/seed0.pt",
+      "sha256": "adc5e3ad1600060177a0132b4cc8e0e9bee99798e792e38d1dbaddd100433d22"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-04T12:18:05.732775+00:00",
+  "state": "succeeded",
+  "wall_seconds": 679.6350747160614
+}

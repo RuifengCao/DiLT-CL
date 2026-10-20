@@ -1,0 +1,86 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "3"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "3",
+    "--methods",
+    "ewc",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/result",
+    "--inference-criterion",
+    "entropy",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/checkpoints"
+  ],
+  "dataset_identity": {
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "6f307858319a2ded9acffb6fb6df2b8d6522127dd5fabfbf1c32255ff5c0e5a9"
+  },
+  "ended_at": "2026-09-04T14:03:08.411901+00:00",
+  "execution_source_sha256": "dca137eb99398b9ca91169dee9ecd9792dd9de14ffc5d62efd7731bf7f5475f2",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy__tinyimagenet__seed3__ewc",
+    "methods": "ewc",
+    "priority": "P0",
+    "purpose": "full-data raw entropy class-IL main rerun",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 3
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_class_entropy__tinyimagenet__seed3__ewc.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 29360,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/result.json",
+      "sha256": "19fd5945452d508dcbbfc9a894e5d0438bde5a40c7294c2e190bb6b08d67cf7e"
+    },
+    {
+      "bytes": 1098,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/result.npz",
+      "sha256": "e641f54109be8884288a3b6363c6d788eaf43ad9dad8cf54b154a4abe7d1767b"
+    },
+    {
+      "bytes": 2680197,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/checkpoints/tinyimagenet/ewc/seed3.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed3__ewc/checkpoints/tinyimagenet/ewc/seed3.pt",
+      "sha256": "fd8f1fdc30bab3153cea3aa6a2be1d28f29d3b46aaddab5038fb3d1174d33c1b"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-04T13:51:42.923306+00:00",
+  "state": "succeeded",
+  "wall_seconds": 685.4782739048824
+}

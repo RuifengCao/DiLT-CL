@@ -1,0 +1,120 @@
+== cifar seed0
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed0__diltcl/checkpoints/cifar/diltcl/seed0.pt
+benchmark             : cifar
+tasks with experts    : 19
+
+dense resume file     :    99.30 MiB   (what the runner wrote)
+dense in-memory state :    94.57 MiB
+compact export        :     8.14 MiB   (11.6x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== cifar seed1
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/checkpoints/cifar/diltcl/seed1.pt
+benchmark             : cifar
+tasks with experts    : 19
+
+dense resume file     :    99.30 MiB   (what the runner wrote)
+dense in-memory state :    94.57 MiB
+compact export        :     8.14 MiB   (11.6x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== cifar seed2
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed2__diltcl/checkpoints/cifar/diltcl/seed2.pt
+benchmark             : cifar
+tasks with experts    : 19
+
+dense resume file     :    99.30 MiB   (what the runner wrote)
+dense in-memory state :    94.57 MiB
+compact export        :     8.15 MiB   (11.6x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== cifar seed3
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed3__diltcl/checkpoints/cifar/diltcl/seed3.pt
+benchmark             : cifar
+tasks with experts    : 19
+
+dense resume file     :    99.30 MiB   (what the runner wrote)
+dense in-memory state :    94.57 MiB
+compact export        :     8.13 MiB   (11.6x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== cifar seed4
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed4__diltcl/checkpoints/cifar/diltcl/seed4.pt
+benchmark             : cifar
+tasks with experts    : 19
+
+dense resume file     :    99.30 MiB   (what the runner wrote)
+dense in-memory state :    94.57 MiB
+compact export        :     8.14 MiB   (11.6x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== tinyimagenet seed0
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed0__diltcl/checkpoints/tinyimagenet/diltcl/seed0.pt
+benchmark             : tinyimagenet
+tasks with experts    : 9
+
+dense resume file     :    52.34 MiB   (what the runner wrote)
+dense in-memory state :    47.58 MiB
+compact export        :     4.06 MiB   (11.7x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== tinyimagenet seed1
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed1__diltcl/checkpoints/tinyimagenet/diltcl/seed1.pt
+benchmark             : tinyimagenet
+tasks with experts    : 9
+
+dense resume file     :    52.34 MiB   (what the runner wrote)
+dense in-memory state :    47.58 MiB
+compact export        :     4.07 MiB   (11.7x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== tinyimagenet seed2
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed2__diltcl/checkpoints/tinyimagenet/diltcl/seed2.pt
+benchmark             : tinyimagenet
+tasks with experts    : 9
+
+dense resume file     :    52.34 MiB   (what the runner wrote)
+dense in-memory state :    47.58 MiB
+compact export        :     4.08 MiB   (11.7x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== tinyimagenet seed3
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed3__diltcl/checkpoints/tinyimagenet/diltcl/seed3.pt
+benchmark             : tinyimagenet
+tasks with experts    : 9
+
+dense resume file     :    52.34 MiB   (what the runner wrote)
+dense in-memory state :    47.58 MiB
+compact export        :     4.08 MiB   (11.7x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.
+== tinyimagenet seed4
+checkpoint            : /root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__tinyimagenet__seed4__diltcl/checkpoints/tinyimagenet/diltcl/seed4.pt
+benchmark             : tinyimagenet
+tasks with experts    : 9
+
+dense resume file     :    52.34 MiB   (what the runner wrote)
+dense in-memory state :    47.58 MiB
+compact export        :     4.07 MiB   (11.7x smaller than dense)
+
+logit equivalence     : PASS (max abs diff 0.000e+00)
+
+Reportable: this compact size is backed by exact logit equivalence.

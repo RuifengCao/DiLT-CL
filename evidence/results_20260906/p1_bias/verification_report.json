@@ -1,0 +1,384 @@
+{
+  "acknowledged_source_changes": [],
+  "dataset_fingerprint": {
+    "file_count": 120236,
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "total_bytes": 1564674822,
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "determinism": [],
+  "errors": [],
+  "jobs_expected": 40,
+  "jobs_under_acknowledged_source": [],
+  "jobs_validated": 40,
+  "publication_reportable": true,
+  "results": [
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed0__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__packnet/result.json",
+      "json_sha256": "00827a00b62f134add26082e5b14bb8056745213b7155eb7c62009b3b43b925b",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__packnet/result.npz",
+      "npz_sha256": "6cae53b8d7d5d90580de844ea0bb70cd3c67d5df969f62a281d21e8bbec7f3be",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed0__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__supsup/result.json",
+      "json_sha256": "e8aa661af1911610890946320f74d004649e9277ebdfb73be067e6331d92967d",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__supsup/result.npz",
+      "npz_sha256": "1abb37c11fd90825b0350a14faa06ba63c457f25aadfcc5a8ced6b55db427add",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed0__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__wsn/result.json",
+      "json_sha256": "e73932c38dd2131820e28ce9bfadc91943b74ea7d6a0a53b9f5336ac59906302",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__wsn/result.npz",
+      "npz_sha256": "abd4075735f331446d7f180a27235f598cc389e65e027f5656994f9c4dd605f5",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed0__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__diltcl/result.json",
+      "json_sha256": "d17e25c3be22f3e7d12db82651a988b8afa5bfbfebe753d9d6113aed8d6822ea",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__diltcl/result.npz",
+      "npz_sha256": "ad3de016502113a1f1c39e02d206dd9c0bf277f7858e0c28718aa04a1ef2583e",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__packnet/result.json",
+      "json_sha256": "a144add91e4682e2b4d9764bd98e43478ca6bb7f5e70b0d28e4020f32403e707",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__packnet/result.npz",
+      "npz_sha256": "fc98ae4311948fc7faf4330a5ae28fd460adfcae4fb74628eae6ca5f053b03ef",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__supsup/result.json",
+      "json_sha256": "ac7718f03725d75c4e3ebd80ed03ec8dd1ac4edb46434ae5699f95ac38bd7d9e",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__supsup/result.npz",
+      "npz_sha256": "262d18a8093580671d48cf400e1e0a6bed7442eff7584e6a3c57aaec2f29fb42",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__wsn/result.json",
+      "json_sha256": "64dbcaddaff6d319085711c742825d7f78dbc42d4574a4d793ad2cfdd9ea251c",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__wsn/result.npz",
+      "npz_sha256": "4543b299d2b79587c4d27b1d9ce0ec4f39d5a9bf9b303d25d94f7f207f4c49d0",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__diltcl/result.json",
+      "json_sha256": "3bf6f54033f97dec1db85428081795c6a183bfdafbe6c8baf5cbb4e94a82443d",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__diltcl/result.npz",
+      "npz_sha256": "08214edaa2aaf13af05cae5b55684b132e11970aee96254548b779a64af26c2b",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed1__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__packnet/result.json",
+      "json_sha256": "b7e7c20b6217b75fc298a0f78b706bcc5761361249e098c6152cc7b6767254fa",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__packnet/result.npz",
+      "npz_sha256": "7cddea6a31918fc96b49044a3eb5fabe6c1be0a84ef0e49ab544146fbe73427e",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed1__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__supsup/result.json",
+      "json_sha256": "a17acb5ebe084728c2ed6c451c2ce64e22940770d9ccbe6a573eb7b08617b201",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__supsup/result.npz",
+      "npz_sha256": "0d6b2c39dfa45e5612c0372acf340c448862b9febb48377310b401deb40e6520",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed1__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__wsn/result.json",
+      "json_sha256": "f4e3961dcd58be1fd5c485f4465185b5f8a31ce239b9e5a31c10a0d27beb77c5",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__wsn/result.npz",
+      "npz_sha256": "42396bfa81ab4b346823006afa3f8372824ffd75b7c4a73de6e62769ddae1860",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed1__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.json",
+      "json_sha256": "d7aca6afde6d2a55956f01ec7bbbebed562e3e25586a00c63b3af32c7018c329",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.npz",
+      "npz_sha256": "c3a6259bfd1568db23058cba063127b61d3448a0a0e9b06e1f21ff0b2bc0fa92",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__packnet/result.json",
+      "json_sha256": "3748692e4dc4ad3667d9b14c803d4ad0c4909e3783aa58e1646686b36f08cd2d",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__packnet/result.npz",
+      "npz_sha256": "a2b9aa62ba82d2fb96b9479ed281d631a27f8b3f8f6567728f27eddb4b361a65",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__supsup/result.json",
+      "json_sha256": "84b0939a32ce1e9dc64753d0abac370b596a59f6dea363fd13f7bc4fe4ea9259",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__supsup/result.npz",
+      "npz_sha256": "1aabf507c627deeaf67707029d189a45e9aa7b539850dbb7403011d8edcaf569",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__wsn/result.json",
+      "json_sha256": "cbd450163409e5b48454db1cec25365a0845c2dd349eb2277a07c0435478531d",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__wsn/result.npz",
+      "npz_sha256": "47dbb99ef47c23ba7dc059678a63b78135731967f1adb5bb5859a28486a0ad62",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__diltcl/result.json",
+      "json_sha256": "89696adcafb0dafdb29c053b7307a6b29cc1033e5c815c62cb7e99f3c0103b6c",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__diltcl/result.npz",
+      "npz_sha256": "25ea1d59739814aedd58e3c9c123cb530b19c810c4f31bd84a0a7409df553f51",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed2__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__packnet/result.json",
+      "json_sha256": "e1743d870d327456e3bbd4305b9dd0259a67e7fa4705026881858ac239092bca",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__packnet/result.npz",
+      "npz_sha256": "8b37c72cfd58cfda6d07a0437c6f44d2807642fe272fd990011824cd65d4c0df",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed2__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__supsup/result.json",
+      "json_sha256": "a41837483197e2ca1b679412bcf66ca27c57b5c2fc69e306f2048d18312c6565",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__supsup/result.npz",
+      "npz_sha256": "1c2a9a9d556da591398b436017a32a804eac5b75426887f04513b34d4dee242b",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed2__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__wsn/result.json",
+      "json_sha256": "5785f1a16ad69505f6500e58e79b514265a0381a4d5ecfbd10fa0aa89e0dd48e",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__wsn/result.npz",
+      "npz_sha256": "e7ce097c81d71769906b3432a3cb6732183341e9e20c5a86b9085c5ff5ac0cf3",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed2__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__diltcl/result.json",
+      "json_sha256": "44c1829deeea342908bc449194b25df6ee2668f2ff3b716d74791caa358446fc",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__diltcl/result.npz",
+      "npz_sha256": "a92cb986984cae65ee7eb1223c87bad2fd56c4339ef1b1049a8fa6921998b105",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__packnet/result.json",
+      "json_sha256": "23b12f82085f8af56879e370973feb60a9018d0b40d7a25d87e895bd7667d2e2",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__packnet/result.npz",
+      "npz_sha256": "81ce02555a4b068fbebaaab2fdb96de1134ccd35d21c3526e230da79da2d7212",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__supsup/result.json",
+      "json_sha256": "39439acdbdb7546c1a45fa6676bdc19038ee13fea790d322d5c7a62f026e79ab",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__supsup/result.npz",
+      "npz_sha256": "032ea815042629b91586883e272325c69a0d4f45d214efdcbb2c109ab26da356",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__wsn/result.json",
+      "json_sha256": "8c2e8494cbf43fa5155691d304ee5cd3cffb68ac9e37045f31a0b839f06f7b71",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__wsn/result.npz",
+      "npz_sha256": "9fd7fc3e036f577fb7d4ce8c001d6c83efba8ece001a86c9af7fc7504090fcd9",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__diltcl/result.json",
+      "json_sha256": "389245c0ca60d2cc16dcd11ea92c0ab7126ec41682ab2235f7becaa2163a9080",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__diltcl/result.npz",
+      "npz_sha256": "2278b6c59fd43a81909e63ba8be1b8d34e7be37dc5ea0083aee7da2682e80adb",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed3__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__packnet/result.json",
+      "json_sha256": "cf1c3de0d1575359a66f4197ed61a12a542951ab065315eb6f0cd5d2d31f0ca3",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__packnet/result.npz",
+      "npz_sha256": "63e8457b0542a2db7c10cdb295e0990c95b8c60ebb233377bfb6a0a81bd39b15",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed3__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__supsup/result.json",
+      "json_sha256": "e9646fcd0829672935f71695240958fefa3a6629864f51152d9096e86fd9907d",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__supsup/result.npz",
+      "npz_sha256": "9029f9aceae294e80b4df3cc950791c131ad038e11712abfd27ecffbcdaa56fa",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed3__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__wsn/result.json",
+      "json_sha256": "dee84d832a03ba0a78477658768ca2d74a956b9174852c8ee8e0d9d5ba0d7637",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__wsn/result.npz",
+      "npz_sha256": "a2f3dbc2356069070bc2f2c9d2c168c3752af8aa40ac55eff5904e353bc036fb",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed3__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__diltcl/result.json",
+      "json_sha256": "c96985b3111254a6d9ee7777932e83a614ef802449eec04ff60c3fc2c04b8e59",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__diltcl/result.npz",
+      "npz_sha256": "e6ae3bab75ade31c3a30e9261afddb18fba5f642b9b0722cf3a4bce0d2f7d398",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__packnet/result.json",
+      "json_sha256": "6ab4a3aa1b73597ac8523a972cda430de108378018045709ee4f9422e6d94bec",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__packnet/result.npz",
+      "npz_sha256": "3576b4ea325124a9d59af52bcdde1eca86a2fb1d89cedbea3c91e3c90694739e",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__supsup/result.json",
+      "json_sha256": "44d6fbd9678e42017e73701f40307600dd2bfac1ce4677259dcbdb7a5ad9a6d5",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__supsup/result.npz",
+      "npz_sha256": "a0a1ec09976c65f915db55764185904838b3032613b08b3d0ec1076d6164ff36",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__wsn/result.json",
+      "json_sha256": "cb2643b4340fe9f5527b8943067018c343aceedacdfa8e9c02aa11619e6aa1a9",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__wsn/result.npz",
+      "npz_sha256": "ac5246f9a7ea6a759df10f88b7f836e3e1b6571e83fddf2f2dbafb385f75116d",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__diltcl/result.json",
+      "json_sha256": "2189c1deaee65d96c22684f1de52f920e38afd9e17a334f8af5745cb710b0ec1",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__diltcl/result.npz",
+      "npz_sha256": "cd4bef0c1a23be4d1cb4ad02a0cb9c5b887151d689eedf5c33b759469261b7dd",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed4__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__packnet/result.json",
+      "json_sha256": "bbc397e48f11b4c2dd93f0bd491ce810204749a074b06e03c46f102c06eae5e7",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__packnet/result.npz",
+      "npz_sha256": "55ed4590061538967d9c99fafcf23bc738ea3d57cf236223153bbb8b7e6b68e5",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed4__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__supsup/result.json",
+      "json_sha256": "5c691031830bf69537aa87d5608f8aa9b5ed2b4d30bbbaea2976fa96fffdd3aa",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__supsup/result.npz",
+      "npz_sha256": "603992117d146a584d84a6dd00f42da56aa5d90c1b7725d8ebea1795cd6c551a",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed4__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__wsn/result.json",
+      "json_sha256": "60882ec5cc670267ae6c85840b55d4ba8680f4d8597b3288d7494bf559eb7337",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__wsn/result.npz",
+      "npz_sha256": "b1f6eefd75062460ad478036e6a60b788da823c9e1d68f6bac8194dfa9985d9b",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__cifar__seed4__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__diltcl/result.json",
+      "json_sha256": "41334187f84ef8e1898fdbb4903d798aad16fe2eca77083692c536e747178c21",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__diltcl/result.npz",
+      "npz_sha256": "f9ec8f0e40da9465edd6f5e5dfa61cafcf7780e06b01818c127627a7dbcc72c8",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__packnet",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__packnet/result.json",
+      "json_sha256": "1fb213ef5e0c8c6e021cf268d662b4feb3f5e1eb2ca662b49508e157f8e0855e",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__packnet/result.npz",
+      "npz_sha256": "920a9b50266e658983316b743d989611ff8ff05164c42f9c8d533fc903a0fd50",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__supsup",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__supsup/result.json",
+      "json_sha256": "83179d2e1e733cfd11600503a085039a33d711fa51276776fe0b049efaff73fe",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__supsup/result.npz",
+      "npz_sha256": "f0bf413df6399107a6ef8702a0b367f6f682b52db96e3038be13f0295852098a",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__wsn",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__wsn/result.json",
+      "json_sha256": "437f4ee9d5238a1546e93582e3632e4fb3eab6c679d41680c90665c61a420fcc",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__wsn/result.npz",
+      "npz_sha256": "48402e81a011a3f5d7bb00ff412c11bf36570860bdadfda157e18a293843012b",
+      "passed": true
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__diltcl",
+      "json": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__diltcl/result.json",
+      "json_sha256": "882dfeed22681f1c3e6fbaa172ac7c6dd92e2a084a641621a19e6e123bc56944",
+      "npz": "/root/autodl-tmp/runs_v3/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__diltcl/result.npz",
+      "npz_sha256": "10174e49530baf3caaba754b56547c4f7d0b3024001921006db2a4c168dc0154",
+      "passed": true
+    }
+  ],
+  "run_dir": "/root/autodl-tmp/runs_v3/p1_bias",
+  "scope_note": "This verifier establishes artifact arithmetic, structure, hashes, suite completeness, and the declared same-seed repeat. It does not turn the reused-C-head Task-IL shared baselines into standard separate-head baselines and does not certify a compact exporter.",
+  "status": "verified",
+  "verification_schema_version": 1,
+  "verified_at": "2026-09-06T04:53:40.345063+00:00",
+  "warnings": []
+}

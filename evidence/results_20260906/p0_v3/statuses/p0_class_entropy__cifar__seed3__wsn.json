@@ -1,0 +1,90 @@
+{
+  "attempt": 2,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "3"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "3",
+    "--methods",
+    "wsn",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__cifar__seed3__wsn/result",
+    "--inference-criterion",
+    "entropy",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__cifar__seed3__wsn/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "ended_at": "2026-09-05T19:29:45.620668+00:00",
+  "execution_source_sha256": "404c756e027331c43195da31516f217dcf497ca1b386c884adfd3eb53a317152",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy__cifar__seed3__wsn",
+    "methods": "wsn",
+    "priority": "P0",
+    "purpose": "full-data raw entropy class-IL main rerun",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 3
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_class_entropy__cifar__seed3__wsn.attempt2.log",
+  "outputs": [
+    {
+      "bytes": 34691,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__cifar__seed3__wsn/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__wsn/result.json",
+      "sha256": "12afa45eb5575dbfc9d112e9c8a645e9e4fc61301fc042d958080ed475fe6dd1"
+    },
+    {
+      "bytes": 13960,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__cifar__seed3__wsn/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__wsn/result.npz",
+      "sha256": "1ff51f0a322f04b8290006ba9454da3ab79840ecbf7aacc9fba879637e2b2e70"
+    },
+    {
+      "bytes": 51996323,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy__cifar__seed3__wsn/checkpoints/cifar/wsn/seed3.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__wsn/checkpoints/cifar/wsn/seed3.pt",
+      "sha256": "e897a04a9c8855b1fa1025f2bac039f2319bdc8027280148e91cb4d8261bc865"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-05T19:22:14.924585+00:00",
+  "state": "succeeded",
+  "wall_seconds": 450.5977011267096
+}

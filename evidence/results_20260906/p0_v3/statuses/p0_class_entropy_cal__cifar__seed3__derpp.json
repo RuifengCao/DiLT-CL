@@ -1,0 +1,106 @@
+{
+  "attempt": 2,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "3"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "3",
+    "--methods",
+    "derpp",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__cifar__seed3__derpp/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-logreg",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-c",
+    "1.0",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__cifar__seed3__derpp/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "ended_at": "2026-09-05T13:27:40.970940+00:00",
+  "execution_source_sha256": "bee8db745ca3e35b1a94cc1a31ebb26b0dac8c7eb2b26ddc7b302f47d6314b45",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-logreg",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-c",
+      "1.0",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy_cal__cifar__seed3__derpp",
+    "methods": "derpp",
+    "priority": "P0",
+    "purpose": "90%-train matched raw entropy versus score-logreg",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 3
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_class_entropy_cal__cifar__seed3__derpp.attempt2.log",
+  "outputs": [
+    {
+      "bytes": 32961,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__cifar__seed3__derpp/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed3__derpp/result.json",
+      "sha256": "f7ea375979efed396d8a6487307b43b8856fa3319add1a3e9df7a720b69b0bc2"
+    },
+    {
+      "bytes": 3488,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__cifar__seed3__derpp/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed3__derpp/result.npz",
+      "sha256": "df40c4ffbb50873cf532f77fe7ceebc75b5eb574e41bd6294b0d8b5d4a229239"
+    },
+    {
+      "bytes": 2577413,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_class_entropy_cal__cifar__seed3__derpp/checkpoints/cifar/derpp/seed3.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed3__derpp/checkpoints/cifar/derpp/seed3.pt",
+      "sha256": "7a409c717fafb7d8cf3e0e9919b1dda9f2c9211eb04b11097112c108d81b88e4"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-05T13:19:26.316734+00:00",
+  "state": "succeeded",
+  "wall_seconds": 494.64391109440476
+}

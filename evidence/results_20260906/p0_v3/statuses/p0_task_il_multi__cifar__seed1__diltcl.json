@@ -1,0 +1,86 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "1"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_task_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "1",
+    "--methods",
+    "diltcl",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/result",
+    "--head-mode",
+    "multi",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/checkpoints"
+  ],
+  "dataset_identity": {
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "6f307858319a2ded9acffb6fb6df2b8d6522127dd5fabfbf1c32255ff5c0e5a9"
+  },
+  "ended_at": "2026-09-04T12:18:05.634764+00:00",
+  "execution_source_sha256": "dca137eb99398b9ca91169dee9ecd9792dd9de14ffc5d62efd7731bf7f5475f2",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--head-mode",
+      "multi"
+    ],
+    "fast": false,
+    "job_id": "p0_task_il_multi__cifar__seed1__diltcl",
+    "methods": "diltcl",
+    "priority": "P0",
+    "purpose": "corrected Task-IL main rerun (multi heads)",
+    "repeat_of": null,
+    "runner": "run_task_il.py",
+    "seed": 1
+  },
+  "log": "/root/autodl-tmp/runs_v3/p0_v3/logs/p0_task_il_multi__cifar__seed1__diltcl.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 30277,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__cifar__seed1__diltcl/result.json",
+      "sha256": "f1d327f2ec663e79473d79fdef8585d44b89c66b8c6e483a5cabf76c27478e75"
+    },
+    {
+      "bytes": 6978,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__cifar__seed1__diltcl/result.npz",
+      "sha256": "e7d6733567607dd39de6ae968908a123c2a0b700995e9c1d7a3f9a73935e9f94"
+    },
+    {
+      "bytes": 104126583,
+      "path": "/root/autodl-tmp/runs_v3/p0_v3/artifacts/p0_task_il_multi__cifar__seed1__diltcl/checkpoints/cifar/diltcl/seed1.pt",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__cifar__seed1__diltcl/checkpoints/cifar/diltcl/seed1.pt",
+      "sha256": "b439ca7efce4cad2a5faedc46b2b296fcfe6ecaa5f98daa5f8f50091adbe6531"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-04T12:09:18.541766+00:00",
+  "state": "succeeded",
+  "wall_seconds": 526.9274958474562
+}

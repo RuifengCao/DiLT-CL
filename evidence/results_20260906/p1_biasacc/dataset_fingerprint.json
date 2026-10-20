@@ -1,0 +1,76 @@
+{
+  "entries": {
+    ".ipynb_checkpoints": {
+      "bytes": 1714,
+      "files": 1,
+      "sha256": "8cef33d8d6978f554f9f6ce8c3c309da91e94c7e42cf9d4811fa6c2498f45fc2"
+    },
+    "FashionMNIST": {
+      "bytes": 30878645,
+      "files": 4,
+      "sha256": "d496001d3dcde817f2f678ccbaef18732b6d50c3d67480414490217a9d095be8"
+    },
+    "KMNIST": {
+      "bytes": 21240888,
+      "files": 4,
+      "sha256": "6b0906f9bca6e8ecdf9395776cef1344024302f773c2994183e6bbe6a7de2eff"
+    },
+    "MNIST": {
+      "bytes": 66472590,
+      "files": 6,
+      "sha256": "eb03b5b89e738d0da1a4a30cee62008734750a462481d95e57327491cc9398f8"
+    },
+    "cifar-10-batches-py": {
+      "bytes": 186214114,
+      "files": 8,
+      "sha256": "30636da6290ce4fc7bfe78819bcc75eafcc197bc3463ece83dcb89d4837b45db"
+    },
+    "cifar-10-python.tar.gz": {
+      "bytes": 170498071,
+      "files": 1,
+      "sha256": "d229ebe260a5da075d57a9e3c30dc7c1901984313ee43dbd3924d55d01bba23b"
+    },
+    "cifar-100-python": {
+      "bytes": 186301098,
+      "files": 4,
+      "sha256": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "cifar-100-python.tar.gz": {
+      "bytes": 169001437,
+      "files": 1,
+      "sha256": "fb781af77602fa452bed8ef167a6dd23c428dfe4567abbdbb0a179d8d004c8e2"
+    },
+    "download.sh": {
+      "bytes": 1714,
+      "files": 1,
+      "sha256": "1e6c861c73bab2a8a79f72dbf295069207e3889801c87b695e4bbaa9d6b839a0"
+    },
+    "test_32x32.mat": {
+      "bytes": 64275384,
+      "files": 1,
+      "sha256": "02fbc7aac8606eaa44c1ff8143267af46115a733a76f9617190d8ca31bfca53f"
+    },
+    "tiny-imagenet-200": {
+      "bytes": 239648330,
+      "files": 120203,
+      "sha256": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "tiny-imagenet-200.zip": {
+      "bytes": 248100043,
+      "files": 1,
+      "sha256": "187ac5a1bbc5f74252d6f3dff8f8b064006793b625159ac0d599c9063ad7ca24"
+    },
+    "train_32x32.mat": {
+      "bytes": 182040794,
+      "files": 1,
+      "sha256": "88383fdf641f2567b10d65daa17f66c2f5468b687d450e8853c9579b0741a2b1"
+    }
+  },
+  "exists": true,
+  "file_count": 120236,
+  "mode": "full",
+  "root": "/root/autodl-tmp/data",
+  "total_bytes": 1564674822,
+  "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835",
+  "note": "per-file records removed for the package; the tree_sha256 and entries identify the data exactly"
+}

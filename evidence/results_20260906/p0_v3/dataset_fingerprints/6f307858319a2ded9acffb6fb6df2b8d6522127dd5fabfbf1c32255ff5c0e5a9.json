@@ -1,0 +1,9 @@
+{
+  "exists": true,
+  "file_count": 120234,
+  "mode": "full",
+  "root": "/root/autodl-tmp/data",
+  "total_bytes": 1509794790,
+  "tree_sha256": "6f307858319a2ded9acffb6fb6df2b8d6522127dd5fabfbf1c32255ff5c0e5a9",
+  "note": "per-file records removed for the package; the tree_sha256 and entries identify the data exactly"
+}

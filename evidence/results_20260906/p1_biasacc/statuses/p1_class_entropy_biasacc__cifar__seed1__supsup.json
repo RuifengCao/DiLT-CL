@@ -1,0 +1,102 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "1"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "1",
+    "--methods",
+    "supsup",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-bias-acc",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "ended_at": "2026-09-06T13:23:29.299168+00:00",
+  "execution_source_sha256": "6692ffd724d8283406f2b4f3d4748a59c20f414bbcb1166b2976c547f7b6f626",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-bias-acc",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p1_class_entropy_biasacc__cifar__seed1__supsup",
+    "methods": "supsup",
+    "priority": "P1",
+    "purpose": "90%-train matched raw entropy versus score-bias-acc router",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 1
+  },
+  "log": "/root/autodl-tmp/runs_v3/p1_biasacc/logs/p1_class_entropy_biasacc__cifar__seed1__supsup.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 157808,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.json",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.json",
+      "sha256": "ab3ca0eeb84003805dda6c4b2d0df5efc84c2284dab565b7c93af01532e8b51f"
+    },
+    {
+      "bytes": 27992,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.npz",
+      "sha256": "82239caa6c16499b2ab3e01f223ba917c60b3ad79dd86bfb55b19eb6531f9cd9"
+    },
+    {
+      "bytes": 51996323,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/checkpoints/cifar/supsup/seed1.pt",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/checkpoints/cifar/supsup/seed1.pt",
+      "sha256": "20951f457a0870b29b8476a37f23cc11930a26097c29313aad207667e6e04b07"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-06T13:14:36.963109+00:00",
+  "state": "succeeded",
+  "wall_seconds": 532.2240689424798
+}

@@ -1,0 +1,102 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "2"
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/diltcl_v3/DiLT-CL/01_code/run_class_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "2",
+    "--methods",
+    "supsup",
+    "--out",
+    "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-bias-acc",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "tinyimagenet",
+    "entries": {
+      "tiny-imagenet-200": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "23ec6c7f3e691eefba342ac8a46ab568c53f3a49a633caafcdd1e7c869de5835"
+  },
+  "ended_at": "2026-09-06T13:12:46.404891+00:00",
+  "execution_source_sha256": "6692ffd724d8283406f2b4f3d4748a59c20f414bbcb1166b2976c547f7b6f626",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-bias-acc",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__supsup",
+    "methods": "supsup",
+    "priority": "P1",
+    "purpose": "90%-train matched raw entropy versus score-bias-acc router",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 2
+  },
+  "log": "/root/autodl-tmp/runs_v3/p1_biasacc/logs/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 62435,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.json",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.json",
+      "sha256": "839e775441053e6bd51fc530f4ac4d3d99ecd288ebc125d221927db02f480a62"
+    },
+    {
+      "bytes": 8904,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.npz",
+      "sha256": "3af20aa61f994ce98537ed2580b408ec584ed8d8c0b93102128e1bd2c17fe049"
+    },
+    {
+      "bytes": 27406767,
+      "path": "/root/autodl-tmp/runs_v3/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/checkpoints/tinyimagenet/supsup/seed2.pt",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/checkpoints/tinyimagenet/supsup/seed2.pt",
+      "sha256": "991b32a71b601ca4399234f15bcf590ede3bba6262969e8e6cabf02a264d953b"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-09-06T12:54:51.395946+00:00",
+  "state": "succeeded",
+  "wall_seconds": 1074.9310864293948
+}

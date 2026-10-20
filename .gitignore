@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Experiment outputs, datasets, model weights and release archives
+# (not versioned; see README.md)
+runs/
+runs_*/
+data/
+data_cache/
+*.pt
+*.pth
+*.ckpt
+*.tar
+*.tar.gz
+
+# Files written by the quick check in README.md
+code/paired.csv
+code/paired_*.tex
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

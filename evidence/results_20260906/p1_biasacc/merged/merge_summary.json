@@ -1,0 +1,30 @@
+{
+  "merged_at": "2026-09-06T14:50:05.498478+00:00",
+  "run_dir": "/root/autodl-tmp/runs_v3/p1_biasacc",
+  "groups": {
+    "p1_class_entropy_biasacc": {
+      "json": "/root/autodl-tmp/runs_v3/p1_biasacc/merged/p1_class_entropy_biasacc.json",
+      "npz": "/root/autodl-tmp/runs_v3/p1_biasacc/merged/p1_class_entropy_biasacc.npz",
+      "inputs": 40,
+      "missing_jobs": 0,
+      "verification_status": "verified",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "methods": [
+        "packnet",
+        "supsup",
+        "wsn",
+        "diltcl"
+      ],
+      "benchmarks": [
+        "cifar",
+        "tinyimagenet"
+      ]
+    }
+  }
+}

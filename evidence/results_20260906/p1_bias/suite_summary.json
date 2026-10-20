@@ -1,0 +1,262 @@
+{
+  "failed_jobs": [],
+  "job_count": 40,
+  "job_granularity": "method",
+  "outcomes": [
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 720.1523616248742
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 720.193652709946
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 724.1359198912978
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1276.710062515922
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1275.1178592089564
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1273.3212185679004
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1271.9832503395155
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1272.812900543213
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 657.4472346138209
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 696.7278822753578
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 703.598263842985
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 473.97033970523626
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 469.99544603936374
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 477.23283218499273
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 472.5065257009119
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1334.693416734226
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1271.3007988091558
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1247.7323300717399
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1248.4190807100385
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1063.9496211698279
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1067.2669971436262
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1067.011233315803
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1066.3952340763062
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 263.6107511520386
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 260.03366055712104
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 249.328994050622
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 251.3367942944169
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 255.2404245212674
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 541.051997625269
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 526.9876679806039
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 534.044438675046
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 906.9752662768587
+    },
+    {
+      "job_id": "p1_class_entropy_bias__tinyimagenet__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 897.414578480646
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 503.0974565241486
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 496.1471876669675
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 495.0806470653042
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 361.72245990484953
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 330.0571180721745
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 346.09707383438945
+    },
+    {
+      "job_id": "p1_class_entropy_bias__cifar__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 319.6830485127866
+    }
+  ],
+  "profile": "p1",
+  "rerun_policy": "Successful jobs with matching SHA-256 are skipped. Failed or corrupt jobs are rerun under the same explicit seed/config; no seed is silently excluded.",
+  "scheduling": {
+    "by_cpu": 69,
+    "by_memory": 15,
+    "cpu_count": 208,
+    "gpu_memory_total_mib": 32607,
+    "gpu_memory_used_mib": 2,
+    "job_memory_mib": 2048,
+    "max_parallel": 8,
+    "rule": "auto=min(cpu//threads, free_vram//job_mem, 8)",
+    "threads_per_job": 3
+  },
+  "state": "completed",
+  "updated_at": "2026-09-06T04:40:27.105636+00:00"
+}

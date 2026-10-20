@@ -1,0 +1,262 @@
+{
+  "failed_jobs": [],
+  "job_count": 40,
+  "job_granularity": "method",
+  "outcomes": [
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 717.9558025086299
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 717.9582554316148
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 723.6781208589673
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1280.9954389901832
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1276.7720568357036
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1274.7307506557554
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1281.7289189305156
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1282.4548279661685
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 654.2385361082852
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 695.6011242382228
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 698.0325985783711
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 487.9997623646632
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 484.8160162670538
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 491.8766041463241
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 490.7105226619169
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1333.670805442147
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1274.673429406248
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1249.928755382076
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1256.234978958033
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1074.9310864293948
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1071.4173331987113
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1076.6128881825134
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1073.9020791435614
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 265.3156212484464
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 280.05432134494185
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 261.9360739979893
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 263.8687228253111
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 268.1788385445252
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 546.2191421398893
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 532.1145011754707
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 532.2240689424798
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 908.4271708745509
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 899.4106190307066
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 494.9738252190873
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 492.9990690825507
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 492.94975320622325
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 354.95526955928653
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 346.60493907518685
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 365.6957742013037
+    },
+    {
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 329.6865863269195
+    }
+  ],
+  "profile": "p1",
+  "rerun_policy": "Successful jobs with matching SHA-256 are skipped. Failed or corrupt jobs are rerun under the same explicit seed/config; no seed is silently excluded.",
+  "scheduling": {
+    "by_cpu": 69,
+    "by_memory": 15,
+    "cpu_count": 208,
+    "gpu_memory_total_mib": 32607,
+    "gpu_memory_used_mib": 2,
+    "job_memory_mib": 2048,
+    "max_parallel": 8,
+    "rule": "auto=min(cpu//threads, free_vram//job_mem, 8)",
+    "threads_per_job": 3
+  },
+  "state": "completed",
+  "updated_at": "2026-09-06T13:29:41.790943+00:00"
+}

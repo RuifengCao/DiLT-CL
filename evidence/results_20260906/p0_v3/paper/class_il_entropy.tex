@@ -1,0 +1,41 @@
+\begin{table}[t]
+\centering
+\caption{Class-incremental results on Split-CIFAR-100 (no task identity at test). Mean$\pm$std over 5 seeds. ACC is the macro average of per-task accuracies over the seen global class space; MicroACC is stored separately in the artifact. Shared-backbone methods use a fixed-full-head; isolation methods use a task-local head plus exhaustive router (local+router). ACC, BWT, Forgetting and LA are computed from the same prefix-candidate result matrix for both method families. Oracle-route accuracy (OracleACC) is the isolation subnetwork accuracy under the true route; TA is final task-routing accuracy; Cond. is pooled class accuracy conditioned on a correct route. Router criterion=entropy; calibration=none. Code=3.0.0/3.0.2; metric schema=3; verification status=verified. Stars are uncorrected exploratory paired tests of ACC vs.\ DER++ ($^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$); comparisons with fewer than five paired seeds receive no stars; best ACC bold.}
+\label{tab:classil_cifar}
+\begin{tabular}{lccccccc}
+\toprule
+Method & ACC & BWT & Forgetting & LA & OracleACC & TA & Cond. \\
+\midrule
+Finetune & $1.50\pm1.12$\,$^{***}$ & $-48.11\pm5.89$ & $48.12\pm5.89$ & $47.21\pm6.01$ & -- & -- & -- \\
+EWC & $3.75\pm0.26$\,$^{***}$ & $-76.56\pm1.13$ & $76.56\pm1.13$ & $76.48\pm1.13$ & -- & -- & -- \\
+LwF & $10.93\pm0.16$\,$^{***}$ & $-46.60\pm0.41$ & $46.65\pm0.42$ & $55.19\pm0.38$ & -- & -- & -- \\
+ER & $5.60\pm0.24$\,$^{***}$ & $-75.21\pm0.36$ & $75.21\pm0.36$ & $77.05\pm0.42$ & -- & -- & -- \\
+DER++ (ref.) & $7.59\pm0.56$ & $-76.06\pm0.44$ & $76.06\pm0.44$ & $79.85\pm0.48$ & -- & -- & -- \\
+PackNet & $12.93\pm0.11$\,$^{***}$ & $-18.32\pm0.51$ & $18.32\pm0.51$ & $30.34\pm0.47$ & $69.33\pm0.76$ & $13.56\pm0.14$ & $95.40\pm0.44$ \\
+SupSup & $18.42\pm0.40$\,$^{***}$ & $-17.46\pm1.47$ & $17.46\pm1.47$ & $35.01\pm1.29$ & $78.30\pm0.19$ & $18.91\pm0.47$ & $97.38\pm0.33$ \\
+WSN & $18.44\pm0.57$\,$^{***}$ & $-10.53\pm0.96$ & $10.53\pm0.96$ & $28.44\pm1.01$ & $79.84\pm0.44$ & $18.86\pm0.57$ & $97.73\pm0.24$ \\
+DiLT-CL & $\mathbf{19.30\pm0.34}$\,$^{***}$ & $-17.84\pm0.46$ & $17.84\pm0.46$ & $36.25\pm0.59$ & $78.26\pm0.39$ & $19.73\pm0.30$ & $97.79\pm0.39$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Class-incremental results on tinyimagenet (no task identity at test). Mean$\pm$std over 5 seeds. ACC is the macro average of per-task accuracies over the seen global class space; MicroACC is stored separately in the artifact. Shared-backbone methods use a fixed-full-head; isolation methods use a task-local head plus exhaustive router (local+router). ACC, BWT, Forgetting and LA are computed from the same prefix-candidate result matrix for both method families. Oracle-route accuracy (OracleACC) is the isolation subnetwork accuracy under the true route; TA is final task-routing accuracy; Cond. is pooled class accuracy conditioned on a correct route. Router criterion=entropy; calibration=none. Code=3.0.0/3.0.2; metric schema=3; verification status=verified. Stars are uncorrected exploratory paired tests of ACC vs.\ DER++ ($^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$); comparisons with fewer than five paired seeds receive no stars; best ACC bold.}
+\label{tab:classil_tinyimagenet}
+\begin{tabular}{lccccccc}
+\toprule
+Method & ACC & BWT & Forgetting & LA & OracleACC & TA & Cond. \\
+\midrule
+Finetune & $3.09\pm1.46$\,$^{*}$ & $-37.28\pm1.21$ & $37.28\pm1.21$ & $36.65\pm2.39$ & -- & -- & -- \\
+EWC & $3.12\pm1.00$\,$^{**}$ & $-33.05\pm3.53$ & $33.05\pm3.53$ & $32.87\pm3.91$ & -- & -- & -- \\
+LwF & $9.63\pm0.35$\,$^{***}$ & $-15.53\pm0.40$ & $15.53\pm0.40$ & $23.61\pm0.40$ & -- & -- & -- \\
+ER & $4.18\pm0.33$\,$^{***}$ & $-37.11\pm0.78$ & $37.11\pm0.78$ & $37.58\pm0.74$ & -- & -- & -- \\
+DER++ (ref.) & $5.54\pm0.09$ & $-42.88\pm1.09$ & $42.88\pm1.09$ & $44.14\pm0.93$ & -- & -- & -- \\
+PackNet & $6.49\pm0.14$\,$^{***}$ & $-4.72\pm0.44$ & $4.72\pm0.44$ & $10.74\pm0.47$ & $22.65\pm1.22$ & $12.46\pm0.26$ & $52.10\pm0.49$ \\
+SupSup & $\mathbf{14.89\pm0.43}$\,$^{***}$ & $-9.59\pm1.07$ & $9.59\pm1.07$ & $23.53\pm0.84$ & $42.70\pm0.29$ & $21.03\pm0.54$ & $70.83\pm0.70$ \\
+WSN & $12.36\pm0.36$\,$^{***}$ & $-4.88\pm0.31$ & $4.88\pm0.31$ & $16.76\pm0.59$ & $42.87\pm0.40$ & $17.40\pm0.33$ & $71.07\pm1.15$ \\
+DiLT-CL & $12.42\pm0.29$\,$^{***}$ & $-8.70\pm0.43$ & $8.70\pm0.43$ & $20.25\pm0.55$ & $38.59\pm0.21$ & $17.47\pm0.32$ & $71.12\pm0.60$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,40 @@
+{
+  "captured_at": "2026-09-06T12:25:07.440256+00:00",
+  "cpu_count": 208,
+  "environment_controls": {
+    "CUBLAS_WORKSPACE_CONFIG": null,
+    "CUDA_VISIBLE_DEVICES": null,
+    "MKL_NUM_THREADS": "25",
+    "OMP_NUM_THREADS": "25",
+    "PYTHONHASHSEED": null
+  },
+  "executable": "/root/miniconda3/bin/python",
+  "machine": "x86_64",
+  "nvidia_smi": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "0, NVIDIA GeForce RTX 5090, GPU-f3159e8f-7705-8206-17ba-28779ceec66d, 595.71.05, 32607 MiB"
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.1",
+    "torch": "2.12.1+cu130",
+    "torchvision": "0.27.1+cu130"
+  },
+  "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+  "processor": "x86_64",
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "torch_probe": {
+    "cuda_available": true,
+    "cuda_count": 1,
+    "cuda_version": "13.0",
+    "cudnn": 92000,
+    "devices": [
+      "NVIDIA GeForce RTX 5090"
+    ],
+    "ok": true,
+    "torch": "2.12.1+cu130"
+  },
+  "usable_cpu_count": 208
+}

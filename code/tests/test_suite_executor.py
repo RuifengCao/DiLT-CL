@@ -1,0 +1,310 @@
+"""Functional checks of ``run_suite.execute_jobs`` with stand-in child jobs.
+
+The scheduler is exercised for real -- thread pool, child processes, per-job
+logs, atomic status files, resume skipping, stop-on-error -- but each "job"
+is a tiny Python one-liner that writes the expected ``result.json`` /
+``result.npz`` pair (or fails on request), so the test needs neither torch nor
+datasets.
+"""
+
+import json
+import pathlib
+import sys
+import tempfile
+import unittest
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
+import run_suite as suite  # noqa: E402
+
+_CHILD = r'''
+import json, os, sys, time
+prefix, fail, delay = sys.argv[1], sys.argv[2] == "1", float(sys.argv[3])
+time.sleep(delay)
+print("child working on", prefix, flush=True)
+if fail:
+    sys.exit(3)
+os.makedirs(os.path.dirname(prefix), exist_ok=True)
+with open(prefix + ".json", "w") as f:
+    json.dump({"ok": True}, f)
+with open(prefix + ".npz", "wb") as f:
+    f.write(b"PK\x05\x06" + b"\0" * 18)   # empty zip: enough for an existence check
+'''
+
+
+def _fake_jobs():
+    return [
+        suite.Job(job_id=f"grp__cifar__seed0__{m}", priority="P0", purpose="t",
+                  runner="run_task_il.py", benchmark="cifar", seed=0,
+                  methods=m)
+        for m in ("finetune", "diltcl", "lwf", "ewc")
+    ]
+
+
+class ExecutorTests(unittest.TestCase):
+    def _run(self, run_dir, jobs, fail=(), max_parallel=2, stop_on_error=False,
+             force=False):
+        def fake_command(job, run_dir_, data_root, allow_download,
+                         save_checkpoints=True, execution_args=()):
+            prefix = run_dir_ / "artifacts" / job.job_id / "result"
+            delay = "0.3" if job.methods == "diltcl" else "0.05"
+            return ([sys.executable, "-c", _CHILD, str(prefix),
+                     "1" if job.methods in fail else "0", delay], prefix)
+
+        original = suite.command_for
+        suite.command_for = fake_command
+        try:
+            return suite.execute_jobs(
+                jobs, run_dir=run_dir, data_root=None, allow_download=False,
+                save_checkpoints=False, force=force,
+                execution_source_sha256="sha", dataset_identity={"mode": "none"},
+                execution_args=(), max_parallel=max_parallel, threads_per_job=1,
+                job_memory_mib=1, stop_on_error=stop_on_error, stream_logs=False,
+                launch_stagger_seconds=0.0)
+        finally:
+            suite.command_for = original
+
+    def test_parallel_execution_writes_logs_statuses_and_outputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp)
+            outcomes = self._run(run_dir, _fake_jobs())
+            self.assertEqual(sorted(o["state"] for o in outcomes),
+                             ["succeeded"] * 4)
+            for job in _fake_jobs():
+                status = json.loads(
+                    (run_dir / "statuses" / f"{job.job_id}.json").read_text())
+                self.assertEqual(status["state"], "succeeded")
+                self.assertEqual(status["returncode"], 0)
+                self.assertEqual(
+                    status["child_environment_controls"]["DILTCL_NUM_THREADS"],
+                    "1")
+                self.assertTrue(
+                    (run_dir / "artifacts" / job.job_id / "result.json").is_file())
+                log = pathlib.Path(status["log"]).read_text()
+                self.assertIn("child working on", log)
+            # Resume: a second run skips every validated job.
+            again = self._run(run_dir, _fake_jobs())
+            self.assertEqual({o["state"] for o in again}, {"skipped"})
+            # --force reruns them (attempt counter advances).
+            forced = self._run(run_dir, _fake_jobs(), force=True)
+            self.assertEqual({o["state"] for o in forced}, {"succeeded"})
+            self.assertEqual(len(list((run_dir / "logs").glob("*diltcl*.log"))), 2)
+
+    def test_failures_are_recorded_and_do_not_block_other_jobs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp)
+            outcomes = self._run(run_dir, _fake_jobs(), fail=("lwf",))
+            by_id = {o["job_id"]: o for o in outcomes}
+            self.assertEqual(by_id["grp__cifar__seed0__lwf"]["state"], "failed")
+            self.assertEqual(by_id["grp__cifar__seed0__lwf"]["returncode"], 3)
+            self.assertEqual(sum(o["state"] == "succeeded" for o in outcomes), 3)
+            status = json.loads(
+                (run_dir / "statuses" / "grp__cifar__seed0__lwf.json").read_text())
+            self.assertEqual(status["state"], "failed")
+            # A failed job is not "valid" for resume purposes.
+            self.assertFalse(suite.status_is_valid(
+                run_dir / "statuses" / "grp__cifar__seed0__lwf.json", "sha",
+                {"mode": "none"}))
+
+    def test_stop_on_error_stops_dispatching_new_jobs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp)
+            # Sequential so the ordering is deterministic: the slow DiLT-CL
+            # job is dispatched first (longest-first), then the failing one.
+            jobs = _fake_jobs()
+            outcomes = self._run(run_dir, jobs, fail=("diltcl",),
+                                 max_parallel=1, stop_on_error=True)
+            self.assertEqual(outcomes[0]["job_id"], "grp__cifar__seed0__diltcl")
+            self.assertEqual(outcomes[0]["state"], "failed")
+            self.assertEqual(len(outcomes), 1)
+
+    def test_gpu_headroom_guard_waits_only_while_jobs_run(self):
+        readings = [(31000, 32000), (31000, 32000), (10000, 32000)]
+        calls = []
+        original = suite.gpu_memory_mib
+        suite.gpu_memory_mib = lambda: (calls.append(1), readings[min(len(calls) - 1, 2)])[1]
+        try:
+            suite.wait_for_gpu_headroom(2048, running=1, poll_seconds=0.01)
+            self.assertEqual(len(calls), 3)          # waited twice, then enough
+            calls.clear()
+            suite.wait_for_gpu_headroom(2048, running=0, poll_seconds=0.01)
+            self.assertEqual(calls, [])              # nothing running: no wait
+            calls.clear()
+            suite.gpu_memory_mib = lambda: None      # no nvidia-smi: no wait
+            suite.wait_for_gpu_headroom(2048, running=3, poll_seconds=0.01)
+        finally:
+            suite.gpu_memory_mib = original
+        # An unrelated process hogging the GPU cannot stall the suite forever.
+        suite.gpu_memory_mib = lambda: (31000, 32000)
+        try:
+            started = __import__("time").perf_counter()
+            suite.wait_for_gpu_headroom(2048, running=1, poll_seconds=0.01,
+                                        max_wait_seconds=0.05)
+            self.assertLess(__import__("time").perf_counter() - started, 1.0)
+        finally:
+            suite.gpu_memory_mib = original
+
+    def _run_with_fingerprint(self, run_dir, jobs, data_root, sources=None,
+                              execution_sha="sha"):
+        fingerprint = suite.fingerprint_data_root(data_root, "metadata")
+        suite.archive_fingerprint(run_dir, fingerprint)
+
+        def fake_command(job, run_dir_, data_root_, allow_download,
+                         save_checkpoints=True, execution_args=()):
+            prefix = run_dir_ / "artifacts" / job.job_id / "result"
+            return ([sys.executable, "-c", _CHILD, str(prefix), "0", "0.01"], prefix)
+
+        original = suite.command_for
+        suite.command_for = fake_command
+        try:
+            return suite.execute_jobs(
+                jobs, run_dir=run_dir, data_root=data_root, allow_download=False,
+                save_checkpoints=False, force=False,
+                execution_source_sha256=execution_sha, execution_args=(),
+                max_parallel=2, threads_per_job=1, job_memory_mib=1,
+                stop_on_error=False, stream_logs=False, launch_stagger_seconds=0.0,
+                fingerprint=fingerprint, dataset_hash_mode="metadata",
+                accepted_sources=sources)
+        finally:
+            suite.command_for = original
+
+    def test_resume_survives_changes_to_other_benchmarks_data_and_acknowledged_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir, data_root = pathlib.Path(tmp) / "run", pathlib.Path(tmp) / "data"
+            run_dir.mkdir()
+            (data_root / "cifar-100-python").mkdir(parents=True)
+            (data_root / "cifar-100-python" / "train").write_bytes(b"c")
+            jobs = [suite.Job(job_id="g__cifar__seed0__finetune", priority="P0",
+                              purpose="t", runner="run_task_il.py", benchmark="cifar",
+                              seed=0, methods="finetune"),
+                    suite.Job(job_id="g__pmnist__seed0__finetune", priority="P0",
+                              purpose="t", runner="run_task_il.py", benchmark="pmnist",
+                              seed=0, methods="finetune")]
+            first = self._run_with_fingerprint(run_dir, jobs, data_root)
+            self.assertEqual({o["state"] for o in first}, {"succeeded"})
+            # Stage MNIST afterwards: only the Permuted-MNIST job reruns.
+            (data_root / "MNIST" / "raw").mkdir(parents=True)
+            (data_root / "MNIST" / "raw" / "train-images-idx3-ubyte").write_bytes(b"m")
+            second = {o["job_id"]: o["state"] for o in
+                      self._run_with_fingerprint(run_dir, jobs, data_root)}
+            self.assertEqual(second["g__cifar__seed0__finetune"], "skipped")
+            self.assertEqual(second["g__pmnist__seed0__finetune"], "succeeded")
+            # A code change without acknowledgement reruns everything; with
+            # the old hash acknowledged, finished jobs are kept.
+            third = {o["job_id"]: o["state"] for o in self._run_with_fingerprint(
+                run_dir, jobs, data_root, execution_sha="sha2", sources={"sha", "sha2"})}
+            self.assertEqual(set(third.values()), {"skipped"})
+            fourth = {o["job_id"]: o["state"] for o in self._run_with_fingerprint(
+                run_dir, jobs, data_root, execution_sha="sha3")}
+            self.assertEqual(set(fourth.values()), {"succeeded"})
+
+    def test_main_acknowledges_a_source_change_only_when_asked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            args = ["--profile", "smoke", "--dry-run", "--run-dir", str(run_dir),
+                    "--max-parallel", "1"]
+            self.assertEqual(suite.main(args), 0)
+            plan_path = run_dir / "plan.json"
+            plan = json.loads(plan_path.read_text())
+            current = plan["execution_source_sha256"]
+            plan["execution_source_sha256"] = "0" * 64      # pretend older code
+            plan_path.write_text(json.dumps(plan))
+            with self.assertRaises(SystemExit) as ctx:
+                suite.main(args)
+            self.assertIn("--accept-source-change", str(ctx.exception))
+            self.assertEqual(suite.main(args + ["--accept-source-change",
+                                                "validation fix"]), 0)
+            plan = json.loads(plan_path.read_text())
+            self.assertEqual(plan["execution_source_sha256"], current)
+            self.assertEqual(plan["source_change_acknowledgements"][0]["from"], "0" * 64)
+            self.assertEqual(plan["source_change_acknowledgements"][0]["reason"],
+                             "validation fix")
+            # A genuinely different plan is still refused.
+            with self.assertRaises(SystemExit) as ctx:
+                suite.main(args + ["--seeds", "0,1", "--accept-source-change", "x"])
+            self.assertIn("different plan", str(ctx.exception))
+
+    def test_invalidated_methods_rerun_only_their_jobs(self):
+        """Executor-level check of the v3.0.2 mechanism: after an acknowledged
+        change that invalidates supsup/wsn, only those jobs rerun."""
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            run_dir.mkdir()
+            jobs = [suite.Job(job_id=f"g__cifar__seed0__{m}", priority="P0", purpose="t",
+                              runner="run_task_il.py", benchmark="cifar", seed=0, methods=m)
+                    for m in ("finetune", "supsup", "wsn", "diltcl")]
+            first = self._run(run_dir, jobs)
+            self.assertEqual({o["state"] for o in first}, {"succeeded"})
+            plan = {"execution_source_sha256": "sha2",
+                    "source_change_acknowledgements": [
+                        {"from": "sha", "to": "sha2", "reason": "STE fix",
+                         "invalidated_methods": ["supsup", "wsn"]}]}
+
+            def fake_command(job, run_dir_, data_root, allow_download,
+                             save_checkpoints=True, execution_args=()):
+                prefix = run_dir_ / "artifacts" / job.job_id / "result"
+                return ([sys.executable, "-c", _CHILD, str(prefix), "0", "0.01"], prefix)
+
+            original = suite.command_for
+            suite.command_for = fake_command
+            try:
+                second = suite.execute_jobs(
+                    jobs, run_dir=run_dir, data_root=None, allow_download=False,
+                    save_checkpoints=False, force=False, execution_source_sha256="sha2",
+                    dataset_identity={"mode": "none"}, execution_args=(),
+                    max_parallel=2, threads_per_job=1, job_memory_mib=1,
+                    stop_on_error=False, stream_logs=False, launch_stagger_seconds=0.0,
+                    accepted_sources=suite.accepted_source_hashes(plan), plan=plan)
+            finally:
+                suite.command_for = original
+            states = {o["job_id"].split("__")[-1]: o["state"] for o in second}
+            self.assertEqual(states, {"finetune": "skipped", "diltcl": "skipped",
+                                      "supsup": "succeeded", "wsn": "succeeded"})
+            for m in ("supsup", "wsn"):
+                status = json.loads((run_dir / "statuses" / f"g__cifar__seed0__{m}.json").read_text())
+                self.assertEqual(status["execution_source_sha256"], "sha2")
+
+    def test_main_records_invalidated_methods_in_the_acknowledgement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            args = ["--profile", "smoke", "--dry-run", "--run-dir", str(run_dir),
+                    "--max-parallel", "1"]
+            self.assertEqual(suite.main(args), 0)
+            plan_path = run_dir / "plan.json"
+            plan = json.loads(plan_path.read_text())
+            plan["execution_source_sha256"] = "1" * 64
+            plan_path.write_text(json.dumps(plan))
+            with self.assertRaises(SystemExit) as ctx:
+                suite.main(args + ["--invalidate-methods", "supsup"])
+            self.assertIn("--accept-source-change", str(ctx.exception))
+            self.assertEqual(suite.main(args + ["--accept-source-change", "STE fix",
+                                                "--invalidate-methods", "supsup, wsn"]), 0)
+            record = json.loads(plan_path.read_text())["source_change_acknowledgements"][0]
+            self.assertEqual(record["invalidated_methods"], ["supsup", "wsn"])
+            self.assertEqual(record["from"], "1" * 64)
+
+    def test_only_groups_filters_the_plan(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            data_root = pathlib.Path(tmp) / "data"
+            data_root.mkdir()
+            base = ["--profile", "p1", "--seeds", "0", "--head-mode", "multi",
+                    "--dry-run", "--run-dir", str(run_dir), "--data-root",
+                    str(data_root), "--max-parallel", "1"]
+            self.assertEqual(suite.main(base + ["--only-groups", "p1_class_entropy_bias"]), 0)
+            plan = json.loads((run_dir / "plan.json").read_text())
+            ids = [r["job"]["job_id"] for r in plan["jobs"]]
+            self.assertEqual(len(ids), 8)
+            self.assertTrue(all(i.startswith("p1_class_entropy_bias__") for i in ids))
+            with self.assertRaises(SystemExit) as ctx:
+                suite.main(base + ["--only-groups", "nope", "--force-plan"])
+            self.assertIn("unknown groups", str(ctx.exception))
+
+    def test_dispatch_order_is_longest_first(self):
+        ordered = sorted(_fake_jobs(), key=suite.estimate_cost, reverse=True)
+        self.assertEqual(ordered[0].methods, "diltcl")
+        self.assertEqual(ordered[1].methods, "lwf")
+
+
+if __name__ == "__main__":
+    unittest.main()
