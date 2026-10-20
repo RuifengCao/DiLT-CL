@@ -28,6 +28,11 @@ routing would remove with the experts held fixed (class-IL artifacts only).
 it equals the task-IL accuracy of the same experts seed by seed, so it would
 duplicate the task-IL rows in the multiplicity family.
 
+Every requested comparison must be present: a comparator, method or seed
+missing from an input is an error (``--allow-missing`` records it instead),
+because silently dropping one would shrink the Holm family and make the
+adjusted p-values smaller.
+
 Two families are adjusted separately (Holm within each):
 
 * ``main`` -- the reference method (DiLT-CL) against each comparator: task-IL
@@ -113,9 +118,15 @@ def min_detectable_difference(sd: float, n: int, alpha: float = 0.05,
         lower = 0.0 if not np.isfinite(lower) else lower
         return stats.nct.sf(t_crit, df, nc) + lower - power
 
-    # Bracket the noncentrality: the required value is about 4.4 for n = 5
-    # and 3.0 for n = 10 at 80% power, well inside [0, 10].
-    nc = optimize.brentq(achieved, 1e-9, 10.0)
+    # Bracket the noncentrality: the required value is 3.76 for n = 5, 3.15
+    # for n = 10 and 5.65 for n = 3 at 80% power; widen the bracket for very
+    # small n, and report NaN if 80% power is out of reach.
+    upper = 10.0
+    while achieved(upper) < 0:
+        upper *= 4.0
+        if upper > 1e4:
+            return float("nan")
+    nc = optimize.brentq(achieved, 1e-9, upper)
     return float(nc * sd / math.sqrt(n))
 
 
@@ -132,11 +143,19 @@ def holm(pvalues: list[float | None]) -> list[float | None]:
     return adjusted
 
 
+class MissingComparison(ValueError):
+    """A requested comparison, method or seed is absent from an input."""
+
+
 def compare(payload: dict, benchmark: str, metric: str, reference: str,
-            comparator: str) -> dict:
+            comparator: str, allow_missing: bool = False) -> dict:
     ref = per_seed_values(payload, benchmark, reference, metric)
     cmp_ = per_seed_values(payload, benchmark, comparator, metric)
     seeds = sorted(set(ref) & set(cmp_))
+    expected = sorted(int(s) for s in payload["seeds"])
+    if seeds != expected and not allow_missing:
+        raise MissingComparison(f"{benchmark}/{metric} {reference} vs {comparator}: aligned seeds "
+                                f"{seeds} instead of {expected}")
     diffs = np.array([ref[s] - cmp_[s] for s in seeds], dtype=np.float64)
     n = diffs.size
     mean = float(diffs.mean())
@@ -202,33 +221,45 @@ def _adjust(rows: list[dict]) -> None:
             r["paired_t_p_holm"] = ta
             r["sign_flip_p_holm"] = sa
             r["family_size"] = len(members)
+            # Comparisons with an undefined p (zero variance) are not tested.
+            r["holm_tests"] = sum(m["paired_t_p"] is not None for m in members)
 
 
 def build(task_il: dict | None, class_il: dict | None, reference: str,
           comparators_task: list[str], comparators_class: list[str],
           class_metrics=CLASS_METRICS, calibrated: list[dict] | None = None,
-          calibrated_methods=ISOLATION + ("diltcl",)) -> list[dict]:
-    rows = []
+          calibrated_methods=ISOLATION + ("diltcl",), allow_missing: bool = False) -> list[dict]:
+    rows, missing = [], []
+
+    def present(payload, b, *methods):
+        absent = [m for m in methods if m not in payload["per_seed"].get(b, {})]
+        if absent:
+            missing.append(f"{b}: {', '.join(absent)} missing")
+        return not absent
+
     if task_il is not None:
         for b in task_il["benchmarks"]:
             for c in comparators_task:
-                if c in task_il["per_seed"][b] and reference in task_il["per_seed"][b]:
+                if present(task_il, b, c, reference):
                     rows.append({"family": "main", "protocol": "task-IL",
-                                 **compare(task_il, b, "ACC", reference, c)})
+                                 **compare(task_il, b, "ACC", reference, c, allow_missing)})
     if class_il is not None:
         for b in class_il["benchmarks"]:
             for metric in class_metrics:
                 for c in comparators_class:
-                    if c in class_il["per_seed"][b] and reference in class_il["per_seed"][b]:
+                    if present(class_il, b, c, reference):
                         rows.append({"family": "main", "protocol": "class-IL",
-                                     **compare(class_il, b, metric, reference, c)})
+                                     **compare(class_il, b, metric, reference, c, allow_missing)})
     for payload in calibrated or []:
         for b in payload["benchmarks"]:
             for metric in ("TA", "ACC"):
                 for m in calibrated_methods:
-                    if m in payload["per_seed"][b]:
+                    if present(payload, b, m):
                         rows.append({"family": "calibration", "protocol": "class-IL",
                                      **compare_router(payload, b, metric, m)})
+    if missing and not allow_missing:
+        raise MissingComparison("requested comparisons are missing from the inputs: "
+                                + "; ".join(sorted(set(missing))))
     _adjust(rows)
     return rows
 
@@ -242,7 +273,24 @@ def _fmt(p, tex=True):
 
 
 def _signed(x: float) -> str:
+    if x is None or not np.isfinite(x):
+        return "--"
     return f"${x:+.2f}$".replace("+", "{+}").replace("-", "{-}")
+
+
+def _num(x: float, fmt: str = ".2f") -> str:
+    return "--" if x is None or not np.isfinite(x) else format(x, fmt)
+
+
+def _sign_flip_floor(n_seeds: list[int]) -> str:
+    """Caption sentence on the smallest attainable sign-flip p-value."""
+    if len(n_seeds) != 1:
+        return "The exact sign-flip test cannot fall below $p=2/2^n$ with $n$ seeds; "
+    n = n_seeds[0]
+    words = {3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight",
+             9: "nine", 10: "ten"}
+    return (f"With {words.get(n, str(n))} seeds the exact sign-flip test cannot fall below "
+            f"$p={2 / 2 ** n:.4g}$; ")
 
 
 def write_tex(rows: list[dict], path: Path) -> None:
@@ -279,8 +327,8 @@ def write_tex(rows: list[dict], path: Path) -> None:
             f"{r['protocol']} & {BENCH.get(r['benchmark'], r['benchmark'])} & {metric} & "
             f"{LABEL.get(r['comparator'], r['comparator'])} & {_signed(r['mean_difference'])} & "
             f"[{_signed(r['ci95_low'])}, {_signed(r['ci95_high'])}] & {_fmt(r['paired_t_p_holm'])} & "
-            f"{r['sign_flip_p']:.4f} ({r['positive_seeds']}/{r['negative_seeds']}) & "
-            f"{r['min_detectable_difference_80pct']:.2f} \\\\")
+            f"{_num(r['sign_flip_p'], '.4f')} ({r['positive_seeds']}/{r['negative_seeds']}) & "
+            f"{_num(r['min_detectable_difference_80pct'])} \\\\")
     lines += ["\\bottomrule", "\\end{tabular}", "\\end{table}", ""]
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -309,7 +357,7 @@ def write_compact_tex(rows: list[dict], path: Path,
          f"with unadjusted two-sided 95\\% Student-$t$ intervals over {'/'.join(map(str, n_seeds))} aligned seeds. "
          "$^{*}$: Holm-adjusted paired-$t$ $p<0.05$ within the family of "
          f"{family} comparisons in this table; an unadjusted interval can exclude zero without a star. "
-         "With five seeds the exact sign-flip test cannot fall below $p=0.0625$; "
+         + _sign_flip_floor(n_seeds) +
          "Table~\\ref{tab:paired-full} reports it with the minimum detectable difference. "
          "$\\rho$: recoverable-error fraction (Equation~\\eqref{eq:partition}).}"),
         "\\label{tab:paired}",
@@ -390,17 +438,25 @@ def parse_args(argv=None):
     p.add_argument("--out-compact-tex", type=Path, default=None, help="Compact main-text table.")
     p.add_argument("--out-calibration-tex", type=Path, default=None,
                    help="Calibration-family table (exploratory).")
+    p.add_argument("--allow-missing", action="store_true",
+                   help="Skip comparisons whose methods or seeds are missing instead of "
+                        "failing (the Holm families then shrink).")
     return p.parse_args(argv)
 
 
 def main(argv=None) -> int:
     args = parse_args(argv)
     load = lambda path: None if path is None else json.loads(path.read_text(encoding="utf-8"))  # noqa: E731
-    rows = build(load(args.task_il), load(args.class_il), args.reference,
-                 [m for m in args.task_comparators.split(",") if m],
-                 [m for m in args.class_comparators.split(",") if m],
-                 class_metrics=tuple(m for m in args.class_metrics.split(",") if m),
-                 calibrated=[load(p) for p in (args.calibrated or [])])
+    try:
+        rows = build(load(args.task_il), load(args.class_il), args.reference,
+                     [m for m in args.task_comparators.split(",") if m],
+                     [m for m in args.class_comparators.split(",") if m],
+                     class_metrics=tuple(m for m in args.class_metrics.split(",") if m),
+                     calibrated=[load(p) for p in (args.calibrated or [])],
+                     allow_missing=args.allow_missing)
+    except MissingComparison as exc:
+        print(f"paired_stats: {exc}")
+        return 2
     if args.out_json:
         args.out_json.write_text(json.dumps(rows, indent=2), encoding="utf-8")
     if args.out_csv:
@@ -409,7 +465,7 @@ def main(argv=None) -> int:
             # ``method`` column that the main-family rows do not have.
             fields = []
             for row in rows:
-                fields += [k for k in row if k != "seeds" and k not in fields]
+                fields += [k for k in row if k not in ("seeds", "holm_tests") and k not in fields]
             writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(rows)
@@ -427,7 +483,11 @@ def main(argv=None) -> int:
               f"n={r['n_seeds']} +{r['positive_seeds']}/-{r['negative_seeds']} "
               f"p_t={_fmt(r['paired_t_p'], False)} (Holm {_fmt(r['paired_t_p_holm'], False)}) "
               f"p_sf={_fmt(r['sign_flip_p'], False)} (Holm {_fmt(r['sign_flip_p_holm'], False)}) "
-              f"MDD={r['min_detectable_difference_80pct']:.2f}")
+              f"MDD={_num(r['min_detectable_difference_80pct'])}")
+    families = {}
+    for r in rows:
+        families[r["family"]] = families.get(r["family"], 0) + 1
+    print("families: " + ", ".join(f"{k} {v} comparisons" for k, v in sorted(families.items())))
     return 0
 
 

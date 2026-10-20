@@ -325,7 +325,11 @@ def test_runner_persists_verifiable_predictions(calibration):
         assert len(entries) == 1 and entries[0]["errors"] == []
         if calibration != "none":
             assert entries[0]["stored_router"]["route_agreement"] == 1.0
+            assert entries[0]["stored_router"]["errors"] == []
             assert entries[0]["refit"]["route_agreement"] == 1.0
+            # Fitting accuracies of every stored prefix router are reproduced.
+            fit = entries[0]["fit_accuracy_check"]
+            assert fit["stages_checked"] == len(record["prefix_models"]) and fit["errors"] == []
         # Tampering with the file is detected through its recorded hash.
         with path.open("ab") as handle:
             handle.write(b"\0")
@@ -366,3 +370,166 @@ def test_checkpoints_reevaluate_bit_identically(calibration):
                                          methods=("wsn",), setup_fn=_fake_isolation_setup())
         assert any("SHA-256" in e for e in entries[0]["errors"])
         assert any("content" in e for e in entries[0]["errors"])
+
+
+def test_reevaluation_fails_on_any_difference_in_exact_mode():
+    """Exact mode: one changed decision, a NaN, or a missing file is an error."""
+    evaluator = _load("evaluate_checkpoints_strict_test", ROOT / "tools" / "evaluate_checkpoints.py")
+    with tempfile.TemporaryDirectory() as tmp:
+        out = pathlib.Path(tmp) / "job" / "result"
+        out.parent.mkdir()
+        _run_runner(str(out), str(out.parent / "predictions"), ("wsn",),
+                    checkpoint_dir=str(out.parent / "checkpoints"))
+        result_json = out.with_suffix(".json")
+        payload = json.loads(result_json.read_text())
+        record = payload["calibration"]["cifar"]["wsn"]["0"]
+        ppath = out.parent / record["predictions"]["relative_path"]
+        # 1. One per-example decision changed; the artifact's hash is updated so
+        #    that only the decision itself differs.
+        with np.load(ppath, allow_pickle=False) as archive:
+            arrays = {k: np.asarray(archive[k]) for k in archive.files}
+        route = arrays["route_by_stage"].copy()
+        row = int(np.flatnonzero(route[:, -1] >= 0)[0])
+        route[row, -1] = (route[row, -1] + 1) % route.shape[1]
+        arrays["route_by_stage"] = route
+        np.savez(ppath, **arrays)
+        record["predictions"]["sha256"] = hashlib.sha256(ppath.read_bytes()).hexdigest()
+        result_json.write_text(json.dumps(payload))
+        entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+                                         setup_fn=_fake_isolation_setup())
+        assert any("route_by_stage: 1 per-example" in e for e in entries[0]["errors"])
+        tolerant = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+                                          atol=0.05, setup_fn=_fake_isolation_setup())
+        assert tolerant[0]["errors"] == [] and not tolerant[0]["exact"]
+        assert tolerant[0]["per_example_differences"] == {"route_by_stage": 1}
+        # 2. A referenced predictions file that is missing is an error, not a skip.
+        ppath.unlink()
+        entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+                                         setup_fn=_fake_isolation_setup())
+        assert any("missing" in e for e in entries[0]["errors"])
+        # 3. A NaN in the artifact never passes, whatever the tolerance.
+        with np.load(f"{out}.npz", allow_pickle=False) as archive:
+            matrices = {k: np.asarray(archive[k]) for k in archive.files}
+        matrices["cifar/wsn/seed0/task_inference"] = matrices["cifar/wsn/seed0/task_inference"].copy()
+        matrices["cifar/wsn/seed0/task_inference"][0, 0] = np.nan
+        np.savez(f"{out}.npz", **matrices)
+        del record["predictions"]
+        result_json.write_text(json.dumps(payload))
+        for atol in (0.0, 100.0):
+            entries = evaluator.evaluate_job(result_json, device="cpu", methods=("wsn",),
+                                             atol=atol, setup_fn=_fake_isolation_setup())
+            assert any("non-finite" in e for e in entries[0]["errors"])
+
+
+def test_shard_reports_must_cover_every_class_il_job(tmp_path):
+    evaluator = _load("evaluate_checkpoints_combine_test", ROOT / "tools" / "evaluate_checkpoints.py")
+    run = tmp_path / "run"
+    jobs = [str((run / "artifacts" / f"job{i}" / "result.json").resolve()) for i in range(3)]
+
+    def shard(spec, results, methods=evaluator.ISOLATION):
+        entry = {"job": "x", "benchmark": "cifar", "method": "wsn", "seed": 0, "errors": [],
+                 "exact": True}
+        return {"run_dir": str(run.resolve()), "shard": spec, "methods": list(methods),
+                "results": results, "run_results": jobs,
+                "checkpoints_evaluated": len(results), "entries": [entry] * len(results)}
+
+    def combine(reports):
+        paths = []
+        for i, report in enumerate(reports):
+            path = tmp_path / f"r{i}.json"
+            path.write_text(json.dumps(report))
+            paths.append(path)
+        return evaluator.combine(paths, tmp_path / "combined.json")
+
+    assert combine([shard("0/2", jobs[0::2]), shard("1/2", jobs[1::2])]) == 0
+    assert json.loads((tmp_path / "combined.json").read_text())["status"] == "identical"
+    assert combine([shard("0/2", jobs[0::2])]) == 1                       # shard 1 missing
+    assert combine([shard("0/2", jobs[0:1]), shard("1/2", jobs[1::2])]) == 1   # job2 missing
+    assert combine([shard("0/2", jobs[0::2]),
+                    shard("1/2", jobs[1::2], methods=("wsn",))]) == 1      # a method skipped
+
+
+def test_structural_checks_reject_malformed_recordings():
+    T, C, per_task = 4, 3, (7, 5, 9, 6)
+    arrays = _synthetic(T=T, C=C, per_task=per_task)
+    meta = {"num_tasks": T, "classes_per_task": C}
+    assert rp.structural_errors(arrays, meta, list(per_task)) == []
+
+    def broken(mutate):
+        copy = {k: v.copy() for k, v in arrays.items()}
+        mutate(copy)
+        return rp.structural_errors(copy, meta, list(per_task))
+
+    first_of_task1 = int(np.flatnonzero(arrays["true_task"] == 1)[0])
+    assert any("outside the candidates" in e
+               for e in broken(lambda a: a["route_by_stage"].__setitem__((0, 0), 3)))
+    assert any("before the task arrived" in e
+               for e in broken(lambda a: a["route_by_stage"].__setitem__((first_of_task1, 0), 0)))
+    assert any("non-finite" in e
+               for e in broken(lambda a: a["scores"].__setitem__((0, 1), np.nan)))
+    assert any("counts" in e for e in rp.structural_errors(arrays, meta, [7, 5, 9, 7]))
+    raw = dict(arrays)
+    raw.update({f"raw_{k}": v.copy() for k, v in arrays.items()})
+    assert rp.structural_errors(raw, meta, list(per_task)) == []
+    raw["raw_scores"][0, 0] += 1.0
+    errors = rp.structural_errors(raw, meta, list(per_task))
+    assert any("raw_scores differs" in e for e in errors)
+
+
+def _linear_routes(scores, true_task, models):
+    T = scores.shape[1]
+    routes = np.full(scores.shape, -1, np.int16)
+    ties = np.zeros(scores.shape, bool)
+    for s, state in enumerate(models):
+        rows = true_task <= s
+        x = scores[rows, :s + 1]
+        d = ((x - np.asarray(state["feature_mean"], np.float32))
+             / np.asarray(state["feature_scale"], np.float32)) \
+            @ np.asarray(state["coef"], np.float32).T + np.asarray(state["intercept"], np.float32)
+        win = d == d.max(axis=1, keepdims=True)
+        routes[rows, s] = np.where(win, np.arange(s + 1)[None, :], T).min(axis=1)
+        ties[rows, s] = win.sum(axis=1) > 1
+    return routes, ties
+
+
+def test_stored_bias_routers_must_match_exactly():
+    rng = np.random.default_rng(3)
+    T, N = 3, 45
+    true_task = np.repeat(np.arange(T), N // T).astype(np.int16)
+    scores = rng.normal(size=(N, T)).astype(np.float32)
+    models = [{"classes": list(range(s + 1)), "feature_mean": [0.0] * (s + 1),
+               "feature_scale": [1.0] * (s + 1),
+               "coef": (-1.7 * np.eye(s + 1)).tolist(),
+               "intercept": rng.normal(size=s + 1).tolist()} for s in range(T)]
+    routes, ties = _linear_routes(scores, true_task, models)
+    arrays = {"true_task": true_task, "scores": scores, "route_by_stage": routes,
+              "tie_by_stage": ties}
+    record = {"kind": "score-bias", "prefix_models": models}
+    out = rp.stored_router_agreement(arrays, record)
+    assert out["route_agreement"] == 1.0 and out["errors"] == []
+    routes = routes.copy()
+    routes[-1, -1] = (routes[-1, -1] + 1) % T
+    out = rp.stored_router_agreement({**arrays, "route_by_stage": routes}, record)
+    assert out["disagreements"] == 1 and out["errors"]
+
+
+def test_logistic_router_accepts_only_float32_near_ties():
+    # Two candidates whose decisions tie exactly: the recorded route may be
+    # either (GPU summation order), so a disagreement there is a near-tie.
+    scores = np.array([[0.5, 0.5], [0.0, 3.0]], dtype=np.float32)
+    true_task = np.array([1, 1], dtype=np.int16)
+    model0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[1.0]], "intercept": [0.0]}
+    model1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[1.0, 0.0], [0.0, 1.0]], "intercept": [0.0, 0.0]}
+    record = {"kind": "score-logreg", "prefix_models": [model0, model1]}
+    routes = np.array([[-1, 1], [-1, 1]], dtype=np.int16)      # row 0: tie, recorded 1
+    out = rp.stored_router_agreement({"true_task": true_task, "scores": scores,
+                                      "route_by_stage": routes}, record)
+    assert out["disagreements"] == 1 and out["near_tie_disagreements"] == 1
+    assert out["errors"] == []
+    routes = np.array([[-1, 0], [-1, 0]], dtype=np.int16)      # row 1: clear winner is 1
+    out = rp.stored_router_agreement({"true_task": true_task, "scores": scores,
+                                      "route_by_stage": routes}, record)
+    assert out["disagreements"] == 1 and out["near_tie_disagreements"] == 0
+    assert out["errors"]

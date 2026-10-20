@@ -17,6 +17,8 @@ any number of run directories into a single, self-describing package:
                  source_manifests/, environments/, dataset_fingerprints/
                  (tree hashes only)
       <run_name>/paper/*, figures/*  tables, figures, storage, timing
+      <run_name>/audit/*             reports of the regeneration audit and the
+                                     checkpoint re-evaluation, if present
       <run_name>/statuses/*.json     per-job status (small; optional --no-statuses)
 
 Per-job ``artifacts/`` (result JSON/NPZ per job) and checkpoints are *not*
@@ -119,7 +121,7 @@ def collect_run(run_dir: Path, dest: Path, include_artifacts: bool,
             version = payload.get("code_version")
             if version and version not in summary["code_versions"]:
                 summary["code_versions"].append(version)
-    for folder in ("paper", "figures"):      # P0 writes paper/, P1 runs write figures/
+    for folder in ("paper", "figures", "audit"):  # P0 writes paper/, P1 runs write figures/
         if (run_dir / folder).is_dir():
             for path in sorted((run_dir / folder).rglob("*")):
                 if path.is_file():

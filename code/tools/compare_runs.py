@@ -15,10 +15,19 @@ both, compares
   auxiliary matrices), exactly;
 * every per-seed metric in the JSON, exactly.
 
-Seeds present only in the candidate are listed as new. Group identity (the
-protocol, router, calibration settings and full configuration) must agree,
-and the recorded software/hardware environments are compared so that any
-difference can be traced to its cause.
+It also compares the SHA-256 and byte count of the persisted state *files*
+(``sha256`` / ``serialized_bytes`` of the same records) and reports how many
+files are byte-identical; equal content hashes with different file hashes
+would mean the same tensors serialized differently.
+
+The audit is complete only when the candidate covers the reference: every
+reference group must be present (``--groups`` restricts the audit to named
+groups), every reference ``(benchmark, method, seed)`` must be present in the
+candidate, every merged JSON must have its NPZ, and both sides must record a
+state hash for every run. Seeds present only in the candidate are listed as
+new. Group identity (the protocol, router, calibration settings and full
+configuration) must agree, and the recorded software/hardware environments
+are compared so that any difference can be traced to its cause.
 
 ``--pair REF.json CAND.json --states-only`` compares two differently named
 groups that train the same experts with different routers (for example the
@@ -26,7 +35,14 @@ score-logreg, score-bias and score-bias-acc groups, which all train on the
 same 90% split): only the trained-state hashes are then compared, which is how
 independent trainings of the same experts are shown to agree bit for bit.
 
-Torch-free (NumPy only). Exit status 0 when every shared run is identical.
+When run directories (not only merged folders) are given on both sides, the
+per-job status records are compared too: the dataset content hashes each job
+read and the launch controls it ran with (``CUBLAS_WORKSPACE_CONFIG``, thread
+counts, ``PYTHONHASHSEED``). These are reported, not part of the verdict.
+
+Torch-free (NumPy only). Exit status 0 only when the audit is complete and
+every compared run is identical (status ``identical``); otherwise the status
+is ``differences`` or ``incomplete`` and the exit status is 1.
 
 Examples::
 
@@ -51,13 +67,24 @@ ENVIRONMENT_FIELDS = ("python_version", "numpy_version", "pytorch_version", "dev
                       "cuda_version", "cudnn_version", "platform")
 
 
-def merged_groups(paths: list[Path]) -> dict[str, Path]:
-    """Map group name -> merged JSON path over one or more merged directories."""
+def merged_groups(paths: list[Path], unpaired: list[str] | None = None) -> dict[str, Path]:
+    """Map group name -> merged JSON path over one or more merged directories.
+
+    A group JSON without its NPZ cannot be audited; its path is appended to
+    ``unpaired`` (which makes the audit incomplete) instead of being skipped
+    silently.
+    """
     groups: dict[str, Path] = {}
     for path in paths:
         directory = path / "merged" if (path / "merged").is_dir() else path
+        if not directory.is_dir():
+            raise SystemExit(f"not a directory: {directory}")
         for json_path in sorted(directory.glob("*.json")):
-            if json_path.name == "merge_summary.json" or not json_path.with_suffix(".npz").is_file():
+            if json_path.name == "merge_summary.json":
+                continue
+            if not json_path.with_suffix(".npz").is_file():
+                if unpaired is not None:
+                    unpaired.append(str(json_path))
                 continue
             if json_path.stem in groups:
                 raise SystemExit(f"group {json_path.stem} appears twice: "
@@ -66,12 +93,71 @@ def merged_groups(paths: list[Path]) -> dict[str, Path]:
     return groups
 
 
-def state_hash(payload: dict, benchmark: str, method: str, seed: int) -> str | None:
+LAUNCH_KEYS = ("CUBLAS_WORKSPACE_CONFIG", "OMP_NUM_THREADS", "DILTCL_NUM_THREADS",
+               "PYTHONHASHSEED", "CUDA_VISIBLE_DEVICES")
+
+
+def run_statuses(paths: list[Path]) -> dict[str, dict]:
+    """Job id -> status record, for every run directory among ``paths``."""
+    out: dict[str, dict] = {}
+    for path in paths:
+        run = path if (path / "merged").is_dir() else path.parent
+        statuses = run / "statuses"
+        if not statuses.is_dir():
+            continue
+        for status_path in sorted(statuses.glob("*.json")):
+            try:
+                out[status_path.stem] = json.loads(status_path.read_text(encoding="utf-8"))
+            except ValueError:
+                continue
+    return out
+
+
+def compare_launch(ref_status: dict, cand_status: dict, groups: set[str]) -> dict:
+    """Same data and same launch controls, job by job (reported, not a verdict)."""
+    report = {"jobs_compared": 0, "jobs_without_candidate_status": [],
+              "dataset_differences": [], "launch_differences": [],
+              "cache_dir_differences": 0}
+    for job_id, ref in sorted(ref_status.items()):
+        if job_id.split("__")[0] not in groups or ref.get("job", {}).get("repeat_of"):
+            continue
+        cand = cand_status.get(job_id)
+        if cand is None:
+            report["jobs_without_candidate_status"].append(job_id)
+            continue
+        report["jobs_compared"] += 1
+        if ((ref.get("dataset_identity") or {}).get("entries")
+                != (cand.get("dataset_identity") or {}).get("entries")):
+            report["dataset_differences"].append(job_id)
+        rc = ref.get("child_environment_controls") or {}
+        cc = cand.get("child_environment_controls") or {}
+        keys = [k for k in LAUNCH_KEYS if rc.get(k) != cc.get(k)]
+        if keys:
+            report["launch_differences"].append({"job": job_id, "keys": keys})
+        if rc.get("DILTCL_CACHE_DIR") != cc.get("DILTCL_CACHE_DIR"):
+            report["cache_dir_differences"] += 1
+    return report
+
+
+def state_record(payload: dict, benchmark: str, method: str, seed: int) -> dict:
+    """The persisted-state record of one run (class-IL or task-IL layout)."""
     record = (payload.get("per_seed_run_records", {}).get(benchmark, {})
               .get(method, {}).get(str(seed), {}))
     if "trained_state" in record:
-        return record["trained_state"].get("content_sha256")
-    return record.get("method_extras", {}).get("checkpoint", {}).get("content_sha256")
+        return record["trained_state"] or {}
+    return record.get("method_extras", {}).get("checkpoint", {}) or {}
+
+
+def state_hash(payload: dict, benchmark: str, method: str, seed: int) -> str | None:
+    return state_record(payload, benchmark, method, seed).get("content_sha256")
+
+
+def state_file(payload: dict, benchmark: str, method: str, seed: int):
+    """``(sha256, serialized_bytes)`` of the persisted state file, if recorded."""
+    record = state_record(payload, benchmark, method, seed)
+    if not record.get("sha256"):
+        return None
+    return record.get("sha256"), record.get("serialized_bytes")
 
 
 def seed_metrics(payload: dict, benchmark: str, method: str, seed: int) -> dict:
@@ -123,6 +209,8 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
                     run = {"run": f"{benchmark}/{method}/seed{seed}"}
                     a, b = state_hash(ref, benchmark, method, seed), state_hash(cand, benchmark, method, seed)
                     run["state_identical"] = (a == b) if (a and b) else None
+                    fa, fb = state_file(ref, benchmark, method, seed), state_file(cand, benchmark, method, seed)
+                    run["file_identical"] = (fa == fb) if (fa and fb) else None
                     rk, ck = run_keys(rz, benchmark, method, seed), run_keys(cz, benchmark, method, seed)
                     run["array_keys_match"] = rk == ck
                     diffs = {}
@@ -144,7 +232,9 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
                         run["identical"] = run["state_identical"] is True
                         out["runs"].append(run)
                         continue
-                    run["identical"] = bool(run["state_identical"] is not False
+                    # A run without a state hash on either side cannot show that
+                    # the experts were regenerated, so it never counts as identical.
+                    run["identical"] = bool(run["state_identical"] is True
                                             and run["outputs_identical"])
                     out["runs"].append(run)
     runs = out["runs"]
@@ -159,6 +249,9 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
         # evaluation, a different router, or different data -- never benign.
         "same_state_different_outputs": [r["run"] for r in runs
                                          if r["state_identical"] and r["outputs_identical"] is False],
+        "file_identical": sum(r.get("file_identical") is True for r in runs),
+        "file_hash_unavailable": sum(r.get("file_identical") is None for r in runs),
+        "file_different": [r["run"] for r in runs if r.get("file_identical") is False],
         "new": len(out["new_runs"]), "missing_in_candidate": len(out["missing_in_candidate"]),
     }
     return out
@@ -176,33 +269,69 @@ def parse_args(argv=None):
                    help="Compare two merged JSON files directly (repeatable).")
     p.add_argument("--states-only", action="store_true",
                    help="Compare only trained-state hashes (groups with different routers).")
+    p.add_argument("--groups", nargs="+", default=None, metavar="GROUP",
+                   help="Audit only these groups (each must exist in both runs); "
+                        "default: every group of the reference.")
     p.add_argument("--out", type=Path, default=None, help="Write a JSON report.")
     return p.parse_args(argv)
 
 
 def main(argv=None) -> int:
     args = parse_args(argv)
+    unpaired: list[str] = []
+    missing_groups: list[str] = []
     if args.pair:
-        if args.reference or args.candidate:
-            raise SystemExit("use either --pair or --reference/--candidate")
+        if args.reference or args.candidate or args.groups:
+            raise SystemExit("use either --pair or --reference/--candidate[/--groups]")
         ref_groups, cand_groups = {}, {}
+        for a, b in args.pair:
+            for path in (a, b):
+                if not path.with_suffix(".npz").is_file():
+                    unpaired.append(str(path))
+        if unpaired:
+            raise SystemExit(f"merged JSON without its NPZ: {unpaired}")
         groups = [compare_group(f"{a.stem} vs {b.stem}", a, b, args.states_only)
                   for a, b in args.pair]
     else:
         if not (args.reference and args.candidate):
             raise SystemExit("--reference and --candidate are both required")
-        ref_groups, cand_groups = merged_groups(args.reference), merged_groups(args.candidate)
-        shared = sorted(set(ref_groups) & set(cand_groups))
+        ref_groups = merged_groups(args.reference, unpaired)
+        cand_groups = merged_groups(args.candidate, unpaired)
+        wanted = sorted(args.groups) if args.groups else sorted(ref_groups)
+        unknown = [g for g in wanted if g not in ref_groups]
+        if unknown:
+            raise SystemExit(f"--groups not in the reference: {unknown}")
+        missing_groups = [g for g in wanted if g not in cand_groups]
+        shared = [g for g in wanted if g in cand_groups]
         if not shared:
-            raise SystemExit("no group appears in both the reference and the candidate")
+            raise SystemExit("no reference group appears in the candidate "
+                             f"(missing: {missing_groups})")
         groups = [compare_group(name, ref_groups[name], cand_groups[name], args.states_only)
                   for name in shared]
     total = sum(g["summary"]["compared"] for g in groups)
     identical = sum(g["summary"]["identical"] for g in groups)
+    files_identical = sum(g["summary"]["file_identical"] for g in groups)
+    missing_runs = sum(g["summary"]["missing_in_candidate"] for g in groups)
+    no_state_hash = sum(g["summary"]["state_hash_unavailable"] for g in groups)
     clean_identity = args.states_only or all(not g["identity_differences"] for g in groups)
-    status = "identical" if (identical == total and total and clean_identity) else "differences"
+    complete = not (missing_groups or missing_runs or unpaired or no_state_hash) and total > 0
+    if identical == total and clean_identity:
+        status = "identical" if complete else "incomplete"
+    else:
+        status = "differences"
+    launch = None
+    if not args.pair:
+        ref_status, cand_status = run_statuses(args.reference), run_statuses(args.candidate)
+        if ref_status and cand_status:
+            launch = compare_launch(ref_status, cand_status, {g["group"] for g in groups})
     report = {"status": status, "states_only": bool(args.states_only),
+              "complete": complete, "data_and_launch": launch,
               "runs_compared": total, "runs_identical": identical,
+              "state_files_identical": files_identical,
+              "runs_missing_in_candidate": missing_runs,
+              "runs_without_state_hash": no_state_hash,
+              "groups_missing_in_candidate": missing_groups,
+              "unpaired_json": unpaired,
               "groups": groups,
               "groups_only_in_reference": sorted(set(ref_groups) - set(cand_groups)),
               "groups_only_in_candidate": sorted(set(cand_groups) - set(ref_groups))}
@@ -211,13 +340,26 @@ def main(argv=None) -> int:
     for g in groups:
         s = g["summary"]
         print(f"{g['group']:28s} compared={s['compared']:4d} identical={s['identical']:4d} "
-              f"same-state={s['state_identical']:4d} new={s['new']:4d}"
+              f"same-state={s['state_identical']:4d} same-file={s['file_identical']:4d} "
+              f"new={s['new']:4d} missing={s['missing_in_candidate']:4d}"
               + (f"  STATE DIFFERS: {len(s['state_different'])}" if s["state_different"] else "")
+              + (f"  NO STATE HASH: {s['state_hash_unavailable']}" if s["state_hash_unavailable"] else "")
               + (f"  SAME STATE, DIFFERENT OUTPUTS: {s['same_state_different_outputs'][:3]}"
                  if s["same_state_different_outputs"] else "")
               + (f"  IDENTITY: {sorted(g['identity_differences'])}" if g["identity_differences"] else "")
               + (f"  env: {sorted(g['environment_differences'])}" if g["environment_differences"] else ""))
-    print(f"{identical}/{total} shared runs identical -> {status}")
+    for name in missing_groups:
+        print(f"{name:28s} MISSING IN CANDIDATE")
+    for path in unpaired:
+        print(f"merged JSON without its NPZ: {path}")
+    if launch is not None:
+        print(f"data and launch controls: {launch['jobs_compared']} job(s) compared, "
+              f"{len(launch['dataset_differences'])} with different data, "
+              f"{len(launch['launch_differences'])} with different launch controls"
+              + (f", {len(launch['jobs_without_candidate_status'])} without a status"
+                 if launch["jobs_without_candidate_status"] else ""))
+    print(f"{identical}/{total} runs identical (state files {files_identical}/{total} identical); "
+          f"missing: {missing_runs} run(s), {len(missing_groups)} group(s) -> {status}")
     return 0 if status == "identical" else 1
 
 

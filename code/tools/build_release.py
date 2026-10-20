@@ -65,6 +65,27 @@ def _records(payload: dict):
                     yield f"{b}/{m}/seed{s}", state
 
 
+def check_status(run_dir: Path, job_id: str) -> list[str]:
+    """The job must have succeeded and its non-checkpoint outputs must match
+    the hashes in its status record (checkpoints are checked against the
+    artifact's own record in ``check_job``)."""
+    status_path = run_dir / "statuses" / f"{job_id}.json"
+    if not status_path.is_file():
+        return [f"{job_id}: no status record"]
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    if status.get("state") != "succeeded":
+        return [f"{job_id}: job state is {status.get('state')!r}"]
+    errors = []
+    for output in status.get("outputs", []):
+        relative = output.get("path_relative_to_run_dir")
+        path = (run_dir / relative) if isinstance(relative, str) else Path(output.get("path", ""))
+        if not path.is_file():
+            errors.append(f"{job_id}: output missing ({path.name})")
+        elif path.suffix != ".pt" and sha256_file(path) != output.get("sha256"):
+            errors.append(f"{job_id}: {path.name} differs from the hash in its status record")
+    return errors
+
+
 def check_job(job_dir: Path) -> tuple[list[str], list[str]]:
     """Return (errors, files) for one job directory."""
     errors, files = [], []
@@ -137,7 +158,8 @@ def write_tar(path: Path, members: list[tuple[Path, str]]) -> list[dict]:
 
 
 def build(run_dirs: list[Path], out: Path, max_bytes: int, tokens: list[str]) -> dict:
-    out.mkdir(parents=True, exist_ok=False)
+    if out.exists():
+        raise SystemExit(f"{out} already exists; remove it or choose another --out")
     archives = []
     errors: list[str] = []
     plans = {}
@@ -155,6 +177,7 @@ def build(run_dirs: list[Path], out: Path, max_bytes: int, tokens: list[str]) ->
         for job_id, (group, benchmark) in sorted(groups.items()):
             job_dir = run_dir / "artifacts" / job_id
             job_errors, files = check_job(job_dir)
+            job_errors = check_status(run_dir, job_id) + job_errors
             errors += [f"{run_dir.name}/{e}" for e in job_errors]
             for f in files:
                 path = Path(f)
@@ -168,6 +191,8 @@ def build(run_dirs: list[Path], out: Path, max_bytes: int, tokens: list[str]) ->
                           tokens)
     if errors or hits:
         raise SystemExit("release aborted:\n  " + "\n  ".join(errors + [f"anonymity: {h}" for h in hits]))
+    # Created only after every check passed, so an aborted build leaves nothing behind.
+    out.mkdir(parents=True)
     for run_dir, by_part, sizes, meta in selections:
         name = run_dir.name
         path = out / f"{name}__meta.tar"

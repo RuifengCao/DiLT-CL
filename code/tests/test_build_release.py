@@ -93,3 +93,21 @@ def test_release_refuses_identifying_tokens():
         (run / "merged" / "note.json").write_text('{"author": "Jane Example"}')
         with pytest.raises(SystemExit, match="anonymity"):
             br.build([run], base / "out", max_bytes=10**9, tokens=["jane example"])
+
+
+def test_release_refuses_failed_jobs_and_results_changed_after_the_run():
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        run = _run_dir(base)
+        job_id = "grp_b__cifar__seed0__wsn"
+        status_path = run / "statuses" / f"{job_id}.json"
+        npz = run / "artifacts" / job_id / "result.npz"
+        status_path.write_text(json.dumps({"state": "succeeded", "outputs": [
+            {"path_relative_to_run_dir": f"artifacts/{job_id}/result.npz",
+             "sha256": hashlib.sha256(npz.read_bytes()).hexdigest()}]}))
+        np.savez(npz, x=np.ones(2))                 # changed after the job recorded it
+        with pytest.raises(SystemExit, match="differs from the hash in its status"):
+            br.build([run], base / "out1", max_bytes=10_000, tokens=[])
+        status_path.write_text(json.dumps({"state": "failed"}))
+        with pytest.raises(SystemExit, match="job state is 'failed'"):
+            br.build([run], base / "out2", max_bytes=10_000, tokens=[])

@@ -1,6 +1,6 @@
 # DiLT-CL v3.0 experimental protocol
 
-This document is the normative protocol for new experiments (code v3.0.5). If
+This document is the normative protocol for new experiments (code v3.0.6). If
 code, tables, or older documentation disagree with it, stop and resolve the
 disagreement before running or reporting results.
 
@@ -11,7 +11,7 @@ disagreement before running or reporting results.
 > the declared hardware, the independent verifier has passed, and
 > `tools/merge_results.py` has produced `verified` artifacts.
 
-## Verified semantics (v3.0.5)
+## Verified semantics (v3.0.6)
 
 Each item below was checked by constructing a scenario with a known answer and
 comparing against an independent reference implementation, not by reading the
@@ -37,6 +37,7 @@ code. The v2 items live in `tests/test_real_core.py`; the v3 items in
 | **Multi-head replay routing** | Replayed items go through the head that produced them, each group weighted by its share of the draw. Before v2.2.3 the routing was missing (ER fell *below* plain finetuning) and then the grouped loss was summed rather than averaged, inflating replay strength by the number of tasks drawn. Pre-2.2.3 ER/DER++ numbers are invalid |
 | **Provenance** | `CODE_VERSION` is derived from `diltcl.__version__`. Before v2.2.5 both runners hardcoded it, so artifacts produced by later versions still reported `2.1.1` -- and that string is printed into table captions |
 | **Per-example class-IL predictions (v3.0.5)** | Every isolation-method class-IL job launched by the suite writes `predictions/<benchmark>/<method>/seed<N>.npz` (true task, label, the oracle expert's prediction, every expert's routing score, and the routed task, tie flag and prediction at every prefix stage; calibrated jobs add the matched raw router and the held-out calibration inputs). Recording reuses the evaluation's own forward passes and changes no returned value (`tests/test_predictions_audit.py` compares recorded and unrecorded evaluations for every criterion and both label protocols). `tools/recompute_from_predictions.py` rebuilds every class-IL matrix and pooled statistic from these arrays exactly and checks that every raw-router decision is the lowest-ID argmin of the recorded scores; the verifier runs the same check on every job |
+| **Audit tools fail closed (v3.0.6)** | No training or evaluation arithmetic changed. The audit tools now refuse to report success on incomplete or altered evidence: `compare_runs.py` is `identical` only when every reference group, benchmark, method and seed is present in the candidate with a state hash on both sides (otherwise `incomplete`), and it also compares the state *file* SHA-256; `evaluate_checkpoints.py` treats any per-example difference and any non-finite value as an error in exact mode, requires a referenced predictions file to match its SHA-256, compares every per-seed metric, and `--combine` checks that shard reports cover every class-IL job; `merge_results.py` promotes to `verified` only inputs whose JSON/NPZ SHA-256 equal those in the verifier's report written after the jobs ended (also across runs in `--inputs` mode) and otherwise writes `unverified`; the verifier checks each job's methods against the plan, records unreadable artifacts as errors, never leaves a stale report behind and refuses an empty plan; per-example checks add structure checks (ranges, finite scores, nothing recorded before a task arrives, per-task counts, the matched raw pass on the same scores) and enforce the stored calibrated routers (exactly for the bias routers, up to float32 near-ties for the logistic router) and their recorded fitting accuracies; `build_release.py` requires succeeded jobs whose outputs match their status hashes; `paired_stats.py` refuses missing comparators or seeds instead of shrinking a Holm family |
 | **Checkpoint re-evaluation (v3.0.5)** | `tools/evaluate_checkpoints.py` loads each persisted isolation state (`weights_only=True`), checks its file and tensor-content SHA-256 against the artifact, rebuilds the model from the artifact's configuration and execution options, re-runs the class-IL evaluation (job router and matched raw router) and compares every matrix, metric and per-example decision; on the recording hardware the comparison is exact. `tools/compare_runs.py` compares an independent re-run with retained artifacts (trained-state content hashes, every NPZ array, every per-seed metric) |
 | **Device data backend (v3)** | Bit-identical to the `DataLoader` pipeline: same `ToTensor`/`Normalize` arithmetic (tensor divisor, no CUDA reciprocal shortcut), same shuffle order and global-RNG consumption per `iter()`, same subset composition; materialisation restores the RNG state it would otherwise consume. Verified batch by batch against `DataLoader` (0 and 2 workers) and end to end through finetune / ER / LwF / DiLT-CL on synthetic on-disk CIFAR-100 and TinyImageNet trees |
 | **Fast numerics (v3)** | Shared-feature multi-head LwF, consolidated EWC quadratic, device reservoir buffer and per-row routed replay equal the v2 objective: same RNG draws, same retained/replayed items, loss and gradients equal to float tolerance, EWC gradient identical and loss offset by a parameter-independent constant. Fused 0/1 mask multiplies are bit-identical to the v2 loops. `--numerics legacy` selects the v2 arithmetic |
@@ -130,10 +131,16 @@ an unconstrained slope mean this family does not generally contain the raw
 unstandardized ``argmin`` rule; it has no fitting- or test-accuracy
 nondegradation guarantee. It is serialized in the same state layout, so the
 common inference path applies it unchanged. ``score-bias-acc`` (v3.0.3)
-fits the per-task biases for *routing accuracy* by coordinate ascent from
-``b = 0`` on the raw scores, so on its fitting data it is never below the
-raw rule; every router state records ``fit_accuracy`` and
-``raw_argmin_fit_accuracy``. All are leakage-safe:
+fits the per-task biases for *class-balanced routing accuracy* by coordinate
+ascent from ``b = 0`` on the raw scores, so on its fitting data its balanced
+accuracy is never below the raw rule's; every router state records
+``fit_accuracy`` and ``raw_argmin_fit_accuracy``, which are plain (not
+balanced) accuracies. With equal holdout sizes per task, as on
+Split-CIFAR-100 and Split-TinyImageNet, the two coincide; with unequal sizes
+the recorded plain accuracy can fall below the raw rule's. The stage-0 router
+(one candidate) is never fitted, so its state records ``converged: false``
+with zero iterations; this is a reporting artefact, not a failed fit. All are
+leakage-safe:
 
 - each task's calibration examples come from a deterministic training holdout;
 - shared and isolation methods train on the same reduced training split;

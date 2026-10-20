@@ -46,8 +46,9 @@ _SAMPLE_SHAPE = {
 
 def rebuild(checkpoint_path, benchmark, device="cpu"):
     """Reconstruct a DiLT-CL instance from a dense resume checkpoint."""
+    # Tensors and plain containers only: no pickled code is executed.
     payload = torch.load(checkpoint_path, map_location=device,
-                         weights_only=False)
+                         weights_only=True)
     if payload.get("format") != "diltcl-dense-resume-state-v1":
         raise ValueError(
             f"unexpected checkpoint format: {payload.get('format')!r}; "

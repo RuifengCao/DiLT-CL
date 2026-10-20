@@ -127,6 +127,88 @@ def test_states_only_pair_across_routers():
         assert code == 1 and report["groups"][0]["summary"]["state_different"] == ["cifar/wsn/seed0"]
 
 
+def test_partial_candidate_is_incomplete_not_identical():
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        _write(base / "old" / "merged", "g", _payload((0, 1, 2)), _arrays((0, 1, 2)))
+        _write(base / "old" / "merged", "h", _payload(), _arrays())
+        # Candidate: seed 2 of group g missing, group h missing entirely.
+        _write(base / "new" / "merged", "g", _payload(), _arrays())
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        assert code == 1 and report["status"] == "incomplete" and not report["complete"]
+        assert report["runs_missing_in_candidate"] == 1
+        assert report["groups_missing_in_candidate"] == ["h"]
+        # Restricting the audit to the group that was rerun still demands every seed.
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new"),
+                             "--groups", "g"])
+        assert code == 1 and report["status"] == "incomplete"
+        _write(base / "new" / "merged", "g", _payload((0, 1, 2)), _arrays((0, 1, 2)))
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new"),
+                             "--groups", "g"])
+        assert code == 0 and report["status"] == "identical"
+
+
+def test_json_without_npz_and_missing_state_hash_block_identical():
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        _write(base / "old", "g", _payload(), _arrays())
+        _write(base / "new", "g", _payload(), _arrays())
+        (base / "new" / "orphan.json").write_text("{}")
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        assert code == 1 and report["status"] == "incomplete"
+        assert report["unpaired_json"] == [str(base / "new" / "orphan.json")]
+        (base / "new" / "orphan.json").unlink()
+        stripped = _payload()
+        stripped["per_seed_run_records"]["cifar"]["wsn"]["1"] = {}
+        _write(base / "new", "g", stripped, _arrays())
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        assert code == 1 and report["runs_without_state_hash"] == 1
+        assert report["runs_identical"] == 1
+
+
+def test_state_file_hashes_are_compared_and_reported():
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        old = _payload()
+        for s in (0, 1):
+            old["per_seed_run_records"]["cifar"]["wsn"][str(s)]["trained_state"].update(
+                sha256=f"{s + 7:064x}", serialized_bytes=100)
+        new = copy.deepcopy(old)
+        new["per_seed_run_records"]["cifar"]["wsn"]["1"]["trained_state"]["sha256"] = "d" * 64
+        _write(base / "old", "g", old, _arrays())
+        _write(base / "new", "g", new, _arrays())
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        # Same tensors serialized differently: the experts are identical, the files are not.
+        assert code == 0 and report["status"] == "identical"
+        assert report["state_files_identical"] == 1
+        assert report["groups"][0]["summary"]["file_different"] == ["cifar/wsn/seed1"]
+
+
+def test_data_and_launch_controls_are_compared_from_run_statuses():
+    def status(entries, cublas=":4096:8", seed="0"):
+        return {"state": "succeeded", "job": {"job_id": "g__cifar__seed0__wsn"},
+                "dataset_identity": {"entries": entries},
+                "child_environment_controls": {"CUBLAS_WORKSPACE_CONFIG": cublas,
+                                               "OMP_NUM_THREADS": "3", "PYTHONHASHSEED": seed}}
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        for name in ("old", "new"):
+            _write(base / name / "merged", "g", _payload(), _arrays())
+            (base / name / "statuses").mkdir()
+        (base / "old" / "statuses" / "g__cifar__seed0__wsn.json").write_text(
+            json.dumps(status({"cifar-100-python": "a" * 64})))
+        (base / "new" / "statuses" / "g__cifar__seed0__wsn.json").write_text(
+            json.dumps(status({"cifar-100-python": "b" * 64}, cublas=":16:8")))
+        code, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        launch = report["data_and_launch"]
+        assert launch["jobs_compared"] == 1
+        assert launch["dataset_differences"] == ["g__cifar__seed0__wsn"]
+        assert launch["launch_differences"] == [{"job": "g__cifar__seed0__wsn",
+                                                 "keys": ["CUBLAS_WORKSPACE_CONFIG"]}]
+        # Reported, not part of the verdict: the outputs themselves are identical.
+        assert code == 0 and report["status"] == "identical"
+
+
 def test_verifier_can_write_its_report_outside_a_historical_run():
     spec = importlib.util.spec_from_file_location(
         "verify_bundle_for_out_test", ROOT / "tools" / "verify_experiment_bundle.py")

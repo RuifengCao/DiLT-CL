@@ -76,14 +76,18 @@ def validate_predictions(record: dict[str, Any], payload: dict[str, Any], archiv
     module = predictions_module()
     try:
         arrays, meta = module.load_predictions(path)
-    except (OSError, ValueError) as exc:
-        errors.append(f"{label}: cannot read predictions: {exc}")
+    except Exception as exc:  # noqa: BLE001 - any unreadable file is an error
+        errors.append(f"{label}: cannot read predictions: {type(exc).__name__}: {exc}")
         return False
     if meta.get("trained_state_content_sha256") != record.get(
             "trained_state", {}).get("content_sha256"):
         errors.append(f"{label}: predictions belong to a different trained state")
-    for message in module.compare_with_artifact(
-            arrays, meta, payload, archive, benchmark, method, seed):
+    try:
+        messages = module.compare_with_artifact(
+            arrays, meta, payload, archive, benchmark, method, seed)
+    except Exception as exc:  # noqa: BLE001 - malformed content is an error
+        messages = [f"cannot check: {type(exc).__name__}: {exc}"]
+    for message in messages:
         errors.append(f"{label}: predictions: {message}")
     return True
 
@@ -248,7 +252,21 @@ def validate_aggregates(payload: dict[str, Any], errors: list[str]) -> None:
 
 
 def validate_result(json_path: Path, npz_path: Path, expected_seed: int,
-                    expected_benchmark: str) -> dict[str, Any]:
+                    expected_benchmark: str,
+                    expected_methods: list[str] | None = None) -> dict[str, Any]:
+    """Validate one job's artifact; never raises (errors are recorded)."""
+    try:
+        return _validate_result(json_path, npz_path, expected_seed,
+                                expected_benchmark, expected_methods)
+    except Exception as exc:  # noqa: BLE001 - a corrupt artifact is an error, not a crash
+        return {"json": str(json_path), "npz": str(npz_path),
+                "errors": [f"cannot validate artifact: {type(exc).__name__}: {exc}"],
+                "passed": False, "predictions_checked": []}
+
+
+def _validate_result(json_path: Path, npz_path: Path, expected_seed: int,
+                     expected_benchmark: str,
+                     expected_methods: list[str] | None) -> dict[str, Any]:
     errors: list[str] = []
     predictions_checked: list[str] = []
     try:
@@ -258,6 +276,9 @@ def validate_result(json_path: Path, npz_path: Path, expected_seed: int,
                 "errors": [f"cannot read JSON: {exc}"]}
     if payload.get("benchmarks") != [expected_benchmark]:
         errors.append("JSON benchmark does not match suite job")
+    if expected_methods is not None and sorted(payload.get("methods", [])) != sorted(expected_methods):
+        errors.append(f"JSON methods {payload.get('methods')} do not match the suite job's "
+                      f"methods {expected_methods}")
     if payload.get("seeds") != [expected_seed]:
         errors.append("JSON seed list does not match isolated suite job")
     if payload.get("verification_status") != "unverified":
@@ -451,6 +472,8 @@ def verify(run_dir: Path) -> dict[str, Any]:
     results = []
     status_records = {}
     acknowledged_jobs: list[str] = []
+    if not plan.get("jobs"):
+        errors.append("plan.json lists no jobs")
     for entry in plan.get("jobs", []):
         job = entry.get("job", {})
         job_id = job.get("job_id")
@@ -505,9 +528,10 @@ def verify(run_dir: Path) -> dict[str, Any]:
             errors.append(f"{job_id}: plan job entry has no output prefix")
             continue
         prefix = Path(prefix)
+        planned = [m for m in str(job.get("methods", "")).split(",") if m]
         result = validate_result(
             prefix.with_suffix(".json"), prefix.with_suffix(".npz"),
-            int(job["seed"]), job["benchmark"])
+            int(job["seed"]), job["benchmark"], planned or None)
         results.append({"job_id": job_id, **result})
         errors.extend(f"{job_id}: {error}" for error in result["errors"])
         # Jobs launched with --predictions-dir (v3.0.5+) must carry checked
@@ -601,9 +625,21 @@ def parse_args(argv=None) -> argparse.Namespace:
 def main(argv=None) -> int:
     args = parse_args(argv)
     run_dir = args.run_dir.resolve()
-    report = verify(run_dir)
     out = (args.out or run_dir / "verification_report.json").resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
+    # Replace any earlier report first, so a crash can never leave a stale
+    # "verified" report behind for the merger to trust.
+    atomic_json(out, {"verification_schema_version": 1, "status": "running",
+                      "started_at": utc_now(), "run_dir": str(run_dir),
+                      "errors": ["verification did not finish"], "results": []})
+    try:
+        report = verify(run_dir)
+    except Exception as exc:  # noqa: BLE001 - recorded as a failed verification
+        report = {"verification_schema_version": 1, "status": "failed",
+                  "verified_at": utc_now(), "run_dir": str(run_dir), "results": [],
+                  "errors": [f"verifier crashed: {type(exc).__name__}: {exc}"]}
+        atomic_json(out, report)
+        raise
     atomic_json(out, report)
     print(json.dumps({
         "status": report["status"],

@@ -328,7 +328,11 @@ def fit_score_bias_acc(features, task_ids, *, max_sweeps=8, grid_size=41):
 
     Decision ``argmin_k (x_k - b_k)`` on the raw scores. ``b = 0`` is the raw
     rule and is the starting point, so the fitted router can never be worse
-    than ``argmin`` on its own fitting data; each bias is chosen by
+    than ``argmin`` on its own fitting data in class-balanced accuracy (the
+    objective; the recorded ``fit_accuracy`` is plain accuracy, which matches
+    it when every task contributes the same number of examples). With a single
+    candidate nothing is fitted and ``converged`` is reported as False with
+    zero sweeps. Each bias is chosen by
     coordinate ascent over a grid of candidate offsets (quantiles of the
     score gaps), keeping the smallest ``|b_k|`` among ties. With ``T``
     parameters and a monotone objective, it is the most conservative

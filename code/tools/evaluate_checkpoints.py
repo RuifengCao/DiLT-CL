@@ -19,20 +19,35 @@ isolation method/seed whose trained state was persisted, this tool
    per-example predictions, every routed decision.
 
 So the routed, task-inference and oracle results are regenerated from the
-released experts alone. Comparisons are exact by default: on the recorded
-software stack and GPU model the evaluation is deterministic. On other
-hardware (another GPU model, or the CPU) floating-point rounding can move
-decisions that sit on near-ties; ``--atol`` then reports agreement within a
-tolerance instead of failing, and the per-example route differences are
-counted.
+released experts alone. Every per-seed metric of the artifact is compared
+(ACC, LA, BWT and Forgetting recomputed from the re-evaluated matrices with the
+runner's own function). Comparisons are exact by default: on the recorded
+software stack and GPU model the evaluation is deterministic, so any
+difference -- in a matrix, a metric, or a single per-example decision -- and
+any non-finite value is an error. On other hardware (another GPU model, or
+the CPU) floating-point rounding can move decisions that sit on near-ties;
+``--atol`` then accepts matrix and metric differences up to that many
+percentage points (status ``within-tolerance``) and counts the per-example
+differences instead of failing on them.
 
-Needs PyTorch and the benchmark data (the same files the job used).
+A referenced predictions file must exist and match the SHA-256 in the
+artifact before it is used as the baseline. Every isolation method a class-IL
+job ran must have a persisted-state record.
+
+``--shard K/N`` processes every N-th job starting at K so N processes can
+share one GPU; each shard report records the shard and its jobs, and
+``--combine REPORT ...`` checks that the shard reports of a run directory
+cover every class-IL job exactly once and prints the combined verdict.
+
+Needs PyTorch and the benchmark data (the same files the job used); the
+``--combine`` mode needs neither.
 
 Examples::
 
     python tools/evaluate_checkpoints.py --run-dir RUN --data-root DATA
     python tools/evaluate_checkpoints.py --result RUN/artifacts/JOB/result.json \\
         --data-root DATA --methods diltcl,wsn --out eval_report.json
+    python tools/evaluate_checkpoints.py --combine eval_0.json eval_1.json eval_2.json eval_3.json
 """
 
 from __future__ import annotations
@@ -141,6 +156,10 @@ def _compare_matrix(name, actual, expected, atol, out):
     if actual.shape != expected.shape:
         out["errors"].append(f"{name}: shape {actual.shape} != {expected.shape}")
         return
+    if not (np.isfinite(actual).all() and np.isfinite(expected).all()):
+        out["exact"] = False
+        out["errors"].append(f"{name}: non-finite values")
+        return
     diff = float(np.max(np.abs(actual - expected))) if actual.size else 0.0
     out["max_abs_matrix_difference"] = max(out["max_abs_matrix_difference"], diff)
     if not np.array_equal(actual, expected):
@@ -151,6 +170,13 @@ def _compare_matrix(name, actual, expected, atol, out):
 
 def _compare_metric(name, actual, expected, atol, out):
     actual, expected = float(actual), float(expected)
+    out["metrics_compared"].append(name)
+    if not (np.isfinite(actual) and np.isfinite(expected)):
+        if not (np.isnan(actual) and np.isnan(expected)):
+            out["exact"] = False
+            out["errors"].append(f"{name}: non-finite value (re-evaluated {actual!r}, "
+                                 f"artifact {expected!r})")
+        return
     if actual != expected:
         out["exact"] = False
         out["metric_differences"][name] = actual - expected
@@ -158,17 +184,27 @@ def _compare_metric(name, actual, expected, atol, out):
             out["errors"].append(f"{name}: re-evaluated {actual!r} vs artifact {expected!r}")
 
 
-def _compare_predictions(record: dict, stored: dict, prefix: str, out):
-    """Count per-example decisions that differ from the job's predictions file."""
+def _compare_predictions(record: dict, stored: dict, prefix: str, atol: float, out):
+    """Compare every per-example decision with the job's predictions file.
+
+    In exact mode (``atol == 0``) any difference is an error; with a
+    tolerance the differences are counted and reported.
+    """
     for key in PER_EXAMPLE:
-        a = np.asarray(record[key]); b = np.asarray(stored[f"{prefix}{key}"])
+        stored_key = f"{prefix}{key}"
+        if stored_key not in stored:
+            out["errors"].append(f"{stored_key}: missing in the predictions file")
+            continue
+        a = np.asarray(record[key]); b = np.asarray(stored[stored_key])
         if a.shape != b.shape:
-            out["errors"].append(f"{prefix}{key}: shape {a.shape} != {b.shape}")
+            out["errors"].append(f"{stored_key}: shape {a.shape} != {b.shape}")
             continue
         n = int(np.sum(a != b))
         if n:
             out["exact"] = False
-            out["per_example_differences"][f"{prefix}{key}"] = n
+            out["per_example_differences"][stored_key] = n
+            if atol == 0.0:
+                out["errors"].append(f"{stored_key}: {n} per-example value(s) differ")
 
 
 def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
@@ -176,6 +212,7 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
     """Re-evaluate every persisted isolation checkpoint of one class-IL job."""
     import torch
     import run_class_il as runner
+    from diltcl.metrics import summarize_run
     from diltcl.runner_common import _state_content_sha256
     from diltcl.task_inference import evaluate_class_il_inference
     from diltcl.utils import set_seed
@@ -193,10 +230,19 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
     with np.load(result_json.with_suffix(".npz"), allow_pickle=False) as npz:
         for benchmark in payload["benchmarks"]:
             for seed in payload["seeds"]:
-                todo = [m for m in payload["methods"]
-                        if m in ISOLATION and m in methods
-                        and str(seed) in (payload.get("calibration", {})
-                                          .get(benchmark, {}).get(m, {}))]
+                wanted = [m for m in payload["methods"] if m in ISOLATION and m in methods]
+                todo = []
+                for m in wanted:
+                    if str(seed) in (payload.get("calibration", {}).get(benchmark, {})
+                                     .get(m, {})):
+                        todo.append(m)
+                    else:       # every isolation method of a class-IL job has a record
+                        entries.append({"job": job_dir.name, "benchmark": benchmark,
+                                        "method": m, "seed": int(seed), "router": None,
+                                        "errors": ["no persisted-state record in the artifact"],
+                                        "exact": False, "max_abs_matrix_difference": 0.0,
+                                        "metric_differences": {}, "per_example_differences": {},
+                                        "metrics_compared": [], "metrics_not_compared": []})
                 if not todo:
                     continue
                 set_seed(int(seed))
@@ -209,7 +255,8 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
                     out = {"job": job_dir.name, "benchmark": benchmark, "method": method,
                            "seed": int(seed), "router": record.get("kind", "none"),
                            "errors": [], "exact": True, "max_abs_matrix_difference": 0.0,
-                           "metric_differences": {}, "per_example_differences": {}}
+                           "metric_differences": {}, "per_example_differences": {},
+                           "metrics_compared": []}
                     entries.append(out)
                     rel = trained.get("persisted_relative_path")
                     path = (job_dir / rel) if rel else None
@@ -234,7 +281,14 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
                     pred = record.get("predictions")
                     if pred:
                         ppath = job_dir / pred.get("relative_path", "")
-                        if ppath.is_file():
+                        out["predictions"] = str(ppath)
+                        if not ppath.is_file():
+                            out["errors"].append("predictions file referenced by the "
+                                                 "artifact is missing")
+                        elif sha256_file(ppath) != pred.get("sha256"):
+                            out["errors"].append("predictions file SHA-256 differs from "
+                                                 "the artifact")
+                        else:
                             with np.load(ppath, allow_pickle=False) as archive:
                                 stored = {k: np.asarray(archive[k]) for k in archive.files}
                     for prefix, calibrators in runs:
@@ -257,11 +311,23 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
                             name = ("Raw" if prefix else "") + json_name
                             if name in metrics:
                                 _compare_metric(name, res[stat], metrics[name], atol, out)
+                        # ACC/LA/BWT/Forgetting with the runner's own function.
+                        summary = summarize_run(np.asarray(res["result_matrix"]))
+                        for json_name in ("ACC", "LA", "BWT", "Forgetting"):
+                            name = ("Raw" if prefix else "") + json_name
+                            if name in metrics:
+                                _compare_metric(name, summary[json_name], metrics[name], atol, out)
                         if prefix == "":
                             out["oracle_acc"] = float(res["oracle_route_acc"])
                             out["routed_acc"] = float(res["class_il_acc"])
                         if stored is not None:
-                            _compare_predictions(rec, stored, prefix, out)
+                            _compare_predictions(rec, stored, prefix, atol, out)
+                    out["metrics_not_compared"] = sorted(
+                        set(payload["per_seed"][benchmark][method][payload["seeds"].index(seed)])
+                        - set(out["metrics_compared"]))
+                    if out["metrics_not_compared"]:
+                        out["errors"].append("per-seed metrics not re-evaluated: "
+                                             f"{out['metrics_not_compared']}")
                     del forward_t, state
                     if str(device).startswith("cuda"):
                         torch.cuda.empty_cache()
@@ -275,6 +341,9 @@ def parse_args(argv=None):
     src.add_argument("--run-dir", type=Path, help="Suite run directory (all class-IL jobs).")
     src.add_argument("--result", type=Path, action="append",
                      help="A job's result.json (repeatable).")
+    src.add_argument("--combine", type=Path, nargs="+", metavar="REPORT",
+                     help="Combine shard reports (written with --out) and check that "
+                          "they cover every class-IL job of their run directories.")
     p.add_argument("--data-root", type=str, default=None,
                    help="Dataset directory (overrides $DILTCL_DATA_ROOT).")
     p.add_argument("--device", default=None, help="cuda (default when available) or cpu.")
@@ -289,16 +358,95 @@ def parse_args(argv=None):
     return p.parse_args(argv)
 
 
+def _class_il_results(run_dir: Path) -> list[str]:
+    """Every class-IL job artifact of a run directory (torch-free)."""
+    out = []
+    for path in sorted(run_dir.glob("artifacts/*/result.json")):
+        try:
+            protocol = json.loads(path.read_text(encoding="utf-8")).get("protocol")
+        except (OSError, ValueError):
+            protocol = None
+        if protocol == "class_il":
+            out.append(str(path.resolve()))
+    return out
+
+
+def combine(paths: list[Path], out_path: Path | None) -> int:
+    """Merge shard reports; fail unless they cover their run directories exactly."""
+    reports = [json.loads(p.read_text(encoding="utf-8")) for p in paths]
+    problems: list[str] = []
+    by_run: dict[str, list[dict]] = {}
+    for path, report in zip(paths, reports):
+        run_dir = report.get("run_dir")
+        if not run_dir:
+            problems.append(f"{path}: report has no run_dir (written with --result?)")
+            continue
+        by_run.setdefault(run_dir, []).append(report)
+    for run_dir, shard_reports in sorted(by_run.items()):
+        specs = [r.get("shard") or "0/1" for r in shard_reports]
+        sizes = {int(s.split("/")[1]) for s in specs}
+        indices = sorted(int(s.split("/")[0]) for s in specs)
+        if len(sizes) != 1 or indices != list(range(next(iter(sizes)))):
+            problems.append(f"{run_dir}: shards {sorted(specs)} do not form a complete 0..N-1 set")
+        covered = [j for r in shard_reports for j in r.get("results", [])]
+        duplicates = sorted({j for j in covered if covered.count(j) > 1})
+        if duplicates:
+            problems.append(f"{run_dir}: {len(duplicates)} job(s) evaluated twice")
+        # Each shard records the full class-IL job list it was cut from, so
+        # coverage can be checked where the run directory is not available.
+        listed = {tuple(r.get("run_results") or ()) for r in shard_reports}
+        if len(listed) != 1 or not next(iter(listed)):
+            problems.append(f"{run_dir}: shard reports disagree on (or lack) the job list")
+            expected = []
+        else:
+            expected = sorted(next(iter(listed)))
+        if Path(run_dir).is_dir() and expected and _class_il_results(Path(run_dir)) != expected:
+            problems.append(f"{run_dir}: the run directory's class-IL jobs changed since "
+                            "the shards were evaluated")
+        missing = sorted(set(expected) - set(covered))
+        if missing:
+            problems.append(f"{run_dir}: {len(missing)} class-IL job(s) not covered by any shard")
+        method_sets = {tuple(r.get("methods") or ()) for r in shard_reports}
+        if method_sets != {ISOLATION}:
+            problems.append(f"{run_dir}: shards did not all evaluate every isolation method "
+                            f"({sorted(method_sets)})")
+    entries = [e for r in reports for e in r.get("entries", [])]
+    failures = [e for e in entries if e["errors"]]
+    exact = all(e["exact"] for e in entries)
+    status = ("failed" if failures or problems else
+              "no-checkpoints" if not entries else
+              "identical" if exact else "within-tolerance")
+    combined = {"combined_from": [str(p) for p in paths], "coverage_problems": problems,
+                "checkpoints_evaluated": len(entries), "with_errors": len(failures),
+                "exact": exact if entries else None, "status": status,
+                "per_run": {run: sum(r.get("checkpoints_evaluated", 0) for r in rs)
+                            for run, rs in sorted(by_run.items())}}
+    if out_path:
+        out_path.write_text(json.dumps(combined, indent=2), encoding="utf-8")
+    for problem in problems:
+        print(f"COVERAGE: {problem}")
+    for run, count in combined["per_run"].items():
+        print(f"{run}: {count} checkpoint(s)")
+    print(f"{len(entries)} checkpoint(s) re-evaluated in {len(reports)} report(s), "
+          f"{len(failures)} with errors -> {status}")
+    return 0 if status in ("identical", "within-tolerance") else 1
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
+    if args.combine:
+        return combine(args.combine, args.out)
     if args.data_root:
         os.environ["DILTCL_DATA_ROOT"] = args.data_root
     os.environ.setdefault("DILTCL_DOWNLOAD", "0")
+    # Every suite job ran with this cuBLAS workspace setting (run_suite.py);
+    # it must be in place before CUDA initialises to select the same kernels.
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     import torch
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     methods = tuple(m for m in args.methods.split(",") if m)
-    results = (sorted(args.run_dir.glob("artifacts/*/result.json")) if args.run_dir
-               else list(args.result))
+    run_results = _class_il_results(args.run_dir) if args.run_dir else None
+    results = ([Path(p) for p in run_results] if args.run_dir else list(args.result))
     if args.shard:
         k, n = (int(x) for x in args.shard.split("/"))
         if not 0 <= k < n:
@@ -313,6 +461,12 @@ def main(argv=None) -> int:
               "no-checkpoints" if not entries else
               "identical" if exact else "within-tolerance")
     report = {"device": device, "torch": torch.__version__, "atol": args.atol,
+              "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+              "run_dir": str(args.run_dir.resolve()) if args.run_dir else None,
+              "shard": args.shard or ("0/1" if args.run_dir else None),
+              "methods": list(methods),
+              "results": [str(Path(p).resolve()) for p in results],
+              "run_results": run_results,
               "checkpoints_evaluated": len(entries), "with_errors": len(failures),
               "exact": exact if entries else None, "status": status, "entries": entries}
     if args.out:

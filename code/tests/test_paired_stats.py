@@ -119,10 +119,48 @@ def test_csv_keeps_the_method_column_of_calibration_rows(tmp_path=None):
         tmp = pathlib.Path(tmp)
         (tmp / "t.json").write_text(__import__("json").dumps(main))
         (tmp / "c.json").write_text(__import__("json").dumps(calibrated))
-        ps.main(["--task-il", str(tmp / "t.json"), "--task-comparators", "wsn",
-                 "--calibrated", str(tmp / "c.json"), "--out-csv", str(tmp / "out.csv")])
+        # The calibrated input holds only WSN, so the other isolation methods
+        # are missing: refused by default, recorded with --allow-missing.
+        args = ["--task-il", str(tmp / "t.json"), "--task-comparators", "wsn",
+                "--calibrated", str(tmp / "c.json"), "--out-csv", str(tmp / "out.csv")]
+        assert ps.main(args) == 2 and not (tmp / "out.csv").exists()
+        assert ps.main([*args, "--allow-missing"]) == 0
         with (tmp / "out.csv").open() as handle:
             rows = list(csv.DictReader(handle))
     cal = [r for r in rows if r["family"] == "calibration"]
     assert cal and all(r["method"] == "wsn" for r in cal)
     assert [r for r in rows if r["family"] == "main"][0]["method"] == ""
+
+
+def test_missing_comparators_or_seeds_are_refused():
+    full = _payload({"diltcl": [10, 11, 12, 13, 14.5], "wsn": [9, 10.5, 11, 12.5, 13]})
+    with pytest.raises(ps.MissingComparison, match="supsup missing"):
+        ps.build(full, None, "diltcl", ["wsn", "supsup"], [])
+    rows = ps.build(full, None, "diltcl", ["wsn", "supsup"], [], allow_missing=True)
+    assert len(rows) == 1 and rows[0]["family_size"] == 1
+    # A comparator that lacks a seed: alignment by value drops it -> refused.
+    short = _payload({"diltcl": [10, 11, 12, 13, 14.5], "wsn": [9, 10.5, 11, 12.5, 13]})
+    short["seeds"] = [0, 1, 2, 3, 4]
+    values = ps.per_seed_values(short, "cifar", "wsn", "ACC")
+    assert len(values) == 5
+    original = ps.per_seed_values
+
+    def drop_seed(payload, benchmark, method, metric):
+        out = original(payload, benchmark, method, metric)
+        if method == "wsn":
+            out.pop(4)
+        return out
+    ps.per_seed_values = drop_seed
+    try:
+        with pytest.raises(ps.MissingComparison, match="aligned seeds"):
+            ps.compare(short, "cifar", "ACC", "diltcl", "wsn")
+    finally:
+        ps.per_seed_values = original
+
+
+def test_mdd_for_very_few_seeds_and_the_ten_seed_caption():
+    assert math.isfinite(ps.min_detectable_difference(1.0, 3))
+    value = ps.min_detectable_difference(1.0, 2)      # needs a very large noncentrality
+    assert value != value or value > 10                # NaN or a finite, large value
+    assert "five seeds" in ps._sign_flip_floor([5]) and "0.0625" in ps._sign_flip_floor([5])
+    assert "ten seeds" in ps._sign_flip_floor([10]) and "0.001953" in ps._sign_flip_floor([10])

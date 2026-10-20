@@ -52,7 +52,7 @@ environment and data (`source_manifest*.json`, `environment*.json`,
 ```bash
 cd code
 pip install -r requirements.txt pytest scikit-learn
-python -m pytest tests -q                 # 268 tests; the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
+python -m pytest tests -q                 # 280 tests; the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
 
 # every evidence file against its recorded hash
 python - <<'EOF'
@@ -91,17 +91,19 @@ in [`code/REPRODUCE.md`](code/REPRODUCE.md).
 
 ## Status
 
-Code version 3.0.5 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
+Code version 3.0.6 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
 were produced by versions 3.0.0 to 3.0.3 on one NVIDIA RTX 5090; the exact
 software stack is pinned in `code/requirements-lock.txt` and recorded in each
 run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
 accounting, parameter counts, a SciPy fallback that the recorded runs did not
 use) and added per-example prediction recording, checkpoint re-evaluation, a
-regeneration audit and a release builder. These additions are covered by the
-test suite and by a synthetic end-to-end run. Whether 3.0.5 regenerates the
-recorded results bit for bit on the recorded stack is what the Level 3
-regeneration audit in `code/REPRODUCE.md` checks; that audit has not been run
-yet.
+regeneration audit and a release builder. Version 3.0.6 changes no training
+or evaluation arithmetic; it makes those audit tools fail on incomplete or
+altered evidence instead of reporting success (`code/PROTOCOL.md`). These
+additions are covered by the test suite and by a synthetic end-to-end run.
+Whether 3.0.6 regenerates the recorded results bit for bit on the recorded
+stack is what the Level 3 regeneration audit in `code/REPRODUCE.md` checks;
+that audit has not been run yet.
 
 ## License
 

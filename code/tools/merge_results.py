@@ -13,11 +13,17 @@ expect, and it recomputes every derived quantity instead of copying it:
 * ``paired_significance`` is added (Wilcoxon / paired t) against DiLT-CL for
   every metric with at least five aligned seeds,
 * the NPZ matrices are concatenated key by key (duplicates are an error),
-* in run-directory mode the merged artifact is marked ``verified`` when the
-  independent verifier (``tools/verify_experiment_bundle.py``) reported the
-  whole run as verified, every job of the group passed it, and the merge's
-  own recomputation agreed -- this is the only code path that turns a result
-  artifact from ``unverified`` into ``verified``.
+* the merged artifact is marked ``verified`` only when the independent
+  verifier (``tools/verify_experiment_bundle.py``) reported the run as
+  verified, every input job passed it, the SHA-256 of every input JSON/NPZ
+  equals the hash in the verifier's report (so nothing changed after
+  verification), the report postdates every job's completion, and the
+  merge's own recomputation agreed -- this is the only code path that turns
+  a result artifact from ``unverified`` into ``verified``; otherwise the
+  merged artifact is ``unverified`` whatever its inputs said. With
+  ``--inputs`` the same binding is applied to every input that is a per-job
+  artifact (``RUN/artifacts/<job>/result.json``) of a verified run, so a
+  merge across runs (for example ten seeds from two runs) can be verified.
 
 Every input must agree on the experiment identity -- schema version, code
 version, ``config``, execution options, head mode / inference settings. A
@@ -561,18 +567,74 @@ def load_verification(run_dir: Path) -> dict[str, Any] | None:
         "verified_at": report.get("verified_at"),
         "job_errors": {r.get("job_id"): list(r.get("errors", []))
                        for r in report.get("results", [])},
+        "job_hashes": {r.get("job_id"): (r.get("json_sha256"), r.get("npz_sha256"))
+                       for r in report.get("results", [])},
         "error_count": len(report.get("errors", [])),
     }
 
 
+def _parse_time(text: Any) -> datetime | None:
+    try:
+        return datetime.fromisoformat(str(text))
+    except (TypeError, ValueError):
+        return None
+
+
+def job_reasons(verification: dict[str, Any], job_id: str,
+                item: dict[str, Any] | None, ended_at: Any) -> list[str]:
+    """Why one input job does not count as verified (empty when it does).
+
+    The verifier's report must cover the job without errors, record the same
+    SHA-256 for its JSON and NPZ as the files being merged (nothing changed
+    after verification), and postdate the job's completion.
+    """
+    errors = verification["job_errors"].get(job_id)
+    if errors is None:
+        return [f"{job_id}: not covered by the verification report"]
+    reasons = [f"{job_id}: verifier errors {errors[:2]}"] if errors else []
+    if item is not None:
+        recorded = tuple(verification["job_hashes"].get(job_id) or (None, None))
+        if recorded != (item["json_sha256"], item["npz_sha256"]):
+            reasons.append(f"{job_id}: result files differ from the verified ones "
+                           "(SHA-256 differs from the verifier's report)")
+    if ended_at is not None:
+        verified_at, finished = _parse_time(verification["verified_at"]), _parse_time(ended_at)
+        if verified_at is None or finished is None or verified_at < finished:
+            reasons.append(f"{job_id}: the verification report predates the job's completion")
+    return reasons
+
+
+def _set_status(merged: dict[str, Any], reasons: list[str], record: dict[str, Any]) -> None:
+    merged["merge_provenance"]["verification"] = record
+    reportability = dict(merged.get("artifact_reportability") or {})
+    if not reasons:
+        merged["verification_status"] = "verified"
+        merged["evidence_status"] = "verified"
+        reportability["postrun_validation_completed"] = True
+        reportability["verified_by"] = "tools/verify_experiment_bundle.py + tools/merge_results.py"
+    else:
+        # Never inherit a status from the inputs: a merge that was not
+        # promoted here is unverified, whatever its inputs claimed.
+        merged["verification_status"] = "unverified"
+        merged["evidence_status"] = "unverified"
+        reportability["postrun_validation_completed"] = False
+        reportability.pop("verified_by", None)
+    merged["artifact_reportability"] = reportability
+
+
 def apply_verification(merged: dict[str, Any], verification: dict[str, Any] | None,
-                       job_ids: list[str], missing: list[dict[str, Any]]) -> None:
+                       job_ids: list[str], missing: list[dict[str, Any]],
+                       items: dict[str, dict[str, Any]] | None = None,
+                       ended: dict[str, Any] | None = None) -> None:
     """Promote a merged artifact to ``verified`` when the evidence allows it.
 
     Conditions (all required): the verifier reported the run as verified,
-    every job of the group appears in its results without errors, no job of
-    the group is missing, and the merge recheck against the NPZ matrices
-    passed (it raises otherwise, so reaching this point implies it).
+    every job of the group appears in its results without errors, the merged
+    input files are byte-identical to the verified ones (``items``: job id ->
+    loaded input with its SHA-256s), the report postdates every job's
+    completion (``ended``: job id -> ``ended_at``), no job of the group is
+    missing, and the merge recheck against the NPZ matrices passed (it raises
+    otherwise, so reaching this point implies it).
     """
     reasons = []
     if verification is None:
@@ -583,11 +645,9 @@ def apply_verification(merged: dict[str, Any], verification: dict[str, Any] | No
             reasons.append(f"verifier status is {verification['status']!r} "
                            f"({verification['error_count']} error(s))")
         for job_id in job_ids:
-            errors = verification["job_errors"].get(job_id)
-            if errors is None:
-                reasons.append(f"{job_id}: not covered by the verification report")
-            elif errors:
-                reasons.append(f"{job_id}: verifier errors {errors[:2]}")
+            reasons += job_reasons(verification, job_id,
+                                   None if items is None else items.get(job_id),
+                                   None if ended is None else ended.get(job_id))
     if missing:
         reasons.append(f"{len(missing)} job(s) of the group did not succeed")
     record = {
@@ -595,17 +655,52 @@ def apply_verification(merged: dict[str, Any], verification: dict[str, Any] | No
         "verifier_report": None if verification is None else {
             "path": verification["path"], "sha256": verification["sha256"],
             "verified_at": verification["verified_at"]},
+        "bound_to_input_hashes": items is not None,
         "merge_recheck": "ACC/BWT/Forgetting/LA recomputed from NPZ for every seed",
         "reasons_not_verified": reasons,
     }
-    merged["merge_provenance"]["verification"] = record
-    if not reasons:
-        merged["verification_status"] = "verified"
-        merged["evidence_status"] = "verified"
-        reportability = dict(merged.get("artifact_reportability") or {})
-        reportability["postrun_validation_completed"] = True
-        reportability["verified_by"] = "tools/verify_experiment_bundle.py + tools/merge_results.py"
-        merged["artifact_reportability"] = reportability
+    _set_status(merged, reasons, record)
+
+
+def bind_inputs(merged: dict[str, Any], inputs: list[dict[str, Any]]) -> None:
+    """``--inputs`` mode: verify each input against its own run's report."""
+    reasons: list[str] = []
+    reports: dict[Path, dict[str, Any] | None] = {}
+    for item in inputs:
+        path = Path(item["json_path"]).resolve()
+        job_dir = path.parent
+        run_dir = job_dir.parent.parent
+        job_id = job_dir.name
+        if (path.name != "result.json" or job_dir.parent.name != "artifacts"
+                or not (run_dir / "plan.json").is_file()):
+            reasons.append(f"{path}: not a per-job artifact of a suite run directory")
+            continue
+        if run_dir not in reports:
+            reports[run_dir] = load_verification(run_dir)
+        verification = reports[run_dir]
+        if verification is None:
+            reasons.append(f"{run_dir}: verification_report.json not found")
+            continue
+        if verification["status"] != "verified":
+            reasons.append(f"{run_dir}: verifier status is {verification['status']!r}")
+            continue
+        status_path = run_dir / "statuses" / f"{job_id}.json"
+        status = (json.loads(status_path.read_text(encoding="utf-8"))
+                  if status_path.is_file() else None)
+        if status is None or status.get("state") != "succeeded":
+            reasons.append(f"{job_id}: no succeeded status in {run_dir}")
+            continue
+        reasons += job_reasons(verification, job_id, item, status.get("ended_at"))
+    record = {
+        "verified": not reasons,
+        "verifier_reports": [None if v is None else {
+            "run_dir": str(run), "path": v["path"], "sha256": v["sha256"],
+            "verified_at": v["verified_at"]} for run, v in sorted(reports.items())],
+        "bound_to_input_hashes": True,
+        "merge_recheck": "ACC/BWT/Forgetting/LA recomputed from NPZ for every seed",
+        "reasons_not_verified": reasons,
+    }
+    _set_status(merged, reasons, record)
 
 
 def group_of(job_id: str) -> str:
@@ -628,7 +723,8 @@ def collect_from_run_dir(run_dir: Path, wanted_groups: set[str] | None,
         if wanted_groups and group not in wanted_groups:
             continue
         record = groups.setdefault(group, {"inputs": [], "missing": [],
-                                           "job_ids": []})
+                                           "job_ids": [], "input_jobs": [],
+                                           "ended_at": {}})
         record["job_ids"].append(job["job_id"])
         status_path = run_dir / "statuses" / f"{job['job_id']}.json"
         prefix = run_dir / entry["output_prefix_relative"]
@@ -640,6 +736,8 @@ def collect_from_run_dir(run_dir: Path, wanted_groups: set[str] | None,
                 "state": None if status is None else status.get("state")})
             continue
         record["inputs"].append(prefix.with_suffix(".json"))
+        record["input_jobs"].append(job["job_id"])
+        record["ended_at"][job["job_id"]] = status.get("ended_at")
     for group, record in groups.items():
         if record["missing"] and not allow_incomplete:
             raise MergeError(
@@ -679,13 +777,17 @@ def main(argv=None) -> int:
         if args.inputs:
             if args.out is None:
                 raise MergeError("--out is required with --inputs")
+            inputs = load_inputs(args.inputs)
             merged, arrays = merge_payloads(
-                load_inputs(args.inputs), allow_incomplete=args.allow_incomplete,
+                inputs, allow_incomplete=args.allow_incomplete,
                 allow_mismatch=allow_mismatch, group=None)
-            apply_verification(merged, None, [], [])
+            bind_inputs(merged, inputs)
             json_path, npz_path = write_outputs(merged, arrays, args.out)
+            reasons = merged["merge_provenance"]["verification"]["reasons_not_verified"]
             print(f"merged {len(args.inputs)} artifact(s) -> {json_path}, {npz_path} "
-                  "(unverified: --inputs mode has no verification report)")
+                  f"({merged['verification_status']})")
+            for reason in reasons[:5]:
+                print(f"  not verified: {reason}")
             return 0
         if args.run_dir is None:
             raise MergeError("give a run directory or --inputs")
@@ -708,14 +810,16 @@ def main(argv=None) -> int:
             if not record["inputs"]:
                 print(f"[skip] {group}: no successful jobs")
                 continue
+            inputs = load_inputs(record["inputs"])
             merged, arrays = merge_payloads(
-                load_inputs(record["inputs"]),
-                allow_incomplete=args.allow_incomplete,
+                inputs, allow_incomplete=args.allow_incomplete,
                 allow_mismatch=allow_mismatch, group=group)
             merged["merge_provenance"]["jobs_not_succeeded"] = record["missing"]
             merged["merge_provenance"]["source_change_acknowledgements"] = acknowledged
             apply_verification(merged, verification, record["job_ids"],
-                               record["missing"])
+                               record["missing"],
+                               items=dict(zip(record["input_jobs"], inputs)),
+                               ended=record["ended_at"])
             json_path, npz_path = write_outputs(merged, arrays, out_dir / group)
             summary[group] = {"json": str(json_path), "npz": str(npz_path),
                               "inputs": len(record["inputs"]),
@@ -726,6 +830,8 @@ def main(argv=None) -> int:
                               "benchmarks": merged["benchmarks"]}
             print(f"[merged] {group}: {len(record['inputs'])} jobs -> {json_path} "
                   f"({merged['verification_status']})")
+            for reason in merged["merge_provenance"]["verification"]["reasons_not_verified"][:5]:
+                print(f"  not verified: {reason}")
         (out_dir / "merge_summary.json").write_text(
             json.dumps({"merged_at": utc_now(), "run_dir": str(args.run_dir),
                         "groups": summary}, indent=2), encoding="utf-8")

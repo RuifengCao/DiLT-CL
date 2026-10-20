@@ -226,7 +226,8 @@ def test_run_dir_mode_groups_jobs_from_the_plan():
                              "output_prefix_relative": str(
                                  prefix.relative_to(run_dir))})
                 (run_dir / "statuses" / f"{job_id}.json").write_text(
-                    json.dumps({"state": "succeeded"}))
+                    json.dumps({"state": "succeeded",
+                                "ended_at": "2026-01-01T00:00:00+00:00"}))
         # A failed job in another group must not block this group's merge.
         jobs.append({"job": {"job_id": "p0_class_entropy__cifar__seed0__lwf",
                              "seed": 0, "benchmark": "cifar", "repeat_of": None},
@@ -244,9 +245,21 @@ def test_run_dir_mode_groups_jobs_from_the_plan():
 
         # A passing verifier report covering every job promotes the artifact.
         group_jobs = [j["job"]["job_id"] for j in jobs[:-1]]
-        (run_dir / "verification_report.json").write_text(json.dumps({
-            "status": "verified", "verified_at": "now", "errors": [],
-            "results": [{"job_id": jid, "errors": []} for jid in group_jobs]}))
+
+        def report(status="verified", verified_at="2026-01-02T00:00:00+00:00",
+                   errors_for=None):
+            results = []
+            for jid in group_jobs:
+                prefix = run_dir / "artifacts" / jid / "result"
+                results.append({
+                    "job_id": jid, "errors": ["ACC mismatch"] if jid == errors_for else [],
+                    "json_sha256": merge.sha256_file(prefix.with_suffix(".json")),
+                    "npz_sha256": merge.sha256_file(prefix.with_suffix(".npz"))})
+            (run_dir / "verification_report.json").write_text(json.dumps({
+                "status": status, "verified_at": verified_at,
+                "errors": [] if status == "verified" else ["x"], "results": results}))
+
+        report()
         assert merge.main([str(run_dir), "--group", "p0_task_il_multi"]) == 0
         merged = json.loads((run_dir / "merged" / "p0_task_il_multi.json").read_text())
         assert merged["verification_status"] == "verified"
@@ -254,17 +267,36 @@ def test_run_dir_mode_groups_jobs_from_the_plan():
         assert merged["artifact_reportability"]["postrun_validation_completed"] is True
         assert merged["merge_provenance"]["verification"]["verified"] is True
 
-        # One job with a verifier error, or a failed run, keeps it unverified.
-        (run_dir / "verification_report.json").write_text(json.dumps({
-            "status": "verified", "verified_at": "now", "errors": [],
-            "results": [{"job_id": jid, "errors": ["ACC mismatch"] if i == 0 else []}
-                        for i, jid in enumerate(group_jobs)]}))
+        # --inputs across the run binds every input to the same report.
+        inputs = [str(run_dir / "artifacts" / jid / "result.json") for jid in group_jobs]
+        assert merge.main(["--inputs", *inputs, "--out", str(run_dir / "again")]) == 0
+        again = json.loads((run_dir / "again.json").read_text())
+        assert again["verification_status"] == "verified"
+
+        # A result edited after verification no longer matches the report.
+        victim = run_dir / "artifacts" / group_jobs[0] / "result.json"
+        victim.write_text(victim.read_text().replace('"ACC"', '"ACC" ', 1))
         assert merge.main([str(run_dir), "--group", "p0_task_il_multi"]) == 0
         merged = json.loads((run_dir / "merged" / "p0_task_il_multi.json").read_text())
         assert merged["verification_status"] == "unverified"
-        (run_dir / "verification_report.json").write_text(json.dumps({
-            "status": "failed", "verified_at": "now", "errors": ["x"],
-            "results": [{"job_id": jid, "errors": []} for jid in group_jobs]}))
+        assert merged["evidence_status"] == "unverified"
+        assert any("differ from the verified" in r for r in
+                   merged["merge_provenance"]["verification"]["reasons_not_verified"])
+        assert merge.main(["--inputs", *inputs, "--out", str(run_dir / "again")]) == 0
+        assert json.loads((run_dir / "again.json").read_text())["verification_status"] == "unverified"
+
+        # A report written before a job finished does not cover it.
+        report(verified_at="2025-12-31T00:00:00+00:00")
+        assert merge.main([str(run_dir), "--group", "p0_task_il_multi"]) == 0
+        merged = json.loads((run_dir / "merged" / "p0_task_il_multi.json").read_text())
+        assert merged["verification_status"] == "unverified"
+
+        # One job with a verifier error, or a failed run, keeps it unverified.
+        report(errors_for=group_jobs[0])
+        assert merge.main([str(run_dir), "--group", "p0_task_il_multi"]) == 0
+        merged = json.loads((run_dir / "merged" / "p0_task_il_multi.json").read_text())
+        assert merged["verification_status"] == "unverified"
+        report(status="failed")
         assert merge.main([str(run_dir), "--group", "p0_task_il_multi"]) == 0
         merged = json.loads((run_dir / "merged" / "p0_task_il_multi.json").read_text())
         assert merged["verification_status"] == "unverified"

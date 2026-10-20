@@ -132,10 +132,12 @@ class ExperimentSuiteTests(unittest.TestCase):
                 {"root": "/d", "mode": mode, "tree_sha256": "t"}))
             return run_dir
 
+        # An empty plan never verifies; the fingerprint rule is still visible:
+        # for a non-publication (smoke) plan it is only a warning.
         smoke = verifier.verify(run_dir_with([], "metadata"))
-        self.assertEqual(smoke["status"], "verified")
+        self.assertEqual(smoke["status"], "failed")
         self.assertTrue(any("not content-hash" in w for w in smoke["warnings"]))
-        self.assertEqual(smoke["errors"], [])
+        self.assertEqual(smoke["errors"], ["plan.json lists no jobs"])
 
         p0_job = {"job": {"job_id": "p0_task_il_multi__cifar__seed0__lwf",
                           "priority": "P0", "seed": 0, "benchmark": "cifar"}}
@@ -143,7 +145,7 @@ class ExperimentSuiteTests(unittest.TestCase):
         self.assertEqual(publication["status"], "failed")
         self.assertTrue(any("not content-hash" in e for e in publication["errors"]))
         full = verifier.verify(run_dir_with([], "full"))
-        self.assertEqual(full["status"], "verified")
+        self.assertEqual(full["errors"], ["plan.json lists no jobs"])
         self.assertEqual(full["warnings"], [])
 
     def _data_root(self, base, with_mnist=False):

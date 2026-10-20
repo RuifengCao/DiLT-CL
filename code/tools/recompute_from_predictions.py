@@ -19,20 +19,34 @@ scikit-learn, when re-fitting calibrators). For every predictions file it
    inference ``U``, oracle accuracy ``O``, conditional accuracy ``V`` (with
    ``A = U * V`` exactly) and the recoverable-error fraction
    ``rho = (O - A) / (1 - A)``;
-3. for calibrated jobs, re-fits the prefix routers from the stored
-   calibration inputs and reports how often the re-fitted routers choose the
-   same task as the recorded ones.
+3. for calibrated jobs, recomputes every stored router's fitting accuracy
+   and the raw rule's fitting accuracy on the stored calibration inputs
+   (exact), and with ``--refit`` re-fits the prefix routers from those
+   inputs and reports how often the re-fitted routers choose the same task
+   as the recorded ones.
+
+Before any of this the file's structure is checked: every array present
+with consistent shapes, true tasks and labels in range, finite routing
+scores, routes only among the candidates ``0..s`` at stage ``s`` and ``-1``
+(no tie, no prediction) before an example's task has arrived, per-task
+example counts equal to the job's recorded test-set sizes, and, for
+calibrated jobs, the matched raw pass recorded on the same examples with the
+same scores and oracle predictions.
 
 It also checks that every raw-router decision is the lowest-ID argmin of
 the recorded scores (exact), and re-applies the job's stored calibrated
-routers to the recorded scores (reported agreement).
+routers to the recorded scores: the score-bias and score-bias-acc routers
+put one non-zero coefficient in each decision, so their decisions and tie
+flags must be reproduced exactly; for the score-logreg router (a full
+``T x T`` matrix product, which the GPU may sum in a different order) a
+disagreement is accepted only when the recorded and recomputed winners are
+within float32 rounding of each other, and such near-ties are counted.
 
-Check 1 and the raw-router check must hold exactly (the same integer counts
-produce the same floating-point percentages, and the same float32 scores the
-same argmin); a mismatch makes the exit status non-zero. The calibrated-router
-agreements are reported, not enforced: the GPU evaluated those linear
-decisions in float32 and solver versions can move re-fitted coefficients, so
-decisions that sit on near-ties may differ.
+All of these checks are enforced: a failure makes the job's entry an error
+and the exit status non-zero. Only the re-fit agreement (``--refit``) is
+reported, not enforced, because solver versions can move re-fitted
+coefficients. The decomposition is reported only for disjoint label sets,
+where Proposition 1 (routing ceiling) applies.
 
 Examples::
 
@@ -158,6 +172,81 @@ def recompute(arrays: dict[str, np.ndarray], num_tasks: int,
             "stats": stats, "examples": total}
 
 
+PER_EXAMPLE = ("true_task", "label_local", "oracle_pred_local", "scores",
+               "route_by_stage", "tie_by_stage", "routed_pred_local_by_stage")
+
+
+def expected_test_counts(payload: dict, benchmark: str, seed: int) -> list[int] | None:
+    """Recorded per-task test-set sizes of the isolation view, if available."""
+    counts = (((payload.get("benchmark_metadata") or {}).get(benchmark) or {})
+              .get("per_seed_counts") or {}).get(str(seed)) or {}
+    view = counts.get("isolation") or {}
+    values = view.get("test_samples_per_task")
+    return [int(v) for v in values] if values is not None else None
+
+
+def structural_errors(arrays: dict[str, np.ndarray], meta: dict,
+                      expected_counts: list[int] | None = None) -> list[str]:
+    """Shape, range and consistency checks of a predictions file.
+
+    These guarantee that ``recompute`` sees a well-formed recording: an
+    impossible route, a decision recorded before a task arrived, a non-finite
+    score or a missing example would otherwise be counted silently.
+    """
+    errors: list[str] = []
+    T = int(meta["num_tasks"])
+    C = int(meta.get("classes_per_task") or 0)
+    prefixes = [""] + (["raw_"] if "raw_true_task" in arrays else [])
+    for prefix in prefixes:
+        name = prefix or "router"
+        missing = [k for k in PER_EXAMPLE if prefix + k not in arrays]
+        if missing:
+            errors.append(f"{name}: arrays missing {missing}")
+            continue
+        tt = np.asarray(arrays[prefix + "true_task"]).astype(np.int64)
+        n = tt.shape[0] if tt.ndim == 1 else -1
+        shapes = {"label_local": (n,), "oracle_pred_local": (n,), "scores": (n, T),
+                  "route_by_stage": (n, T), "tie_by_stage": (n, T),
+                  "routed_pred_local_by_stage": (n, T)}
+        bad = [k for k, shape in shapes.items() if arrays[prefix + k].shape != shape]
+        if n < 0 or bad:
+            errors.append(f"{name}: inconsistent array shapes ({bad or 'true_task'})")
+            continue
+        label = arrays[prefix + "label_local"].astype(np.int64)
+        oracle = arrays[prefix + "oracle_pred_local"].astype(np.int64)
+        routes = arrays[prefix + "route_by_stage"].astype(np.int64)
+        ties = arrays[prefix + "tie_by_stage"].astype(bool)
+        preds = arrays[prefix + "routed_pred_local_by_stage"].astype(np.int64)
+        if n and (tt.min() < 0 or tt.max() >= T):
+            errors.append(f"{name}: true task outside 0..{T - 1}")
+        if C and n and (min(label.min(), oracle.min()) < 0 or max(label.max(), oracle.max()) >= C):
+            errors.append(f"{name}: label or oracle prediction outside 0..{C - 1}")
+        if not np.isfinite(arrays[prefix + "scores"]).all():
+            errors.append(f"{name}: non-finite routing scores")
+        for stage in range(T):
+            pending = tt > stage
+            if (np.any(routes[pending, stage] != -1) or np.any(ties[pending, stage])
+                    or np.any(preds[pending, stage] != -1)):
+                errors.append(f"{name} stage {stage}: decisions recorded before the task arrived")
+            r = routes[~pending, stage]
+            if np.any((r < 0) | (r > stage)):
+                errors.append(f"{name} stage {stage}: route outside the candidates 0..{stage}")
+            q = preds[~pending, stage]
+            if C and np.any((q < 0) | (q >= C)):
+                errors.append(f"{name} stage {stage}: prediction outside 0..{C - 1}")
+        if expected_counts is not None and n >= 0:
+            counts = np.bincount(tt[(tt >= 0) & (tt < T)], minlength=T).tolist()
+            if counts != list(expected_counts):
+                errors.append(f"{name}: per-task example counts {counts} differ from the "
+                              f"recorded test-set sizes {list(expected_counts)}")
+    if len(prefixes) == 2 and not errors:
+        for key in ("true_task", "label_local", "oracle_pred_local", "scores"):
+            if not np.array_equal(arrays[key], arrays["raw_" + key]):
+                errors.append(f"raw_{key} differs from the calibrated pass (same experts, "
+                              "same examples)")
+    return errors
+
+
 def raw_route_errors(arrays: dict[str, np.ndarray], prefix: str = "") -> list[str]:
     """Exact check: raw routes are the lowest-task-ID argmin of the scores.
 
@@ -187,12 +276,31 @@ def raw_route_errors(arrays: dict[str, np.ndarray], prefix: str = "") -> list[st
     return errors
 
 
+EXACT_ROUTERS = ("score-bias", "score-bias-acc")
+# Relative float32 tolerance under which two linear decisions count as tied
+# (summation order on the GPU versus NumPy; float32 epsilon is 1.2e-7).
+NEAR_TIE_RTOL = 1e-5
+
+
 def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict:
-    """Re-apply the job's serialized prefix routers to the recorded scores."""
+    """Re-apply the job's serialized prefix routers to the recorded scores.
+
+    Returns the agreement, the number of disagreements, how many of them are
+    float32 near-ties, and ``errors`` -- disagreements that rounding cannot
+    explain (any disagreement at all for the score-bias routers, whose
+    decisions involve one product per candidate and are reproduced exactly).
+    """
+    kind = record.get("kind")
     models = record.get("prefix_models") or []
     scores = arrays["scores"].astype(np.float32)
     routes = arrays["route_by_stage"]
-    agree = total = 0
+    ties = arrays.get("tie_by_stage")
+    agree = total = mismatches = near_ties = tie_flag_errors = 0
+    errors: list[str] = []
+    stages_with_rows = [s for s in range(routes.shape[1]) if np.any(arrays["true_task"] <= s)]
+    if len(models) < len(stages_with_rows):
+        errors.append(f"{len(models)} stored prefix router(s) for "
+                      f"{len(stages_with_rows)} evaluated stage(s)")
     for stage, state in enumerate(models):
         rows = arrays["true_task"] <= stage
         if not rows.any():
@@ -208,13 +316,44 @@ def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict
         decision = ((x - mean) / scale) @ coef.T + intercept
         winning = decision == decision.max(axis=1, keepdims=True)
         pred = np.where(winning, classes[None, :], np.iinfo(np.int64).max).min(axis=1)
-        agree += int(np.sum(pred == routes[rows, stage])); total += int(rows.sum())
-    return {"route_agreement": agree / total if total else float("nan"),
-            "decisions_compared": total}
+        recorded = routes[rows, stage].astype(np.int64)
+        same = pred == recorded
+        agree += int(same.sum()); total += int(rows.sum())
+        if kind in EXACT_ROUTERS and ties is not None:
+            tie_flag_errors += int(np.sum((winning.sum(axis=1) > 1)
+                                          != np.asarray(ties[rows, stage], dtype=bool)))
+        if same.all():
+            continue
+        # Classify each disagreement by the float64 gap between the recorded
+        # and the recomputed winner.
+        d64 = (((x.astype(np.float64) - mean) / scale) @ coef.astype(np.float64).T
+               + intercept.astype(np.float64))
+        column = {int(c): j for j, c in enumerate(classes)}
+        for i in np.flatnonzero(~same):
+            j_rec, j_new = column.get(int(recorded[i])), column.get(int(pred[i]))
+            mismatches += 1
+            if j_rec is None or j_new is None:
+                continue
+            gap = abs(d64[i, j_new] - d64[i, j_rec])
+            if gap <= NEAR_TIE_RTOL * (1.0 + float(np.max(np.abs(d64[i])))):
+                near_ties += 1
+    if kind in EXACT_ROUTERS and (mismatches or tie_flag_errors):
+        errors.append(f"stored {kind} router: {mismatches} route(s) and {tie_flag_errors} tie "
+                      "flag(s) differ from the recorded decisions (expected exact)")
+    elif mismatches - near_ties:
+        errors.append(f"stored {kind} router: {mismatches - near_ties} route(s) differ from "
+                      "the recorded decisions beyond float32 rounding")
+    return {"route_agreement": agree / total if total else None,
+            "decisions_compared": total, "disagreements": mismatches,
+            "near_tie_disagreements": near_ties, "errors": errors}
 
 
 def decomposition(stats: dict) -> dict:
-    """Final-stage error partition in percentage units (pooled over examples)."""
+    """Final-stage error partition in percentage units (pooled over examples).
+
+    Valid for disjoint label sets only (Proposition 1); ``rho`` is ``None``
+    when ``A = 100`` (no errors to recover).
+    """
     A = stats["micro_class_il_acc"]; U = stats["micro_task_inference_acc"]
     O = stats["micro_oracle_route_acc"]; V = stats["conditional_class_acc"]
     return {
@@ -223,7 +362,7 @@ def decomposition(stats: dict) -> dict:
         "identity_residual_A_minus_UV": A - U * V / 100.0,
         "oracle_error": 100.0 - O,
         "recoverable_routing_loss": O - A,
-        "recoverable_fraction_percent": (100.0 * (O - A) / (100.0 - A)) if A < 100.0 else float("nan"),
+        "recoverable_fraction_percent": (100.0 * (O - A) / (100.0 - A)) if A < 100.0 else None,
     }
 
 
@@ -241,7 +380,10 @@ _METRIC_NAMES = (
 def compare_with_artifact(arrays: dict, meta: dict, payload: dict, npz,
                           benchmark: str, method: str, seed: int) -> list[str]:
     """Exact comparison of recomputed statistics with the job's artifacts."""
-    errors: list[str] = []
+    errors: list[str] = structural_errors(arrays, meta,
+                                          expected_test_counts(payload, benchmark, seed))
+    if errors:
+        return errors            # recomputing a malformed recording proves nothing
     T = int(meta["num_tasks"]); disjoint = bool(meta.get("disjoint_classes", True))
     seeds = payload["seeds"]
     metrics = payload["per_seed"][benchmark][method][seeds.index(seed)]
@@ -276,6 +418,13 @@ def compare_with_artifact(arrays: dict, meta: dict, payload: dict, npz,
             if float(metrics[json_name]) != float(rec["stats"][stat]):
                 errors.append(f"{key}: {json_name} JSON={metrics[json_name]} "
                               f"recomputed={rec['stats'][stat]}")
+    if calibrated:
+        record = (((payload.get("calibration") or {}).get(benchmark) or {})
+                  .get(method) or {}).get(str(seed)) or {}
+        if not record.get("prefix_models"):
+            errors.append(f"{key}: calibrated job without stored prefix routers")
+        else:
+            errors += [f"{key}: {e}" for e in stored_router_agreement(arrays, record)["errors"]]
     return errors
 
 
@@ -290,6 +439,37 @@ def _task_calibration():
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def fit_accuracy_check(arrays: dict, record: dict) -> dict:
+    """Recompute each stored router's fitting accuracies from the stored inputs.
+
+    The runner recorded, per prefix stage, the accuracy of the fitted router
+    (``fit_accuracy``) and of the raw argmin rule (``raw_argmin_fit_accuracy``)
+    on the held-out training scores it was fitted on. The predictions file
+    stores those scores (float32, exactly as computed), so both numbers must
+    be reproduced exactly with the stored router.
+    """
+    tc = _task_calibration()
+    x = np.asarray(arrays["calibration_features"], dtype=np.float64)
+    y = np.asarray(arrays["calibration_task_ids"], dtype=np.int64)
+    errors: list[str] = []
+    checked = 0
+    for stage, state in enumerate(record.get("prefix_models") or []):
+        rows = y <= stage
+        xs, ys = x[rows, :stage + 1], y[rows]
+        if "fit_accuracy" in state:
+            value = float(np.mean(tc.predict_score_logreg(xs, state) == ys))
+            if value != float(state["fit_accuracy"]):
+                errors.append(f"stage {stage}: fit_accuracy recomputed {value!r}, "
+                              f"recorded {state['fit_accuracy']!r}")
+            checked += 1
+        if "raw_argmin_fit_accuracy" in state:
+            value = float(np.mean(np.argmin(xs, axis=1) == ys))
+            if value != float(state["raw_argmin_fit_accuracy"]):
+                errors.append(f"stage {stage}: raw_argmin_fit_accuracy recomputed {value!r}, "
+                              f"recorded {state['raw_argmin_fit_accuracy']!r}")
+    return {"stages_checked": checked, "errors": errors}
 
 
 def refit_agreement(arrays: dict, meta: dict, record: dict) -> dict:
@@ -339,24 +519,52 @@ def check_job(result_json: Path, refit: bool) -> list[dict]:
                     if not path.is_file():
                         entry["errors"].append("predictions file missing")
                         out.append(entry); continue
+                    out.append(entry)
                     if sha256_file(path) != pred.get("sha256"):
                         entry["errors"].append("predictions file SHA-256 differs from record")
-                    arrays, meta = load_predictions(path)
-                    if meta.get("trained_state_content_sha256") != record["trained_state"]["content_sha256"]:
-                        entry["errors"].append("predictions belong to a different trained state")
-                    entry["errors"] += compare_with_artifact(
-                        arrays, meta, payload, npz, benchmark, method, int(seed_text))
-                    rec = recompute(arrays, int(meta["num_tasks"]), bool(meta.get("disjoint_classes", True)))
-                    entry["decomposition"] = decomposition(rec["stats"])
-                    if record.get("kind") not in (None, "none") and record.get("prefix_models"):
-                        entry["stored_router"] = stored_router_agreement(arrays, record)
+                    try:
+                        arrays, meta = load_predictions(path)
+                        if meta.get("trained_state_content_sha256") != (
+                                record.get("trained_state") or {}).get("content_sha256"):
+                            entry["errors"].append("predictions belong to a different trained state")
+                        entry["errors"] += compare_with_artifact(
+                            arrays, meta, payload, npz, benchmark, method, int(seed_text))
+                        if entry["errors"]:
+                            continue
+                        disjoint = bool(meta.get("disjoint_classes", True))
+                        rec = recompute(arrays, int(meta["num_tasks"]), disjoint)
+                        if disjoint:
+                            entry["decomposition"] = decomposition(rec["stats"])
+                        if record.get("kind") not in (None, "none") and record.get("prefix_models"):
+                            entry["stored_router"] = stored_router_agreement(arrays, record)
+                            if "calibration_features" in arrays:
+                                fit = fit_accuracy_check(arrays, record)
+                                entry["fit_accuracy_check"] = fit
+                                entry["errors"] += fit["errors"]
+                            else:
+                                entry["errors"].append("calibrated job without stored "
+                                                       "calibration inputs")
+                    except Exception as exc:  # noqa: BLE001 - a corrupt file is an error entry
+                        entry["errors"].append(f"cannot check predictions: "
+                                               f"{type(exc).__name__}: {exc}")
+                        continue
                     if refit and "calibration_features" in arrays and record.get("kind") not in (None, "none"):
                         try:
                             entry["refit"] = refit_agreement(arrays, meta, record)
                         except Exception as exc:  # noqa: BLE001 - reported, not fatal
                             entry["refit"] = {"error": f"{type(exc).__name__}: {exc}"}
-                    out.append(entry)
     return out
+
+
+def _finite(value):
+    """Replace NaN/inf by ``None`` so the report is strict JSON."""
+    if isinstance(value, float) and not np.isfinite(value):
+        return None
+    if isinstance(value, dict):
+        return {k: _finite(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_finite(v) for v in value]
+    return value
 
 
 def parse_args(argv=None):
@@ -372,6 +580,35 @@ def parse_args(argv=None):
     return p.parse_args(argv)
 
 
+def missing_prediction_entries(run_dir: Path, entries: list[dict]) -> list[dict]:
+    """Jobs launched with ``--predictions-dir`` must have one file per isolation method."""
+    plan_path = run_dir / "plan.json"
+    if not plan_path.is_file():
+        return []
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    found: dict[str, int] = {}
+    for e in entries:
+        found[e["job"]] = found.get(e["job"], 0) + 1
+    out = []
+    for item in plan.get("jobs", []):
+        job = item.get("job", {})
+        status_path = run_dir / "statuses" / f"{job.get('job_id')}.json"
+        if not status_path.is_file():
+            continue
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+        if "--predictions-dir" not in (status.get("command") or []):
+            continue
+        expected = [m for m in str(job.get("methods", "")).split(",") if m in ISOLATION]
+        have = found.get(job["job_id"], 0)
+        if have < len(expected):
+            out.append({"job": job["job_id"], "benchmark": job.get("benchmark", "?"),
+                        "method": ",".join(expected), "seed": int(job.get("seed", -1)),
+                        "file": None,
+                        "errors": [f"per-example predictions recorded for {have} of "
+                                   f"{len(expected)} isolation method(s)"]})
+    return out
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
     results = (sorted(args.run_dir.glob("artifacts/*/result.json")) if args.run_dir
@@ -379,21 +616,30 @@ def main(argv=None) -> int:
     entries = []
     for path in results:
         entries += check_job(path, args.refit)
+    if args.run_dir:
+        entries += missing_prediction_entries(args.run_dir, entries)
     failures = [e for e in entries if e["errors"]]
     report = {"files_checked": len(entries), "files_with_errors": len(failures),
               "status": "passed" if entries and not failures else ("failed" if failures else "no-predictions"),
               "entries": entries}
     if args.out:
-        args.out.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        args.out.write_text(json.dumps(_finite(report), indent=2, allow_nan=False),
+                            encoding="utf-8")
     for e in entries:
         d = e.get("decomposition", {})
         refit = e.get("refit", {})
         stored = e.get("stored_router", {})
+        rho = d.get("recoverable_fraction_percent")
+
+        def num(x, fmt):
+            return "n/a" if x is None else format(x, fmt)
         print(f"{e['benchmark']:13s} {e['method']:8s} seed{e['seed']}: "
-              f"A={d.get('routed_accuracy', float('nan')):6.2f} U={d.get('task_inference', float('nan')):6.2f} "
-              f"O={d.get('oracle_accuracy', float('nan')):6.2f} rho={d.get('recoverable_fraction_percent', float('nan')):5.1f}% "
-              + (f"stored-router-agreement={stored['route_agreement']:.4f} " if 'route_agreement' in stored else "")
-              + (f"refit-agreement={refit['route_agreement']:.4f} " if 'route_agreement' in refit else "")
+              + (f"A={num(d.get('routed_accuracy'), '6.2f')} U={num(d.get('task_inference'), '6.2f')} "
+                 f"V={num(d.get('conditional_accuracy'), '6.2f')} O={num(d.get('oracle_accuracy'), '6.2f')} "
+                 f"rho={num(rho, '5.1f')}% " if d else "")
+              + (f"stored-router-agreement={num(stored.get('route_agreement'), '.4f')} "
+                 f"(near-ties {stored.get('near_tie_disagreements', 0)}) " if stored else "")
+              + (f"refit-agreement={num(refit.get('route_agreement'), '.4f')} " if 'route_agreement' in refit else "")
               + ("OK" if not e["errors"] else "ERRORS: " + "; ".join(e["errors"][:3])))
     print(f"{report['files_checked']} predictions file(s) checked, {report['files_with_errors']} with errors -> {report['status']}")
     return 0 if report["status"] == "passed" else 1

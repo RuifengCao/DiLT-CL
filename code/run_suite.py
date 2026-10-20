@@ -1012,7 +1012,10 @@ def run_job(job: Job, command: list[str], output_prefix: Path,
         output_paths.extend(sorted(checkpoint_root.rglob("*.pt")))
     predictions_root = output_prefix.parent / "predictions"
     if predictions_root.is_dir():
-        output_paths.extend(sorted(predictions_root.rglob("*.npz")))
+        # ``*.tmp.<pid>.npz`` is a write in progress (or left by a killed
+        # attempt), never an output of this job.
+        output_paths.extend(sorted(p for p in predictions_root.rglob("*.npz")
+                                   if ".tmp." not in p.name))
     outputs = []
     for path in output_paths:
         if path.is_file():
@@ -1569,7 +1572,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nCompleted. Return the entire directory: {run_dir}")
     if args.job_granularity == "method" and not failures:
         print("Merge the per-method artifacts with: python tools/merge_results.py "
-              f"{run_dir} --out {run_dir / 'merged'}")
+              f"{run_dir}   (writes {run_dir / 'merged'})")
     return 1 if failures else 0
 
 

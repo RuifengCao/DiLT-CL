@@ -1,4 +1,4 @@
-# DiLT-CL v3.0.5: research code
+# DiLT-CL v3.0.6: research code
 
 Disentangled Lottery-Ticket Continual Learning (DiLT-CL) and the baselines,
 protocols and infrastructure used to evaluate it. `diltcl.__version__` is the
@@ -19,7 +19,7 @@ records, are in `../evidence/results_20260906/`.
 | Runners | `run_task_il.py` (task-IL), `run_class_il.py` (class-IL) |
 | Launcher | `run_suite.py`: resumable, parallel job suite with provenance (`run_v21_experiment_suite.py` is a forwarding shim for old command lines) |
 | Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, paired statistics |
-| Tests | `tests/`, 31 files, 268 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (~1 min on CPU) |
+| Tests | `tests/`, 31 files, 280 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (~1 min on CPU) |
 | Metadata | `pyproject.toml` (version read from `diltcl.__version__`), `requirements.txt` (ranges), `requirements-lock.txt` (the exact recorded stack), `Dockerfile` |
 | Reproduction | `REPRODUCE.md`: verify the released artifacts on a CPU, re-evaluate released checkpoints, re-run training and audit the regeneration |
 
@@ -55,9 +55,9 @@ code/
 │   ├── build_release.py            release archives of complete run directories (per-job results, checkpoints, predictions), hash-checked against the job records (v3.0.5)
 │   ├── check_environment.py        installed packages / GPU / CUDA / cuDNN versus the recorded stack (v3.0.5)
 │   ├── measure_compact_storage.py  compact export size with logit-equivalence check
-│   ├── recompute_from_predictions.py  rebuilds every class-IL matrix/statistic from per-example predictions (v3.0.5, CPU)
-│   ├── evaluate_checkpoints.py     re-evaluates persisted isolation checkpoints and compares with the artifacts (v3.0.5)
-│   ├── compare_runs.py             regeneration audit: re-run vs retained artifacts (state hashes, arrays, metrics; v3.0.5)
+│   ├── recompute_from_predictions.py  checks per-example predictions and rebuilds every class-IL matrix/statistic, stored router decisions and fitting accuracies from them (v3.0.5, CPU)
+│   ├── evaluate_checkpoints.py     re-evaluates persisted isolation checkpoints and compares with the artifacts; --combine checks shard coverage (v3.0.5)
+│   ├── compare_runs.py             regeneration audit: re-run vs retained artifacts (state and file hashes, arrays, metrics, coverage; v3.0.5)
 │   ├── paired_stats.py             paired CIs, paired t, exact sign-flip, Holm, minimum detectable difference (v3.0.5)
 │   ├── head_mode_digits.py         CPU-only head-protocol preview on sklearn digits
 │   └── repair_independent_matrices.py  legacy (v2.0) matrix repair; not needed for v3 artifacts
@@ -69,7 +69,7 @@ code/
 │   ├── execution.py              ExecutionOptions: data backend, numerics mode, TF32, threads (recorded in artifacts)
 │   ├── metrics.py, stats.py, task_inference.py, task_calibration.py, profiling.py
 │   ├── compact_export.py, preflight.py, runner_common.py, config.py, utils.py
-│   └── __init__.py               __version__ = "3.0.5"
+│   └── __init__.py               __version__ = "3.0.6"
 └── tests/
 ```
 
@@ -90,7 +90,9 @@ be staged by hand (`tiny-imagenet-200/train`, `val/images`,
 ## Quick start
 
 ```bash
-export DILTCL_DATA_ROOT=/data DILTCL_DOWNLOAD=0 DILTCL_CACHE_DIR=/data_cache   # cache must be outside the data root
+export DILTCL_DATA_ROOT=/data DILTCL_CACHE_DIR=/data_cache   # cache must be outside the data root
+# P0/P1 never download (the suite passes --no-download); only the smoke profile
+# may fetch CIFAR-100/MNIST with --allow-download, unless DILTCL_DOWNLOAD=0 is set.
 
 python tools/preflight_check.py --data-root $DILTCL_DATA_ROOT \
     --benchmarks cifar,pmnist,tinyimagenet --require-calibration \
