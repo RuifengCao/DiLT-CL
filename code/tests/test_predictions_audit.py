@@ -296,7 +296,7 @@ def _run_runner(out_prefix, predictions_dir, methods, calibration="none",
         return json.load(handle)
 
 
-@pytest.mark.parametrize("calibration", ["none", "score-bias"])
+@pytest.mark.parametrize("calibration", ["none", "score-bias", "score-bias-acc", "score-logreg"])
 def test_runner_persists_verifiable_predictions(calibration):
     verifier = _load("verify_bundle_under_test", ROOT / "tools" / "verify_experiment_bundle.py")
     with tempfile.TemporaryDirectory() as tmp:
@@ -326,9 +326,12 @@ def test_runner_persists_verifiable_predictions(calibration):
         entries = rp.check_job(out.with_suffix(".json"), refit=calibration != "none")
         assert len(entries) == 1 and entries[0]["errors"] == []
         if calibration != "none":
-            assert entries[0]["stored_router"]["route_agreement"] == 1.0
+            if calibration in ("score-bias", "score-bias-acc"):
+                # One non-zero coefficient per decision: reproduced exactly.
+                assert entries[0]["stored_router"]["route_agreement"] == 1.0
             assert entries[0]["stored_router"]["errors"] == []
-            assert entries[0]["refit"]["route_agreement"] == 1.0
+            if calibration == "score-bias":
+                assert entries[0]["refit"]["route_agreement"] == 1.0
             # Fitting accuracies of every stored prefix router are reproduced.
             fit = entries[0]["fit_accuracy_check"]
             assert fit["stages_checked"] == len(record["prefix_models"]) and fit["errors"] == []
@@ -368,7 +371,7 @@ def _runner_device():
     return get_device()
 
 
-@pytest.mark.parametrize("calibration", ["none", "score-logreg"])
+@pytest.mark.parametrize("calibration", ["none", "score-logreg", "score-bias", "score-bias-acc"])
 def test_checkpoints_reevaluate_bit_identically(calibration):
     """Released checkpoints alone regenerate every routed and oracle result."""
     evaluator = _load("evaluate_checkpoints_under_test", ROOT / "tools" / "evaluate_checkpoints.py")
@@ -477,6 +480,32 @@ def test_shard_reports_must_cover_every_class_il_job(tmp_path):
                     shard("1/2", jobs[1::2], methods=("wsn",))]) == 1      # a method skipped
     assert combine([shard("0/2", jobs[0::2]),                             # any method order
                     shard("1/2", jobs[1::2], methods=evaluator.ISOLATION[::-1])]) == 0
+
+
+def test_a_job_that_raises_is_reported_and_the_others_kept(tmp_path, monkeypatch):
+    pytest.importorskip("torch")
+    evaluator = _load("evaluate_checkpoints_raise_test", ROOT / "tools" / "evaluate_checkpoints.py")
+    good, bad = tmp_path / "good" / "result.json", tmp_path / "bad" / "result.json"
+
+    def fake_evaluate_job(path, **_):
+        if path.parent.name == "bad":
+            raise RuntimeError("CUDA out of memory")
+        return [{"job": "good", "benchmark": "cifar", "method": "wsn", "seed": 0,
+                 "router": "none", "errors": [], "exact": True,
+                 "max_abs_matrix_difference": 0.0, "metric_differences": {},
+                 "per_example_differences": {}, "metrics_compared": [],
+                 "metrics_not_compared": []}]
+
+    monkeypatch.setattr(evaluator, "evaluate_job", fake_evaluate_job)
+    report_path = tmp_path / "report.json"
+    code = evaluator.main(["--result", str(bad), "--result", str(good), "--device", "cpu",
+                           "--out", str(report_path)])
+    assert code == 1
+    report = json.loads(report_path.read_text())
+    assert report["status"] == "failed" and report["checkpoints_evaluated"] == 2
+    assert [e["job"] for e in report["entries"]] == ["bad", "good"]
+    assert "CUDA out of memory" in report["entries"][0]["errors"][0]
+    assert report["entries"][1]["errors"] == [] and report["entries"][1]["exact"]
 
 
 def test_structural_checks_reject_malformed_recordings():

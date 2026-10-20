@@ -32,7 +32,9 @@ differences instead of failing on them.
 
 A referenced predictions file must exist and match the SHA-256 in the
 artifact before it is used as the baseline. Every isolation method a class-IL
-job ran must have a persisted-state record.
+job ran must have a persisted-state record. A job whose re-evaluation raises
+(missing data, a malformed checkpoint, running out of GPU memory) becomes an
+error entry in the report; the other jobs are still evaluated and reported.
 
 ``--shard K/N`` processes every N-th job starting at K so N processes can
 share one GPU; each shard report records the shard and its jobs, and
@@ -334,6 +336,18 @@ def evaluate_job(result_json: Path, *, device: str, methods: tuple[str, ...],
     return entries
 
 
+def job_error_entry(result_json: Path, exc: Exception) -> dict:
+    """Report entry for a job whose re-evaluation raised (missing data, a
+    malformed checkpoint, CUDA out of memory, ...): an error, so the run fails,
+    while the entries of every other job are kept in the report."""
+    return {"job": Path(result_json).parent.name, "benchmark": "?", "method": "?",
+            "seed": "?", "router": None,
+            "errors": [f"re-evaluation raised {type(exc).__name__}: {exc}"],
+            "exact": False, "max_abs_matrix_difference": 0.0, "metric_differences": {},
+            "per_example_differences": {}, "metrics_compared": [],
+            "metrics_not_compared": []}
+
+
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -454,7 +468,12 @@ def main(argv=None) -> int:
         results = results[k::n]
     entries = []
     for path in results:
-        entries += evaluate_job(path, device=device, methods=methods, atol=args.atol)
+        try:
+            entries += evaluate_job(path, device=device, methods=methods, atol=args.atol)
+        except Exception as exc:  # noqa: BLE001 - one job must not discard the others
+            entries.append(job_error_entry(path, exc))
+            if str(device).startswith("cuda"):
+                torch.cuda.empty_cache()
     failures = [e for e in entries if e["errors"]]
     exact = all(e["exact"] for e in entries)
     status = ("failed" if failures else

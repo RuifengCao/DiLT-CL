@@ -1367,6 +1367,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--pin-sklearn", action="store_true",
                         help="Require scikit-learn for the calibrated router "
                              "instead of allowing the built-in SciPy solver.")
+    parser.add_argument("--allow-cpu", action="store_true",
+                        help="Run a P0/P1/all profile even though PyTorch sees no "
+                             "CUDA device. Without it such a run stops: on the CPU "
+                             "every job is far slower and not comparable bit for "
+                             "bit with GPU runs.")
     parser.add_argument("--skip-verify", action="store_true")
 
     parser.add_argument(
@@ -1619,6 +1624,15 @@ def _main(argv: list[str] | None) -> int:
         raise SystemExit(
             "PyTorch preflight failed. See environment.json; install the "
             "required GPU/CPU PyTorch stack before running experiments.")
+    if (args.profile != "smoke" and not args.allow_cpu
+            and environment["torch_probe"].get("cuda_available") is False):
+        # The runners fall back to the CPU silently (diltcl.utils.get_device);
+        # a driver too old for the installed CUDA build, or a GPU that is not
+        # attached after a restart, would otherwise start days of CPU jobs.
+        raise SystemExit(
+            "PyTorch sees no CUDA device (torch.cuda.is_available() is False), "
+            "so every job would train on the CPU. Check nvidia-smi and the "
+            "driver, or pass --allow-cpu to run on the CPU deliberately.")
 
     # Fail fast on everything else that is knowable now. The first v2.1 P0 run
     # lost five of seven jobs -- including two that had already finished

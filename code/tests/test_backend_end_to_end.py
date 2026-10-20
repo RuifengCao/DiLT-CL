@@ -248,6 +248,34 @@ def test_split_tinyimagenet_generic_decode_path_is_bit_identical():
                 os.environ["DILTCL_CACHE_DIR"] = old_cache
 
 
+def test_tinyimagenet_loads_from_a_relative_data_root():
+    """ImageFolder lists its files with the root already joined, so a relative
+    data root must not be joined a second time when the cache key is derived
+    (v3.0.7 and v3.0.8 raised FileNotFoundError for every relative root)."""
+    with tempfile.TemporaryDirectory() as root, \
+            tempfile.TemporaryDirectory() as cache:
+        _write_fake_tinyimagenet(root)
+        saved_cwd, old_cache = os.getcwd(), os.environ.get("DILTCL_CACHE_DIR")
+        os.environ["DILTCL_CACHE_DIR"] = cache
+        try:
+            os.chdir(root)
+            hashes = []
+            for data_root in (".", "./", root):
+                train, test = get_split_tinyimagenet(
+                    num_tasks=2, classes_per_task=2, batch_size=4, seed=3,
+                    data_root=data_root, num_workers=0, backend="device",
+                    device="cpu")
+                hashes.append((describe_task_loader(train[0], 0)["materialized_pixels_sha256"],
+                               describe_task_loader(test[0], 0)["materialized_pixels_sha256"]))
+            assert hashes[0] == hashes[1] == hashes[2]
+        finally:
+            os.chdir(saved_cwd)
+            if old_cache is None:
+                os.environ.pop("DILTCL_CACHE_DIR", None)
+            else:
+                os.environ["DILTCL_CACHE_DIR"] = old_cache
+
+
 if __name__ == "__main__":
     functions = [value for name, value in sorted(globals().items())
                  if name.startswith("test_") and callable(value)]

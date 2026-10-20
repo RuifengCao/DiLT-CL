@@ -60,7 +60,7 @@ under v3.0.2, so its rows for those two methods time the invalidated runs;
 ```bash
 cd code
 pip install -r requirements.txt pytest matplotlib
-python -m pytest tests -q                 # 305 tests, 304 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
+python -m pytest tests -q                 # 312 tests, 311 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
 
 # every evidence file against its recorded hash
 python - <<'EOF'
@@ -99,25 +99,25 @@ in [`code/REPRODUCE.md`](code/REPRODUCE.md).
 
 ## Status
 
-Code version 3.0.8 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
+Code version 3.0.9 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
 were produced by versions 3.0.0 to 3.0.3 on one NVIDIA RTX 5090; the exact
 software stack is pinned in `code/requirements-lock.txt` and recorded in each
 run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
 accounting, parameter counts, a SciPy fallback that the recorded runs did not
 use) and added per-example prediction recording, checkpoint re-evaluation, a
-regeneration audit and a release builder. Version 3.0.6 changed no training
-or evaluation arithmetic; it made those audit tools fail on incomplete or
-altered evidence instead of reporting success. Version 3.0.7 changed no
-arithmetic either; it closed gaps that a second review found in resuming
-runs, in data identity (dataset folders linked into the data root, the
-decoded-image cache) and in the inputs of the audit tools. Version 3.0.8
-changes no arithmetic: two tests re-evaluated checkpoints on the CPU after
-training them on the GPU, and so failed on any machine with a GPU; and a
-second suite launcher started on a run directory that is already in use now
-stops before writing anything (`code/PROTOCOL.md`).
-These additions are covered by the test suite and by a synthetic end-to-end
-run, both also run on the recorded software stack (Python 3.12.3, PyTorch
-2.12.1) on a CPU. Whether 3.0.8 regenerates the recorded results bit for bit
+regeneration audit and a release builder. Versions 3.0.6 to 3.0.9 changed no
+training or evaluation arithmetic. Version 3.0.6 made the audit tools fail on
+incomplete or altered evidence instead of reporting success; 3.0.7 closed gaps
+in resuming runs, in data identity (dataset folders linked into the data root,
+the decoded-image cache) and in the inputs of the audit tools; 3.0.8 fixed two
+tests that failed on any machine with a GPU and made a second suite launcher
+stop on a run directory that is in use; 3.0.9 fixes TinyImageNet loading from a
+relative data root, stops P0/P1 suites when PyTorch sees no GPU (unless
+`--allow-cpu`), keeps the other jobs' results when one checkpoint
+re-evaluation fails, and runs every router kind through the audit tests
+(`code/PROTOCOL.md`). The test suite and a synthetic end-to-end run pass on
+Python 3.13 and on the recorded software stack (Python 3.12.3, PyTorch
+2.12.1) on a CPU. Whether 3.0.9 regenerates the recorded results bit for bit
 on the recorded stack is what the Level 3 regeneration audit in
 `code/REPRODUCE.md` checks; that audit has not been run yet.
 

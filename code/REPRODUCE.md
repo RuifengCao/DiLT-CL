@@ -31,8 +31,8 @@ with a run's recorded `environment.json`.
 or, with Docker and the NVIDIA Container Toolkit:
 
 ```bash
-docker build -t diltcl:3.0.8 .
-docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.8
+docker build -t diltcl:3.0.9 .
+docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.9
 ```
 
 Levels 1 and 2 also work with any recent PyTorch/NumPy/SciPy; only exact
@@ -154,7 +154,9 @@ per-example differences.
 
 To share one GPU between several processes, run `--shard K/N` for
 `K = 0..N-1` and combine the shard reports; the combination fails unless the
-shards cover every class-IL job of the run exactly once:
+shards cover every class-IL job of the run exactly once. A job whose
+re-evaluation raises (missing data, out of memory) is reported as an error
+and the remaining jobs are still evaluated:
 
 ```bash
 for k in 0 1 2 3; do
@@ -199,7 +201,9 @@ the three suites one after another and nothing else on the GPU meanwhile;
 `--pin-sklearn` makes the preflight require scikit-learn, the router fitting
 backend of every recorded run. The original jobs ran with
 `DILTCL_CACHE_DIR` on the data disk and `CUBLAS_WORKSPACE_CONFIG=:4096:8`
-(the suite sets the latter unless the shell already does).
+(the suite sets the latter unless the shell already does). The runners fall
+back to the CPU when PyTorch sees no CUDA device, so the P0 and P1 profiles
+stop instead unless `--allow-cpu` is given.
 
 The suite runs up to eight jobs in parallel on one 32 GB GPU, resumes after an
 interruption (a second launcher on a run directory that is still in use

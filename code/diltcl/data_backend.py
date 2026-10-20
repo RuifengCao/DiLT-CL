@@ -300,12 +300,15 @@ def _source_signature(dataset):
                 digest.update(np.asarray(labels, dtype=np.int64).tobytes())
             return digest.hexdigest()
         return None
-    base = getattr(dataset, "images_dir", None) or str(getattr(dataset, "root", ""))
+    # ImageFolder lists every file with its root already joined (a relative
+    # root gives relative paths, which must not be joined again); the
+    # TinyImageNet validation split lists bare file names under images_dir.
+    base = getattr(dataset, "images_dir", None)
     digest = hashlib.sha256()
     real_dirs: dict[str, str] = {}      # one realpath per folder, not per image
     for item in samples:
         path, label = (item[0], item[1]) if isinstance(item, (tuple, list)) else (item, "")
-        full = path if os.path.isabs(path) else os.path.join(base, path)
+        full = os.path.join(base, path) if base and not os.path.isabs(path) else path
         folder, name = os.path.split(full)
         if folder not in real_dirs:
             real_dirs[folder] = os.path.realpath(folder)

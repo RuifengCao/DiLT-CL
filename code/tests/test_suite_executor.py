@@ -291,6 +291,35 @@ class ExecutorTests(unittest.TestCase):
                 self.assertFalse(suite.lock_run_dir(run_dir))
                 self.assertEqual(_prepare(args, data_root), 0)
 
+    def test_p0_and_p1_stop_when_pytorch_sees_no_gpu(self):
+        stubs = {"execute_jobs": lambda *a, **k: [],
+                 "environment_probe": lambda: {"torch_probe": {"ok": True,
+                                                               "cuda_available": False}},
+                 "write_pip_freeze": lambda run_dir: None}
+        saved = {name: getattr(suite, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(suite, name, stub)
+            with tempfile.TemporaryDirectory() as tmp:
+                data_root = pathlib.Path(tmp) / "data"
+                data_root.mkdir()
+
+                def run(profile, *extra):
+                    run_dir = pathlib.Path(tmp) / f"{profile}{len(extra)}"
+                    return suite.main(["--profile", profile, "--run-dir", str(run_dir),
+                                       "--max-parallel", "1", "--skip-preflight",
+                                       "--skip-verify", "--dataset-hash", "none",
+                                       "--data-root", str(data_root), *extra])
+
+                with self.assertRaises(SystemExit) as stopped:
+                    run("p1")
+                self.assertIn("no CUDA device", str(stopped.exception))
+                self.assertEqual(run("p1", "--allow-cpu"), 0)    # a deliberate CPU run
+                self.assertEqual(run("smoke"), 0)                # smoke checks run anywhere
+        finally:
+            for name, value in saved.items():
+                setattr(suite, name, value)
+
     def test_main_acknowledges_a_source_change_only_when_asked(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = pathlib.Path(tmp) / "run"
