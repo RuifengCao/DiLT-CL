@@ -406,10 +406,10 @@ def combine(paths: list[Path], out_path: Path | None) -> int:
         missing = sorted(set(expected) - set(covered))
         if missing:
             problems.append(f"{run_dir}: {len(missing)} class-IL job(s) not covered by any shard")
-        method_sets = {tuple(r.get("methods") or ()) for r in shard_reports}
-        if method_sets != {ISOLATION}:
+        method_sets = {frozenset(r.get("methods") or ()) for r in shard_reports}
+        if method_sets != {frozenset(ISOLATION)}:
             problems.append(f"{run_dir}: shards did not all evaluate every isolation method "
-                            f"({sorted(method_sets)})")
+                            f"({sorted(sorted(m) for m in method_sets)})")
     entries = [e for r in reports for e in r.get("entries", [])]
     failures = [e for e in entries if e["errors"]]
     exact = all(e["exact"] for e in entries)

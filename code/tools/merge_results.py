@@ -3,9 +3,10 @@
 
 ``run_suite.py`` runs one job per ``(benchmark, seed, method)`` by default, so a
 finished P0 run holds hundreds of small ``result.json`` / ``result.npz`` pairs.
-This tool folds them back into the single-artifact layout that the paper
-tables, ``tools/verify_experiment_bundle.py --results`` and the notebooks
-expect, and it recomputes every derived quantity instead of copying it:
+This tool folds them back into the single-artifact layout that the table
+and figure tools (``make_class_il_table.py``, ``make_v3_figures.py``,
+``tools/paired_stats.py``) read, and it recomputes every derived quantity
+instead of copying it:
 
 * ``per_seed`` lists are re-assembled in ascending seed order,
 * ``aggregated`` (mean/std/values) is recomputed from the merged per-seed
@@ -61,7 +62,7 @@ from typing import Any
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-TOOL_VERSION = "1.0"
+TOOL_VERSION = "1.1"
 
 # Canonical method order for merged artifacts (unknown methods follow).
 METHOD_ORDER = ["finetune", "ewc", "lwf", "er", "derpp", "packnet", "supsup",
@@ -599,8 +600,13 @@ def job_reasons(verification: dict[str, Any], job_id: str,
                            "(SHA-256 differs from the verifier's report)")
     if ended_at is not None:
         verified_at, finished = _parse_time(verification["verified_at"]), _parse_time(ended_at)
-        if verified_at is None or finished is None or verified_at < finished:
-            reasons.append(f"{job_id}: the verification report predates the job's completion")
+        try:
+            predates = verified_at is None or finished is None or verified_at < finished
+        except TypeError:        # one timestamp has a UTC offset, the other not
+            predates = True
+        if predates:
+            reasons.append(f"{job_id}: the verification report predates the job's completion "
+                           "(or its time cannot be compared)")
     return reasons
 
 

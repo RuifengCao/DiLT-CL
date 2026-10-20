@@ -45,7 +45,7 @@ import tarfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-TOOL_VERSION = "1.1"
+TOOL_VERSION = "1.2"
 # In supplementary mode, references from the code's own docs to repository
 # folders that are not shipped with the package (the evidence folder and the
 # folder names of older project layouts) are replaced by a neutral note.
@@ -71,8 +71,19 @@ def _copy(src: Path, dst: Path) -> None:
 
 
 def _strip_fingerprint(src: Path, dst: Path) -> None:
-    """Copy a dataset fingerprint without its (huge) per-file list."""
+    """Copy a dataset fingerprint without its (huge) per-file list.
+
+    Fingerprints written before v3.0.1 have no per-entry hashes; they are
+    computed from the per-file list before it is dropped (the same function
+    the suite uses), so that every job's data stays comparable entry by entry.
+    """
     data = json.loads(src.read_text(encoding="utf-8"))
+    if "entries" not in data and data.get("files"):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from run_suite import fingerprint_entries
+        data["entries"] = fingerprint_entries(data["files"])
+        data["entries_derived_from_files"] = True
     data.pop("files", None)
     data["note"] = ("per-file records removed for the package; the tree_sha256 "
                     "and entries identify the data exactly")
@@ -94,9 +105,10 @@ def collect_run(run_dir: Path, dest: Path, include_artifacts: bool,
     if (run_dir / "dataset_fingerprint.json").is_file():
         _strip_fingerprint(run_dir / "dataset_fingerprint.json",
                            dest / "dataset_fingerprint.json")
-    for folder in ("source_manifests", "environments"):
+    for folder, pattern in (("source_manifests", "*.json"), ("environments", "*.json"),
+                            ("pip_freezes", "*.txt")):
         if (run_dir / folder).is_dir():
-            for path in sorted((run_dir / folder).glob("*.json")):
+            for path in sorted((run_dir / folder).glob(pattern)):
                 _copy(path, dest / folder / path.name)
     if (run_dir / "dataset_fingerprints").is_dir():
         for path in sorted((run_dir / "dataset_fingerprints").glob("*.json")):
@@ -193,6 +205,10 @@ def write_manifest(root: Path, runs: list[dict], supplementary: bool) -> dict:
         if path.is_file() and path.name != "MANIFEST.json":
             files.append({"path": path.relative_to(root).as_posix(),
                           "bytes": path.stat().st_size, "sha256": _sha256(path)})
+    if supplementary:
+        # The packaging machine's absolute paths mean nothing to reviewers and
+        # may identify the authors.
+        runs = [{k: v for k, v in run.items() if k != "run_dir"} for run in runs]
     manifest = {
         "tool": "tools/build_results_package.py", "tool_version": TOOL_VERSION,
         "built_at": datetime.now(timezone.utc).isoformat(),
@@ -244,8 +260,9 @@ def write_how_to_verify(root: Path, runs: list[dict]) -> None:
     run_names = [r["name"] for r in runs]
     text = f"""# How to verify these results
 
-1. Install: `pip install -r code/requirements.txt` (PyTorch, torchvision, numpy, scipy).
-2. Unit and equivalence tests (CPU, about a minute): `cd code && python -m pytest tests`.
+1. Install: `pip install -r code/requirements.txt pytest matplotlib` (PyTorch, torchvision,
+   numpy, scipy, scikit-learn; pytest and matplotlib for the tests).
+2. Unit and equivalence tests (CPU, a few minutes): `cd code && python -m pytest tests`.
 3. Recompute every reported metric from the raw matrices of a run:
    `python code/tools/verify_experiment_bundle.py <run>` needs the full run directory
    (per-job artifacts); this package ships the verifier's report per run
@@ -258,7 +275,8 @@ def write_how_to_verify(root: Path, runs: list[dict]) -> None:
 
 Runs in this package: {', '.join(run_names)}.
 Every artifact records `code_version`, `execution` (data backend, numerics mode, TF32 policy)
-and the SHA-256 of the exact pixel tensors used per task.
+and, for every task view, the SHA-256 of the decoded split it indexes (training split;
+test split from v3.0.7).
 """
     (root / "HOW_TO_VERIFY.md").write_text(text, encoding="utf-8")
 
@@ -309,7 +327,9 @@ def main(argv=None) -> int:
         write_how_to_verify(out, runs)
         print(f"copied code package ({count} files) -> code/")
     write_readme(out, runs, args.supplementary is not None)
+    manifest = write_manifest(out, runs, args.supplementary is not None)
     if args.anonymity_check:
+        # Scanned last, so that MANIFEST.json and README.md are covered too.
         tokens = [t.strip() for t in args.anonymity_check.split(",") if t.strip()]
         hits = anonymity_check(out, tokens)
         if hits:
@@ -319,7 +339,6 @@ def main(argv=None) -> int:
             shutil.rmtree(out)
             return 2
         print(f"anonymity check passed ({len(tokens)} token(s))")
-    manifest = write_manifest(out, runs, args.supplementary is not None)
     print(f"package: {out} ({manifest['file_count']} files, "
           f"{manifest['total_bytes'] / 2**20:.1f} MiB)")
     if not args.no_tar:

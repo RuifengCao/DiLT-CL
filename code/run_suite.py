@@ -26,7 +26,7 @@ Per-job results are merged across seeds and methods with
 
 Examples
 --------
-Plan a smoke run without importing PyTorch::
+Print the jobs of a smoke run, without importing PyTorch or writing anything::
 
     python run_suite.py --profile smoke --dry-run
 
@@ -512,12 +512,39 @@ def fingerprint_entries(records: list[dict[str, Any]]) -> dict[str, dict[str, An
     return entries
 
 
+def data_files(root: Path) -> list[Path]:
+    """Every regular file under ``root``, following symlinked directories.
+
+    ``Path.rglob`` does not descend into a symlinked directory, so a dataset
+    linked into the data root (common with shared dataset stores) would be
+    missing from the fingerprint. Links are followed like real directories;
+    a link back to a directory already on the current path is skipped.
+    """
+    files: list[Path] = []
+    chains = {str(root): frozenset({os.path.realpath(root)})}
+    for current, dirs, names in os.walk(root, followlinks=True):
+        chain = chains.pop(current, frozenset())
+        keep = []
+        for name in dirs:
+            child = os.path.join(current, name)
+            real = os.path.realpath(child)
+            if real not in chain:
+                chains[child] = chain | {real}
+                keep.append(name)
+        dirs[:] = keep
+        for name in names:
+            path = Path(current) / name
+            if path.is_file():
+                files.append(path)
+    return files
+
+
 def fingerprint_data_root(root: Path, mode: str) -> dict[str, Any]:
     if not root.exists():
         return {"root": str(root), "exists": False, "mode": mode}
     records = []
     aggregate = hashlib.sha256()
-    files = [path for path in root.rglob("*") if path.is_file()]
+    files = data_files(root)
     files.sort(key=lambda path: path.relative_to(root).as_posix())
     total_bytes = 0
     for index, path in enumerate(files, 1):
@@ -544,6 +571,18 @@ def fingerprint_data_root(root: Path, mode: str) -> dict[str, Any]:
         "tree_sha256": aggregate.hexdigest(), "files": records,
         "entries": fingerprint_entries(records),
     }
+
+
+def unrecorded_entries(fingerprint: dict[str, Any], jobs: list[Job]) -> list[str]:
+    """Data entries some job reads that the fingerprint does not record.
+
+    Such a job's dataset identity would be empty, so a later change to that
+    data would go unnoticed on resume and in the verifier.
+    """
+    present = fingerprint.get("entries") or fingerprint_entries(fingerprint.get("files", []))
+    return sorted({f"{job.benchmark}: {name}" for job in jobs
+                   for name in preflight.benchmark_data_entries(job.benchmark)
+                   if name not in present})
 
 
 def job_dataset_identity(fingerprint: dict[str, Any] | None, benchmark: str,
@@ -758,18 +797,20 @@ def accepted_source_hashes(plan: dict[str, Any]) -> set[str]:
     return accepted
 
 
-def config_path_for(job: Job, run_dir: Path) -> Path | None:
+def config_path_for(job: Job, run_dir: Path, write: bool = True) -> Path | None:
     if not job.config_overrides:
         return None
     path = run_dir / "configs" / f"{job.job_id}.json"
-    atomic_json(path, job.config_overrides)
+    if write:
+        atomic_json(path, job.config_overrides)
     return path
 
 
 def command_for(job: Job, run_dir: Path, data_root: Path | None,
                 allow_download: bool,
                 save_checkpoints: bool = True,
-                execution_args: tuple[str, ...] = ()) -> tuple[list[str], Path]:
+                execution_args: tuple[str, ...] = (),
+                write_config: bool = True) -> tuple[list[str], Path]:
     output_prefix = run_dir / "artifacts" / job.job_id / "result"
     command = [
         sys.executable, str(ROOT / job.runner),
@@ -782,7 +823,7 @@ def command_for(job: Job, run_dir: Path, data_root: Path | None,
         command.append("--fast")
     command.extend(job.extra_args)
     command.extend(execution_args)
-    config_path = config_path_for(job, run_dir)
+    config_path = config_path_for(job, run_dir, write_config)
     if config_path is not None:
         command.extend(("--config-json", str(config_path)))
     if data_root is not None:
@@ -872,13 +913,31 @@ class _ProcessRegistry:
                 process.kill()
 
 
+def visible_gpu_selector() -> list[str] | None:
+    """``nvidia-smi`` arguments selecting the first GPU the jobs will use.
+
+    ``nvidia-smi`` lists every GPU of the machine; ``CUDA_VISIBLE_DEVICES``
+    (an index or UUID list) names the ones the children see. ``None`` when it
+    hides every GPU. With several GPUs, set ``CUDA_DEVICE_ORDER=PCI_BUS_ID`` so
+    that CUDA and ``nvidia-smi`` number them alike.
+    """
+    value = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if value is None:
+        return []
+    first = value.split(",")[0].strip()
+    if not first or first.startswith("-"):
+        return None
+    return ["-i", first]
+
+
 def gpu_memory_mib() -> tuple[int, int] | None:
     """``(used_mib, total_mib)`` of the first visible GPU, or ``None``."""
-    if shutil.which("nvidia-smi") is None:
+    selector = visible_gpu_selector()
+    if shutil.which("nvidia-smi") is None or selector is None:
         return None
     try:
         proc = subprocess.run(
-            ["nvidia-smi", "--query-gpu=memory.used,memory.total",
+            ["nvidia-smi", *selector, "--query-gpu=memory.used,memory.total",
              "--format=csv,noheader,nounits"],
             text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
             timeout=20, check=False)
@@ -1019,9 +1078,10 @@ def run_job(job: Job, command: list[str], output_prefix: Path,
     outputs = []
     for path in output_paths:
         if path.is_file():
+            # Relative to the run directory as laid out (not resolved): an
+            # ``artifacts/`` folder linked to another volume stays inside it.
             outputs.append({"path": str(path.resolve()),
-                            "path_relative_to_run_dir": str(
-                                path.resolve().relative_to(run_dir.resolve())),
+                            "path_relative_to_run_dir": os.path.relpath(path, run_dir),
                             "bytes": path.stat().st_size,
                             "sha256": sha256_file(path)})
     main_outputs_ok = all(path.is_file() for path in output_paths[:2])
@@ -1155,12 +1215,12 @@ def plan_payload(jobs: list[Job], run_dir: Path, data_root: Path | None,
                  dataset_hash_mode: str,
                  execution_options: dict[str, Any] | None = None,
                  execution_args: tuple[str, ...] = (),
-                 granularity: str = "seed") -> dict[str, Any]:
+                 granularity: str = "seed", write_configs: bool = True) -> dict[str, Any]:
     records = []
     for job in jobs:
         command, output = command_for(
             job, run_dir, data_root, allow_download, save_checkpoints,
-            execution_args)
+            execution_args, write_configs)
         records.append({
             "job": asdict(job), "command": command,
             "output_prefix": str(output),
@@ -1197,10 +1257,19 @@ def plan_payload(jobs: list[Job], run_dir: Path, data_root: Path | None,
 
 
 def write_pip_freeze(run_dir: Path) -> None:
+    """Record ``pip freeze``; a different earlier record is kept under
+    ``pip_freezes/<sha256>.txt``, like the environment and source records."""
     proc = subprocess.run(
         [sys.executable, "-m", "pip", "freeze"], text=True,
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
     path = run_dir / "pip_freeze.txt"
+    if path.is_file():
+        previous = path.read_text(encoding="utf-8")
+        if previous != proc.stdout:
+            archive = run_dir / "pip_freezes"
+            archive.mkdir(exist_ok=True)
+            digest = hashlib.sha256(previous.encode("utf-8")).hexdigest()
+            (archive / f"{digest}.txt").write_text(previous, encoding="utf-8")
     path.write_text(proc.stdout, encoding="utf-8")
 
 
@@ -1302,6 +1371,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.invalidate_methods and not args.accept_source_change:
+        raise SystemExit("--invalidate-methods requires --accept-source-change")
+    dry = bool(args.dry_run)          # a dry run reads the run directory, never writes it
     default_seeds = {"smoke": "0", "p0": "0-4", "p1": "0-4", "all": "0-9"}
     try:
         seeds = parse_seed_spec(args.seeds or default_seeds[args.profile])
@@ -1362,7 +1434,8 @@ def main(argv: list[str] | None = None) -> int:
     if any(job.benchmark == "tinyimagenet" for job in jobs) and data_root is None:
         raise SystemExit("--data-root is required because this profile includes TinyImageNet")
 
-    run_dir.mkdir(parents=True, exist_ok=True)
+    if not dry:
+        run_dir.mkdir(parents=True, exist_ok=True)
     save_checkpoints = not args.no_save_checkpoints
     source = source_manifest()
     plan = plan_payload(jobs, run_dir, data_root, args.allow_download,
@@ -1370,13 +1443,16 @@ def main(argv: list[str] | None = None) -> int:
                         source["execution_sha256"], dataset_hash,
                         execution_options=asdict(options),
                         execution_args=execution_args,
-                        granularity=args.job_granularity)
+                        granularity=args.job_granularity, write_configs=not dry)
     plan["scheduling"] = {"max_parallel": max_parallel,
                           "threads_per_job": int(args.threads_per_job),
                           "job_memory_mib": int(args.job_memory_mib),
                           **parallel_detail}
     plan_path = run_dir / "plan.json"
     plan["source_change_acknowledgements"] = []
+    would = "[dry run] would record: " if dry else ""
+    invalidated = sorted({m.strip() for m in (args.invalidate_methods or "").split(",")
+                          if m.strip()})
     if plan_path.exists():
         old_plan = json.loads(plan_path.read_text(encoding="utf-8"))
         plan["source_change_acknowledgements"] = list(
@@ -1400,25 +1476,63 @@ def main(argv: list[str] | None = None) -> int:
                         "\"<reason>\" to keep them; otherwise use another "
                         "--run-dir or --force-plan.")
                 if args.accept_source_change:
-                    invalidated = sorted({m.strip() for m in
-                                          (args.invalidate_methods or "").split(",")
-                                          if m.strip()})
                     plan["source_change_acknowledgements"].append({
                         "from": old_source,
                         "to": plan["execution_source_sha256"],
                         "reason": args.accept_source_change,
                         "invalidated_methods": invalidated,
                         "acknowledged_at": utc_now()})
-                    print(f"[source change] acknowledged {old_source[:12]} -> "
+                    print(f"{would}[source change] acknowledged {old_source[:12]} -> "
                           f"{plan['execution_source_sha256'][:12]}: "
                           f"{args.accept_source_change}")
                     if invalidated:
-                        print(f"[source change] results of {invalidated} produced "
+                        print(f"{would}[source change] results of {invalidated} produced "
                               f"under {old_source[:12]} are invalidated and will be rerun")
             elif not args.force_plan:
                 raise SystemExit(
                     "run directory contains a different plan; choose another "
                     "--run-dir or pass --force-plan")
+        elif args.accept_source_change:
+            # The change into the current source is already acknowledged (an
+            # earlier invocation recorded it). Methods named now must not be
+            # dropped silently: add them to that acknowledgement.
+            current = plan["execution_source_sha256"]
+            latest = next((record for record in reversed(plan["source_change_acknowledgements"])
+                           if record.get("to") == current), None)
+            if latest is None:
+                if invalidated:
+                    raise SystemExit(
+                        "--invalidate-methods: this run directory has no acknowledged "
+                        "source change into the current code, so no finished result "
+                        "was produced by a different version; nothing to invalidate")
+                print("[source change] nothing to acknowledge: the run directory "
+                      "already matches the current code")
+            else:
+                added = sorted(set(invalidated) - set(latest.get("invalidated_methods") or []))
+                if added:
+                    latest["invalidated_methods"] = sorted(
+                        set(latest.get("invalidated_methods") or []) | set(added))
+                    latest.setdefault("amendments", []).append({
+                        "invalidated_methods_added": added,
+                        "reason": args.accept_source_change, "amended_at": utc_now()})
+                    print(f"{would}[source change] the acknowledged change "
+                          f"{latest['from'][:12]} -> {current[:12]} now also invalidates "
+                          f"{added}; their results produced under {latest['from'][:12]} "
+                          "will be rerun")
+                else:
+                    print(f"[source change] {latest['from'][:12]} -> {current[:12]} is "
+                          "already acknowledged"
+                          + (f" with {invalidated} invalidated" if invalidated else ""))
+    if dry:
+        print(f"Run directory: {run_dir} (dry run: nothing is written)")
+        print(f"Profile: {args.profile}; jobs: {len(jobs)} "
+              f"({args.job_granularity} granularity); seeds: {seeds}")
+        for record in plan["jobs"]:
+            print(record["job"]["job_id"])
+            print("  " + " ".join(record["command"]))
+        print("Dry run only; no file was written and no dataset hashing or training "
+              "was performed.")
+        return 0
     atomic_json(plan_path, plan)
     accepted_sources = accepted_source_hashes(plan)
     archive_if_changed(run_dir / "source_manifest.json", source,
@@ -1443,15 +1557,6 @@ def main(argv: list[str] | None = None) -> int:
               "seeds; the table tool suppresses stars below that "
               "threshold, so this run cannot support inferential claims.",
               file=sys.stderr)
-    if args.invalidate_methods and not args.accept_source_change:
-        raise SystemExit("--invalidate-methods requires --accept-source-change")
-    if args.dry_run:
-        for record in plan["jobs"]:
-            print(record["job"]["job_id"])
-            print("  " + " ".join(record["command"]))
-        print("Dry run only; no dataset hashing or training was performed.")
-        return 0
-
     if data_root is None:
         raise SystemExit("--data-root is required for every real suite run")
     if args.profile != "smoke" and args.allow_download:
@@ -1522,6 +1627,13 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"[dataset fingerprint] data root changed since the last "
                       f"run; entries changed: {changed}. Only jobs whose "
                       f"benchmark reads a changed entry will be rerun.")
+        if not args.allow_download:
+            unrecorded = unrecorded_entries(fingerprint, jobs)
+            if unrecorded:
+                raise SystemExit(
+                    "the dataset fingerprint of the data root has no record of "
+                    f"{unrecorded}; stage these entries under --data-root (symbolic "
+                    "links are followed) before running")
 
     outcomes: list[dict[str, Any]] = []
     try:
@@ -1565,9 +1677,15 @@ def main(argv: list[str] | None = None) -> int:
                           "verify_experiment_bundle.py"), str(run_dir)]
         print("\n[verify] " + " ".join(verify_command))
         verification = subprocess.run(verify_command, cwd=ROOT, check=False)
+        summary["postrun_verifier_returncode"] = verification.returncode
         if verification.returncode != 0:
             failures.append({"job_id": "postrun_verifier", "state": "failed",
                              "returncode": verification.returncode})
+            summary.update(state="failed", failed_jobs=failures)
+        # The summary and failure list must agree with the exit status.
+        atomic_json(run_dir / "suite_summary.json", summary)
+        atomic_json(run_dir / "failures.json", {
+            "failed_jobs": failures, "silent_exclusions": False})
 
     print(f"\nCompleted. Return the entire directory: {run_dir}")
     if args.job_granularity == "method" and not failures:

@@ -202,3 +202,25 @@ if __name__ == "__main__":
     for test in tests:
         test()
         print(f"PASS {test.__name__}")
+
+
+def test_labels_benchmark_names_and_caption_notes_follow_the_artifact():
+    module = _load_table_module()
+    module.paired_significance = lambda *_: {"p_value": 0.5}
+    artifact = _artifact(n_seeds=5)
+    artifact["calibration_fraction"] = 0.1
+    artifact["benchmarks"] = ["tinyimagenet"]
+    for key in ("per_seed", "aggregated"):
+        artifact[key] = {"tinyimagenet": artifact[key]["cifar"]}
+    rendered = module._table("tinyimagenet", artifact)
+    assert "results on Split-TinyImageNet" in rendered
+    assert r"\label{tab:classil_tinyimagenet_score-logreg}" in rendered
+    assert r"held-out 10\% of each task's training data" in rendered
+    assert r"remaining 90\%" in rendered and "vs.\\ DER++" in rendered
+    # Entropy routing keeps the plain label; no DER++ row means no stars promised.
+    artifact["inference_calibration"] = "none"
+    artifact["methods"] = ["diltcl"]
+    rendered = module._table("tinyimagenet", artifact)
+    assert r"\label{tab:classil_tinyimagenet}" in rendered
+    assert "No DER++ reference row" in rendered and "vs.\\ DER++" not in rendered
+    assert "held-out" not in rendered

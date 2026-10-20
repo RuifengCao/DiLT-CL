@@ -51,7 +51,10 @@ converted directly; everything else (``ImageFolder`` / TinyImageNet, the
 resized 5-datasets tasks) is decoded with a multi-process ``DataLoader`` and
 cached under ``$DILTCL_CACHE_DIR`` (default ``~/.cache/diltcl``). The cache is
 deliberately kept **outside** the data root so it does not perturb the suite's
-dataset fingerprint. Writes are atomic and guarded by a file lock so that
+dataset fingerprint. A cache entry is selected by the dataset's source files
+(resolved path, size, modification time and label of every image) or raw
+arrays, so changed data is decoded again, and every load recomputes the
+recorded pixel hash. Writes are atomic and guarded by a file lock so that
 parallel jobs starting at the same time decode each dataset only once.
 """
 
@@ -275,6 +278,43 @@ def _array_fast_path(dataset):
     return np.ascontiguousarray(x), y
 
 
+def _source_signature(dataset):
+    """Identity of the image files a decoded dataset is read from.
+
+    Datasets that list their files (``samples``: ``ImageFolder`` and the
+    TinyImageNet validation split) are identified by every file's resolved
+    path, size and modification time and its label, so replacing, adding or
+    removing an image -- or pointing at another copy of the data -- selects
+    a different cache entry. Array-backed datasets decoded through a PIL
+    stage (the resized 5-datasets tasks) are identified by their raw arrays.
+    """
+    samples = getattr(dataset, "samples", None)
+    if not samples:
+        data = getattr(dataset, "data", None)
+        if isinstance(data, np.ndarray):
+            digest = hashlib.sha256(np.ascontiguousarray(data).tobytes())
+            labels = getattr(dataset, "targets", None)
+            if labels is None:
+                labels = getattr(dataset, "labels", None)
+            if labels is not None:
+                digest.update(np.asarray(labels, dtype=np.int64).tobytes())
+            return digest.hexdigest()
+        return None
+    base = getattr(dataset, "images_dir", None) or str(getattr(dataset, "root", ""))
+    digest = hashlib.sha256()
+    real_dirs: dict[str, str] = {}      # one realpath per folder, not per image
+    for item in samples:
+        path, label = (item[0], item[1]) if isinstance(item, (tuple, list)) else (item, "")
+        full = path if os.path.isabs(path) else os.path.join(base, path)
+        folder, name = os.path.split(full)
+        if folder not in real_dirs:
+            real_dirs[folder] = os.path.realpath(folder)
+        info = os.stat(full)
+        digest.update(f"{os.path.join(real_dirs[folder], name)}\0{info.st_size}\0"
+                      f"{info.st_mtime_ns}\0{label}\n".encode("utf-8"))
+    return digest.hexdigest()
+
+
 def _cache_key(dataset, transform_repr):
     parts = {
         "class": f"{type(dataset).__module__}.{type(dataset).__name__}",
@@ -283,7 +323,8 @@ def _cache_key(dataset, transform_repr):
         "split": getattr(dataset, "split", None),
         "len": len(dataset),
         "transform": transform_repr,
-        "format": 1,
+        "sources": _source_signature(dataset),
+        "format": 2,
     }
     encoded = json.dumps(parts, sort_keys=True, default=str).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()[:24]
@@ -422,9 +463,16 @@ def _load_cache(path, mean, std, source_class, transform_repr):
             raise RuntimeError(
                 f"cache {path} was built for a different transform; delete it "
                 "or set DILTCL_CACHE_REFRESH=1")
-        return MaterializedArrays(
-            archive["x"], archive["y"], mean, std, source_class,
-            transform_repr, content_sha256=str(archive["content_sha256"]))
+        arrays = MaterializedArrays(archive["x"], archive["y"], mean, std,
+                                    source_class, transform_repr)
+        recorded = str(archive["content_sha256"])
+    # The hash recorded by the runners is recomputed from the loaded pixels,
+    # so a damaged cache file cannot pass as the data it was built from.
+    if arrays.content_sha256 != recorded:
+        raise RuntimeError(
+            f"cache {path} is damaged (pixel hash {arrays.content_sha256[:12]} != "
+            f"recorded {recorded[:12]}); delete it or set DILTCL_CACHE_REFRESH=1")
+    return arrays
 
 
 # ---------------------------------------------------------------------------

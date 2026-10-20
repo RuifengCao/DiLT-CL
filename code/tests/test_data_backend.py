@@ -27,8 +27,11 @@ try:
     from torch.utils.data import DataLoader, Subset
     from torchvision import transforms
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch/torchvision not installed; data backend tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch/torchvision not installed; data backend tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch/torchvision not installed; data backend tests skipped.", allow_module_level=True)
 
 from diltcl import data_backend as db  # noqa: E402
 from diltcl.data import PermutedMNIST, SubsetWithMapping  # noqa: E402
@@ -236,6 +239,73 @@ def test_generic_decode_path_and_cache_round_trip():
     for i in range(len(ds)):
         expected, _ = ds[i]
         assert torch.equal(x[i], expected), f"resized sample {i} differs"
+
+
+def _image_tree(root, shift=0):
+    """A tiny ImageFolder train split and a TinyImageNet-style val split."""
+    for c, wnid in enumerate(("n01", "n02")):
+        (root / "train" / wnid).mkdir(parents=True)
+        for i in range(3):
+            Image.fromarray(np.full((8, 8, 3), 30 * i + 100 * c + shift, np.uint8)).save(
+                root / "train" / wnid / f"{i}.png")
+    (root / "val" / "images").mkdir(parents=True)
+    lines = []
+    for i in range(4):
+        Image.fromarray(np.full((8, 8, 3), 20 * i + shift, np.uint8)).save(
+            root / "val" / "images" / f"val_{i}.png")
+        lines.append(f"val_{i}.png\t{('n01', 'n02')[i % 2]}\t0\t0\t8\t8")
+    (root / "val" / "val_annotations.txt").write_text("\n".join(lines) + "\n")
+
+
+def test_cache_entries_follow_the_source_files():
+    """Changed, replaced or relocated images are decoded again, never served stale."""
+    from torchvision import datasets
+    from diltcl.hard_benchmarks import _TinyImageNetVal
+    transform = transforms.Compose([transforms.ToTensor()])
+
+    def train(root):
+        return db.materialize_dataset(datasets.ImageFolder(str(root / "train"), transform=transform),
+                                      cache_dir=str(cache), workers=0, verbose=False, name="t")
+
+    def val(root):
+        folder = datasets.ImageFolder(str(root / "train"))
+        dataset = _TinyImageNetVal(str(root / "val"), folder.class_to_idx, transform)
+        return db.materialize_dataset(dataset, cache_dir=str(cache), workers=0,
+                                      verbose=False, name="v")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = pathlib.Path(tmp)
+        cache = tmp / "cache"
+        _image_tree(tmp / "a")
+        _image_tree(tmp / "b", shift=7)          # another copy with other pixels
+        first, first_val = train(tmp / "a"), val(tmp / "a")
+        assert train(tmp / "a").content_sha256 == first.content_sha256      # cache hit
+        assert len(list(cache.glob("*.npz"))) == 2
+        # Another data root: its own entries, its own pixels (the val split
+        # has no ``root`` attribute and used to share one entry).
+        other_val = val(tmp / "b")
+        assert other_val.content_sha256 != first_val.content_sha256
+        assert int(other_val.x[0].min()) == 7
+        # An image replaced in place is decoded again.
+        target = tmp / "a" / "train" / "n01" / "0.png"
+        Image.fromarray(np.full((8, 8, 3), 255, np.uint8)).save(target)
+        stat = target.stat()
+        os.utime(target, ns=(stat.st_atime_ns, stat.st_mtime_ns + 10**9))
+        changed = train(tmp / "a")
+        assert changed.content_sha256 != first.content_sha256 and int(changed.x[0].max()) == 255
+        # A damaged cache file is refused instead of passing as the data.
+        newest = max(cache.glob("t_*.npz"), key=lambda p: p.stat().st_mtime_ns)
+        with np.load(newest) as archive:
+            stored = {k: archive[k] for k in archive.files}
+        stored["x"] = stored["x"].copy()
+        stored["x"][0, 0, 0, 0] ^= 1
+        np.savez(newest, **stored)
+        try:
+            train(tmp / "a")
+        except RuntimeError as exc:
+            assert "damaged" in str(exc)
+        else:
+            raise AssertionError("a damaged cache file was accepted")
 
 
 def test_unsupported_tensor_stage_is_rejected():

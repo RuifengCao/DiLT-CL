@@ -27,8 +27,11 @@ try:
     import numpy as np
     import torch  # noqa: F401 - the runners require it at import time
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch not installed; merge tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch not installed; merge tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch not installed; merge tests skipped.", allow_module_level=True)
 
 import merge_results as merge  # noqa: E402
 import run_task_il as taskil  # noqa: E402

@@ -164,3 +164,52 @@ def test_mdd_for_very_few_seeds_and_the_ten_seed_caption():
     assert value != value or value > 10                # NaN or a finite, large value
     assert "five seeds" in ps._sign_flip_floor([5]) and "0.0625" in ps._sign_flip_floor([5])
     assert "ten seeds" in ps._sign_flip_floor([10]) and "0.001953" in ps._sign_flip_floor([10])
+
+
+def _incomplete(payload, method, drop_seed):
+    """What ``merge_results.py --allow-incomplete`` writes when one seed is absent."""
+    rows = payload["per_seed"]["cifar"][method]
+    keep = [s for s in payload["seeds"] if s != drop_seed]
+    payload["per_seed"]["cifar"][method] = [rows[payload["seeds"].index(s)] for s in keep]
+    payload.setdefault("per_seed_run_records", {}).setdefault("cifar", {})[method] = {
+        str(s): {} for s in keep}
+    return payload
+
+
+def test_rows_of_an_incomplete_merge_are_aligned_to_their_seeds():
+    payload = _incomplete(_payload({"diltcl": [10, 11, 12, 13, 14.5],
+                                    "wsn": [9, 10.5, 11, 12.5, 13]}), "wsn", drop_seed=1)
+    assert ps.per_seed_values(payload, "cifar", "wsn", "ACC") == {0: 9, 2: 11, 3: 12.5, 4: 13}
+    with pytest.raises(ps.MissingComparison, match="aligned seeds"):
+        ps.compare(payload, "cifar", "ACC", "diltcl", "wsn")
+    row = ps.compare(payload, "cifar", "ACC", "diltcl", "wsn", allow_missing=True)
+    assert row["seeds"] == [0, 2, 3, 4] and row["mean_difference"] == pytest.approx(
+        np.mean([10 - 9, 12 - 11, 13 - 12.5, 14.5 - 13]))
+    # Rows that cannot be aligned are a refused comparison, not a traceback.
+    del payload["per_seed_run_records"]
+    with tempfile.TemporaryDirectory() as tmp:
+        path = pathlib.Path(tmp) / "t.json"
+        path.write_text(__import__("json").dumps(payload))
+        assert ps.main(["--task-il", str(path), "--task-comparators", "wsn"]) == 2
+
+
+def test_router_comparisons_check_their_seeds():
+    calibrated = _incomplete(_payload({"wsn": [9, 9, 9, 9, 9.5]}, calibration="score-bias",
+                                      raw={"wsn": [9, 9.2, 9.1, 9.3, 9.4]}), "wsn", drop_seed=3)
+    with pytest.raises(ps.MissingComparison, match="matched raw"):
+        ps.compare_router(calibrated, "cifar", "ACC", "wsn")
+    row = ps.compare_router(calibrated, "cifar", "ACC", "wsn", allow_missing=True)
+    assert row["seeds"] == [0, 1, 2, 4] and row["n_seeds"] == 4
+    assert row["mean_difference"] == pytest.approx(np.mean([0.0, -0.2, -0.1, 0.1]))
+
+
+def test_captions_name_the_comparisons_holm_actually_adjusted():
+    # wsn and supsup differ from diltcl by a constant: zero variance, no p-value.
+    main = _payload({"diltcl": [10, 11, 12, 13, 14.5], "wsn": [9, 10.5, 11, 12.5, 13],
+                     "supsup": [9, 10, 11, 12, 13.5]})
+    rows = ps.build(main, None, "diltcl", ["wsn", "supsup"], [])
+    assert [r["holm_tests"] for r in rows] == [1, 1] and rows[0]["family_size"] == 2
+    with tempfile.TemporaryDirectory() as tmp:
+        path = pathlib.Path(tmp) / "full.tex"
+        ps.write_tex(rows, path)
+        assert "1 comparison of this table with a defined $p$ (of 2)" in path.read_text()

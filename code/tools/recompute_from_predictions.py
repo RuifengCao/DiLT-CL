@@ -30,8 +30,9 @@ with consistent shapes, true tasks and labels in range, finite routing
 scores, routes only among the candidates ``0..s`` at stage ``s`` and ``-1``
 (no tie, no prediction) before an example's task has arrived, per-task
 example counts equal to the job's recorded test-set sizes, and, for
-calibrated jobs, the matched raw pass recorded on the same examples with the
-same scores and oracle predictions.
+calibrated jobs, the matched raw pass and the router-fitting inputs present,
+with the raw pass recorded on the same examples with the same scores and
+oracle predictions.
 
 It also checks that every raw-router decision is the lowest-ID argmin of
 the recorded scores (exact), and re-applies the job's stored calibrated
@@ -39,11 +40,17 @@ routers to the recorded scores: the score-bias and score-bias-acc routers
 put one non-zero coefficient in each decision, so their decisions and tie
 flags must be reproduced exactly; for the score-logreg router (a full
 ``T x T`` matrix product, which the GPU may sum in a different order) a
-disagreement is accepted only when the recorded and recomputed winners are
-within float32 rounding of each other, and such near-ties are counted.
+disagreement is accepted only when the exact gap between the recorded and
+the recomputed winner is within the float32 rounding-error bound of the two
+decisions, and such near-ties are counted. A job that recorded TF32 matrix
+products (``cuda_matmul_allow_tf32``; off in the recorded runs) is checked
+against the TF32 rounding bound for every router instead.
 
 All of these checks are enforced: a failure makes the job's entry an error
-and the exit status non-zero. Only the re-fit agreement (``--refit``) is
+and the exit status non-zero. A run none of whose jobs recorded predictions
+(runs before v3.0.5) has nothing to check: status ``not-recorded``, exit 0;
+a job launched with ``--predictions-dir`` whose files are missing is an
+error. Only the re-fit agreement (``--refit``) is
 reported, not enforced, because solver versions can move re-fitted
 coefficients. The decomposition is reported only for disjoint label sets,
 where Proposition 1 (routing ceiling) applies.
@@ -185,18 +192,38 @@ def expected_test_counts(payload: dict, benchmark: str, seed: int) -> list[int] 
     return [int(v) for v in values] if values is not None else None
 
 
+def is_calibrated(meta: dict) -> bool:
+    return meta.get("calibration", "none") not in (None, "none")
+
+
 def structural_errors(arrays: dict[str, np.ndarray], meta: dict,
                       expected_counts: list[int] | None = None) -> list[str]:
     """Shape, range and consistency checks of a predictions file.
 
     These guarantee that ``recompute`` sees a well-formed recording: an
     impossible route, a decision recorded before a task arrived, a non-finite
-    score or a missing example would otherwise be counted silently.
+    score or a missing example would otherwise be counted silently. A
+    calibrated job must also carry its matched raw pass (``raw_*``) and the
+    held-out scores its routers were fitted on.
     """
     errors: list[str] = []
     T = int(meta["num_tasks"])
     C = int(meta.get("classes_per_task") or 0)
-    prefixes = [""] + (["raw_"] if "raw_true_task" in arrays else [])
+    calibrated = is_calibrated(meta)
+    prefixes = [""] + (["raw_"] if calibrated or "raw_true_task" in arrays else [])
+    if calibrated:
+        missing = [k for k in ("calibration_features", "calibration_task_ids") if k not in arrays]
+        if missing:
+            errors.append(f"calibration inputs missing {missing}")
+        else:
+            x = np.asarray(arrays["calibration_features"])
+            y = np.asarray(arrays["calibration_task_ids"]).astype(np.int64)
+            if x.ndim != 2 or x.shape[1] != T or y.shape != (x.shape[0],) or not y.size:
+                errors.append(f"calibration inputs have shapes {x.shape} and {y.shape} "
+                              f"(expected (m, {T}) and (m,), m > 0)")
+            elif y.min() < 0 or y.max() >= T or not np.isfinite(x).all():
+                errors.append("calibration inputs: task id outside "
+                              f"0..{T - 1} or non-finite score")
     for prefix in prefixes:
         name = prefix or "router"
         missing = [k for k in PER_EXAMPLE if prefix + k not in arrays]
@@ -277,20 +304,28 @@ def raw_route_errors(arrays: dict[str, np.ndarray], prefix: str = "") -> list[st
 
 
 EXACT_ROUTERS = ("score-bias", "score-bias-acc")
-# Relative float32 tolerance under which two linear decisions count as tied
-# (summation order on the GPU versus NumPy; float32 epsilon is 1.2e-7).
-NEAR_TIE_RTOL = 1e-5
+U32 = 2.0 ** -24          # unit roundoff of float32
 
 
-def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict:
+U_TF32 = 2.0 ** -11       # unit roundoff of the TF32 inputs of a tensor-core matmul
+
+
+def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict,
+                            tf32: bool = False) -> dict:
     """Re-apply the job's serialized prefix routers to the recorded scores.
 
     Returns the agreement, the number of disagreements, how many of them are
     float32 near-ties, and ``errors`` -- disagreements that rounding cannot
     explain (any disagreement at all for the score-bias routers, whose
     decisions involve one product per candidate and are reproduced exactly).
+
+    ``tf32`` is the job's recorded ``cuda_matmul_allow_tf32``: with it the
+    device rounded both factors of the decision product to TF32, so no router
+    is reproduced exactly and the rounding bound uses the TF32 unit roundoff.
     """
     kind = record.get("kind")
+    exact = kind in EXACT_ROUTERS and not tf32
+    unit = U_TF32 if tf32 else U32
     models = record.get("prefix_models") or []
     scores = arrays["scores"].astype(np.float32)
     routes = arrays["route_by_stage"]
@@ -319,15 +354,28 @@ def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict
         recorded = routes[rows, stage].astype(np.int64)
         same = pred == recorded
         agree += int(same.sum()); total += int(rows.sum())
-        if kind in EXACT_ROUTERS and ties is not None:
+        if exact and ties is not None:
             tie_flag_errors += int(np.sum((winning.sum(axis=1) > 1)
                                           != np.asarray(ties[rows, stage], dtype=bool)))
         if same.all():
             continue
-        # Classify each disagreement by the float64 gap between the recorded
-        # and the recomputed winner.
-        d64 = (((x.astype(np.float64) - mean) / scale) @ coef.astype(np.float64).T
-               + intercept.astype(np.float64))
+        # Classify each disagreement. The standardized scores are the same
+        # float32 values on both sides (correctly rounded subtraction and
+        # division); only the float32 summation of the matrix product (n
+        # terms, any order, with or without FMA) and the final addition of the
+        # intercept may round differently. Each side is within
+        # gamma_n * sum|z_k c_jk| + u * |d_j| of the exact decision, so a flip
+        # between the recorded and the recomputed winner is explained by
+        # rounding only if their exact gap is within the sum of both sides'
+        # bounds for both classes (doubled for safety). With TF32 the factors
+        # are rounded to 11 significant bits first; gamma_n with the TF32 unit
+        # roundoff covers that rounding and the float32 accumulation for n >= 2.
+        z64 = ((x - mean) / scale).astype(np.float64)
+        c64 = coef.astype(np.float64)
+        d64 = z64 @ c64.T + intercept.astype(np.float64)
+        n_terms = z64.shape[1]
+        gamma = n_terms * unit / (1.0 - n_terms * unit)
+        bound = 2.0 * (gamma * (np.abs(z64) @ np.abs(c64).T) + U32 * np.abs(d64))
         column = {int(c): j for j, c in enumerate(classes)}
         for i in np.flatnonzero(~same):
             j_rec, j_new = column.get(int(recorded[i])), column.get(int(pred[i]))
@@ -335,9 +383,9 @@ def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict
             if j_rec is None or j_new is None:
                 continue
             gap = abs(d64[i, j_new] - d64[i, j_rec])
-            if gap <= NEAR_TIE_RTOL * (1.0 + float(np.max(np.abs(d64[i])))):
+            if gap <= 2.0 * (bound[i, j_new] + bound[i, j_rec]):
                 near_ties += 1
-    if kind in EXACT_ROUTERS and (mismatches or tie_flag_errors):
+    if exact and (mismatches or tie_flag_errors):
         errors.append(f"stored {kind} router: {mismatches} route(s) and {tie_flag_errors} tie "
                       "flag(s) differ from the recorded decisions (expected exact)")
     elif mismatches - near_ties:
@@ -345,7 +393,7 @@ def stored_router_agreement(arrays: dict[str, np.ndarray], record: dict) -> dict
                       "the recorded decisions beyond float32 rounding")
     return {"route_agreement": agree / total if total else None,
             "decisions_compared": total, "disagreements": mismatches,
-            "near_tie_disagreements": near_ties, "errors": errors}
+            "near_tie_disagreements": near_ties, "tf32": bool(tf32), "errors": errors}
 
 
 def decomposition(stats: dict) -> dict:
@@ -379,7 +427,15 @@ _METRIC_NAMES = (
 
 def compare_with_artifact(arrays: dict, meta: dict, payload: dict, npz,
                           benchmark: str, method: str, seed: int) -> list[str]:
-    """Exact comparison of recomputed statistics with the job's artifacts."""
+    """Exact comparison of recomputed statistics with the job's artifacts.
+
+    This is the check the verifier runs on every predictions file; the
+    report-only extras of ``check_job`` (decomposition, re-fit) build on it.
+    """
+    job_calibration = payload.get("inference_calibration")
+    if job_calibration is not None and meta.get("calibration", "none") != job_calibration:
+        return [f"predictions recorded with calibration {meta.get('calibration', 'none')!r}, "
+                f"job ran {job_calibration!r}"]
     errors: list[str] = structural_errors(arrays, meta,
                                           expected_test_counts(payload, benchmark, seed))
     if errors:
@@ -396,7 +452,7 @@ def compare_with_artifact(arrays: dict, meta: dict, payload: dict, npz,
                                       "task_inference_matrix": f"{key}/raw_task_inference",
                                       "conditional_class_matrix": f"{key}/raw_conditional_class",
                                       "routing_tie_matrix": f"{key}/raw_routing_tie"}))
-    calibrated = meta.get("calibration", "none") not in (None, "none")
+    calibrated = is_calibrated(meta)
     raw_prefix = "raw_" if calibrated else ""
     if f"{raw_prefix}scores" in arrays:
         errors += raw_route_errors(arrays, raw_prefix)
@@ -424,8 +480,16 @@ def compare_with_artifact(arrays: dict, meta: dict, payload: dict, npz,
         if not record.get("prefix_models"):
             errors.append(f"{key}: calibrated job without stored prefix routers")
         else:
-            errors += [f"{key}: {e}" for e in stored_router_agreement(arrays, record)["errors"]]
+            stored = stored_router_agreement(arrays, record, matmul_tf32(payload))
+            errors += [f"{key}: {e}" for e in stored["errors"]]
+            errors += [f"{key}: {e}" for e in fit_accuracy_check(arrays, record)["errors"]]
     return errors
+
+
+def matmul_tf32(payload: dict) -> bool:
+    """Whether the job's CUDA matmuls ran in TF32 (recorded execution flags)."""
+    effective = ((payload.get("execution") or {}).get("effective") or {})
+    return bool(effective.get("cuda_matmul_allow_tf32", False))
 
 
 # ---------------------------------------------------------------------------
@@ -535,15 +599,11 @@ def check_job(result_json: Path, refit: bool) -> list[dict]:
                         rec = recompute(arrays, int(meta["num_tasks"]), disjoint)
                         if disjoint:
                             entry["decomposition"] = decomposition(rec["stats"])
-                        if record.get("kind") not in (None, "none") and record.get("prefix_models"):
-                            entry["stored_router"] = stored_router_agreement(arrays, record)
-                            if "calibration_features" in arrays:
-                                fit = fit_accuracy_check(arrays, record)
-                                entry["fit_accuracy_check"] = fit
-                                entry["errors"] += fit["errors"]
-                            else:
-                                entry["errors"].append("calibrated job without stored "
-                                                       "calibration inputs")
+                        if is_calibrated(meta):
+                            # Already enforced by compare_with_artifact; kept for the report.
+                            entry["stored_router"] = stored_router_agreement(
+                                arrays, record, matmul_tf32(payload))
+                            entry["fit_accuracy_check"] = fit_accuracy_check(arrays, record)
                     except Exception as exc:  # noqa: BLE001 - a corrupt file is an error entry
                         entry["errors"].append(f"cannot check predictions: "
                                                f"{type(exc).__name__}: {exc}")
@@ -609,6 +669,18 @@ def missing_prediction_entries(run_dir: Path, entries: list[dict]) -> list[dict]
     return out
 
 
+def run_recorded_predictions(run_dir: Path) -> bool:
+    """Whether any job of a suite run was launched with ``--predictions-dir``."""
+    for status_path in sorted((run_dir / "statuses").glob("*.json")):
+        try:
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        if "--predictions-dir" in (status.get("command") or []):
+            return True
+    return False
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
     results = (sorted(args.run_dir.glob("artifacts/*/result.json")) if args.run_dir
@@ -619,9 +691,16 @@ def main(argv=None) -> int:
     if args.run_dir:
         entries += missing_prediction_entries(args.run_dir, entries)
     failures = [e for e in entries if e["errors"]]
+    if entries:
+        status = "failed" if failures else "passed"
+    elif args.run_dir and not run_recorded_predictions(args.run_dir):
+        # Runs produced before v3.0.5 recorded no per-example predictions;
+        # there is nothing to check, and nothing is missing.
+        status = "not-recorded"
+    else:
+        status = "no-predictions"
     report = {"files_checked": len(entries), "files_with_errors": len(failures),
-              "status": "passed" if entries and not failures else ("failed" if failures else "no-predictions"),
-              "entries": entries}
+              "status": status, "entries": entries}
     if args.out:
         args.out.write_text(json.dumps(_finite(report), indent=2, allow_nan=False),
                             encoding="utf-8")
@@ -641,6 +720,10 @@ def main(argv=None) -> int:
                  f"(near-ties {stored.get('near_tie_disagreements', 0)}) " if stored else "")
               + (f"refit-agreement={num(refit.get('route_agreement'), '.4f')} " if 'route_agreement' in refit else "")
               + ("OK" if not e["errors"] else "ERRORS: " + "; ".join(e["errors"][:3])))
+    if status == "not-recorded":
+        print("no job of this run was launched with --predictions-dir (per-example "
+              "predictions are recorded since v3.0.5) -> not-recorded")
+        return 0
     print(f"{report['files_checked']} predictions file(s) checked, {report['files_with_errors']} with errors -> {report['status']}")
     return 0 if report["status"] == "passed" else 1
 

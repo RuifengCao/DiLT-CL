@@ -41,6 +41,24 @@ def _fake_jobs():
     ]
 
 
+def _prepare(args, data_root):
+    """A real (not dry) ``run_suite.main`` that writes the run directory's plan
+    and provenance but runs no job: execution, the environment probe and pip
+    freeze are stubbed, so the check needs neither PyTorch nor datasets."""
+    stubs = {"execute_jobs": lambda *a, **k: [],
+             "environment_probe": lambda: {"torch_probe": {"ok": True}},
+             "write_pip_freeze": lambda run_dir: None}
+    saved = {name: getattr(suite, name) for name in stubs}
+    for name, stub in stubs.items():
+        setattr(suite, name, stub)
+    try:
+        return suite.main([*args, "--skip-preflight", "--skip-verify", "--dataset-hash", "none",
+                           "--data-root", str(data_root)])
+    finally:
+        for name, original in saved.items():
+            setattr(suite, name, original)
+
+
 class ExecutorTests(unittest.TestCase):
     def _run(self, run_dir, jobs, fail=(), max_parallel=2, stop_on_error=False,
              force=False):
@@ -198,22 +216,74 @@ class ExecutorTests(unittest.TestCase):
                 run_dir, jobs, data_root, execution_sha="sha3")}
             self.assertEqual(set(fourth.values()), {"succeeded"})
 
+    def test_artifacts_on_another_volume_stay_inside_the_run(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            elsewhere = pathlib.Path(tmp) / "big_disk"
+            run_dir.mkdir()
+            elsewhere.mkdir()
+            os.symlink(elsewhere, run_dir / "artifacts")
+            jobs = _fake_jobs()[:1]
+            self.assertEqual([o["state"] for o in self._run(run_dir, jobs)], ["succeeded"])
+            status = json.loads((run_dir / "statuses" / f"{jobs[0].job_id}.json").read_text())
+            self.assertEqual(status["outputs"][0]["path_relative_to_run_dir"],
+                             f"artifacts/{jobs[0].job_id}/result.json")
+            self.assertEqual([o["state"] for o in self._run(run_dir, jobs)], ["skipped"])
+
+    def test_a_changed_pip_freeze_keeps_the_earlier_record(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp)
+            (run_dir / "pip_freeze.txt").write_text("numpy==0.0.1\n")
+            suite.write_pip_freeze(run_dir)
+            digest = hashlib.sha256(b"numpy==0.0.1\n").hexdigest()
+            self.assertEqual((run_dir / "pip_freezes" / f"{digest}.txt").read_text(),
+                             "numpy==0.0.1\n")
+            self.assertNotEqual((run_dir / "pip_freeze.txt").read_text(), "numpy==0.0.1\n")
+
+    def test_gpu_probe_selects_the_first_visible_device(self):
+        import os
+        saved = os.environ.get("CUDA_VISIBLE_DEVICES")
+        try:
+            os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+            self.assertEqual(suite.visible_gpu_selector(), [])
+            os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
+            self.assertEqual(suite.visible_gpu_selector(), ["-i", "2"])
+            os.environ["CUDA_VISIBLE_DEVICES"] = "GPU-8f1e"
+            self.assertEqual(suite.visible_gpu_selector(), ["-i", "GPU-8f1e"])
+            for hidden in ("", "-1"):
+                os.environ["CUDA_VISIBLE_DEVICES"] = hidden
+                self.assertIsNone(suite.visible_gpu_selector())
+        finally:
+            if saved is None:
+                os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+            else:
+                os.environ["CUDA_VISIBLE_DEVICES"] = saved
+
     def test_main_acknowledges_a_source_change_only_when_asked(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = pathlib.Path(tmp) / "run"
-            args = ["--profile", "smoke", "--dry-run", "--run-dir", str(run_dir),
-                    "--max-parallel", "1"]
-            self.assertEqual(suite.main(args), 0)
+            data_root = pathlib.Path(tmp) / "data"
+            data_root.mkdir()
+            args = ["--profile", "smoke", "--run-dir", str(run_dir), "--max-parallel", "1"]
+            self.assertEqual(_prepare(args, data_root), 0)
             plan_path = run_dir / "plan.json"
             plan = json.loads(plan_path.read_text())
             current = plan["execution_source_sha256"]
             plan["execution_source_sha256"] = "0" * 64      # pretend older code
             plan_path.write_text(json.dumps(plan))
-            with self.assertRaises(SystemExit) as ctx:
-                suite.main(args)
-            self.assertIn("--accept-source-change", str(ctx.exception))
-            self.assertEqual(suite.main(args + ["--accept-source-change",
-                                                "validation fix"]), 0)
+            dry = args + ["--dry-run", "--dataset-hash", "none", "--data-root", str(data_root)]
+            for attempt in (lambda: _prepare(args, data_root), lambda: suite.main(dry)):
+                with self.assertRaises(SystemExit) as ctx:
+                    attempt()
+                self.assertIn("--accept-source-change", str(ctx.exception))
+            # A dry run previews the acknowledgement without recording it.
+            before = plan_path.read_text()
+            self.assertEqual(suite.main(dry + ["--accept-source-change", "validation fix"]), 0)
+            self.assertEqual(plan_path.read_text(), before)
+            self.assertEqual(_prepare(args + ["--accept-source-change", "validation fix"],
+                                      data_root), 0)
             plan = json.loads(plan_path.read_text())
             self.assertEqual(plan["execution_source_sha256"], current)
             self.assertEqual(plan["source_change_acknowledgements"][0]["from"], "0" * 64)
@@ -221,7 +291,7 @@ class ExecutorTests(unittest.TestCase):
                              "validation fix")
             # A genuinely different plan is still refused.
             with self.assertRaises(SystemExit) as ctx:
-                suite.main(args + ["--seeds", "0,1", "--accept-source-change", "x"])
+                _prepare(args + ["--seeds", "0,1", "--accept-source-change", "x"], data_root)
             self.assertIn("different plan", str(ctx.exception))
 
     def test_invalidated_methods_rerun_only_their_jobs(self):
@@ -267,21 +337,69 @@ class ExecutorTests(unittest.TestCase):
     def test_main_records_invalidated_methods_in_the_acknowledgement(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = pathlib.Path(tmp) / "run"
-            args = ["--profile", "smoke", "--dry-run", "--run-dir", str(run_dir),
-                    "--max-parallel", "1"]
-            self.assertEqual(suite.main(args), 0)
+            data_root = pathlib.Path(tmp) / "data"
+            data_root.mkdir()
+            args = ["--profile", "smoke", "--run-dir", str(run_dir), "--max-parallel", "1"]
+            self.assertEqual(_prepare(args, data_root), 0)
             plan_path = run_dir / "plan.json"
             plan = json.loads(plan_path.read_text())
             plan["execution_source_sha256"] = "1" * 64
             plan_path.write_text(json.dumps(plan))
             with self.assertRaises(SystemExit) as ctx:
-                suite.main(args + ["--invalidate-methods", "supsup"])
+                _prepare(args + ["--invalidate-methods", "supsup"], data_root)
             self.assertIn("--accept-source-change", str(ctx.exception))
-            self.assertEqual(suite.main(args + ["--accept-source-change", "STE fix",
-                                                "--invalidate-methods", "supsup, wsn"]), 0)
+            self.assertEqual(_prepare(args + ["--accept-source-change", "STE fix",
+                                              "--invalidate-methods", "supsup, wsn"],
+                                      data_root), 0)
             record = json.loads(plan_path.read_text())["source_change_acknowledgements"][0]
             self.assertEqual(record["invalidated_methods"], ["supsup", "wsn"])
             self.assertEqual(record["from"], "1" * 64)
+
+    def test_methods_named_after_the_acknowledgement_are_added_not_dropped(self):
+        # v3.0.6 recorded nothing when the change was already acknowledged
+        # (for instance by an earlier invocation that forgot the flag).
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            data_root = pathlib.Path(tmp) / "data"
+            data_root.mkdir()
+            args = ["--profile", "smoke", "--run-dir", str(run_dir), "--max-parallel", "1"]
+            self.assertEqual(_prepare(args, data_root), 0)
+            plan_path = run_dir / "plan.json"
+            # No acknowledged change into the current code: nothing to invalidate.
+            with self.assertRaises(SystemExit) as ctx:
+                _prepare(args + ["--accept-source-change", "x", "--invalidate-methods", "wsn"],
+                         data_root)
+            self.assertIn("nothing to invalidate", str(ctx.exception))
+            plan = json.loads(plan_path.read_text())
+            plan["execution_source_sha256"] = "2" * 64
+            plan_path.write_text(json.dumps(plan))
+            self.assertEqual(_prepare(args + ["--accept-source-change", "STE fix"], data_root), 0)
+            self.assertEqual(_prepare(args + ["--accept-source-change", "STE fix",
+                                              "--invalidate-methods", "supsup,wsn"],
+                                      data_root), 0)
+            plan = json.loads(plan_path.read_text())
+            [record] = plan["source_change_acknowledgements"]
+            self.assertEqual(record["invalidated_methods"], ["supsup", "wsn"])
+            self.assertEqual(record["amendments"][0]["invalidated_methods_added"],
+                             ["supsup", "wsn"])
+            reason = suite.result_invalidated(plan, "2" * 64, ["supsup"])
+            self.assertIsNotNone(reason)
+            self.assertIsNone(suite.result_invalidated(plan, "2" * 64, ["finetune"]))
+
+    def test_dry_run_writes_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp) / "run"
+            data_root = pathlib.Path(tmp) / "data"
+            data_root.mkdir()
+            args = ["--profile", "smoke", "--run-dir", str(run_dir), "--max-parallel", "1"]
+            dry = args + ["--dry-run", "--dataset-hash", "none", "--data-root", str(data_root)]
+            self.assertEqual(suite.main(dry), 0)
+            self.assertFalse(run_dir.exists())
+            self.assertEqual(_prepare(args, data_root), 0)
+            before = {p.name: p.read_bytes() for p in run_dir.iterdir() if p.is_file()}
+            self.assertEqual(suite.main(dry), 0)
+            after = {p.name: p.read_bytes() for p in run_dir.iterdir() if p.is_file()}
+            self.assertEqual(before, after)
 
     def test_only_groups_filters_the_plan(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -289,15 +407,16 @@ class ExecutorTests(unittest.TestCase):
             data_root = pathlib.Path(tmp) / "data"
             data_root.mkdir()
             base = ["--profile", "p1", "--seeds", "0", "--head-mode", "multi",
-                    "--dry-run", "--run-dir", str(run_dir), "--data-root",
-                    str(data_root), "--max-parallel", "1"]
-            self.assertEqual(suite.main(base + ["--only-groups", "p1_class_entropy_bias"]), 0)
+                    "--run-dir", str(run_dir), "--max-parallel", "1"]
+            self.assertEqual(_prepare(base + ["--only-groups", "p1_class_entropy_bias"],
+                                      data_root), 0)
             plan = json.loads((run_dir / "plan.json").read_text())
             ids = [r["job"]["job_id"] for r in plan["jobs"]]
             self.assertEqual(len(ids), 8)
             self.assertTrue(all(i.startswith("p1_class_entropy_bias__") for i in ids))
             with self.assertRaises(SystemExit) as ctx:
-                suite.main(base + ["--only-groups", "nope", "--force-plan"])
+                suite.main(base + ["--only-groups", "nope", "--force-plan", "--dry-run",
+                                   "--data-root", str(data_root)])
             self.assertIn("unknown groups", str(ctx.exception))
 
     def test_dispatch_order_is_longest_first(self):

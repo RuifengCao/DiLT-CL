@@ -1,6 +1,6 @@
 # DiLT-CL v3.0 experimental protocol
 
-This document is the normative protocol for new experiments (code v3.0.6). If
+This document is the normative protocol for new experiments (code v3.0.7). If
 code, tables, or older documentation disagree with it, stop and resolve the
 disagreement before running or reporting results.
 
@@ -11,7 +11,7 @@ disagreement before running or reporting results.
 > the declared hardware, the independent verifier has passed, and
 > `tools/merge_results.py` has produced `verified` artifacts.
 
-## Verified semantics (v3.0.6)
+## Verified semantics (v3.0.7)
 
 Each item below was checked by constructing a scenario with a known answer and
 comparing against an independent reference implementation, not by reading the
@@ -38,6 +38,7 @@ code. The v2 items live in `tests/test_real_core.py`; the v3 items in
 | **Provenance** | `CODE_VERSION` is derived from `diltcl.__version__`. Before v2.2.5 both runners hardcoded it, so artifacts produced by later versions still reported `2.1.1` -- and that string is printed into table captions |
 | **Per-example class-IL predictions (v3.0.5)** | Every isolation-method class-IL job launched by the suite writes `predictions/<benchmark>/<method>/seed<N>.npz` (true task, label, the oracle expert's prediction, every expert's routing score, and the routed task, tie flag and prediction at every prefix stage; calibrated jobs add the matched raw router and the held-out calibration inputs). Recording reuses the evaluation's own forward passes and changes no returned value (`tests/test_predictions_audit.py` compares recorded and unrecorded evaluations for every criterion and both label protocols). `tools/recompute_from_predictions.py` rebuilds every class-IL matrix and pooled statistic from these arrays exactly and checks that every raw-router decision is the lowest-ID argmin of the recorded scores; the verifier runs the same check on every job |
 | **Audit tools fail closed (v3.0.6)** | No training or evaluation arithmetic changed. The audit tools now refuse to report success on incomplete or altered evidence: `compare_runs.py` is `identical` only when every reference group, benchmark, method and seed is present in the candidate with a state hash on both sides (otherwise `incomplete`), and it also compares the state *file* SHA-256; `evaluate_checkpoints.py` treats any per-example difference and any non-finite value as an error in exact mode, requires a referenced predictions file to match its SHA-256, compares every per-seed metric, and `--combine` checks that shard reports cover every class-IL job; `merge_results.py` promotes to `verified` only inputs whose JSON/NPZ SHA-256 equal those in the verifier's report written after the jobs ended (also across runs in `--inputs` mode) and otherwise writes `unverified`; the verifier checks each job's methods against the plan, records unreadable artifacts as errors, never leaves a stale report behind and refuses an empty plan; per-example checks add structure checks (ranges, finite scores, nothing recorded before a task arrives, per-task counts, the matched raw pass on the same scores) and enforce the stored calibrated routers (exactly for the bias routers, up to float32 near-ties for the logistic router) and their recorded fitting accuracies; `build_release.py` requires succeeded jobs whose outputs match their status hashes; `paired_stats.py` refuses missing comparators or seeds instead of shrinking a Holm family |
+| **Second review: resume, data identity, audit inputs (v3.0.7)** | No training or evaluation arithmetic changed. `run_suite.py`: `--dry-run` writes nothing; `--invalidate-methods` given after the change was acknowledged is added to that acknowledgement instead of being ignored; dataset folders linked into the data root are fingerprinted like real ones (real trees hash as before) and every entry a job reads must be in the fingerprint; an `artifacts/` folder on another volume no longer loses the job status; a failing post-run verifier is recorded in `suite_summary.json`; a replaced `pip_freeze.txt` is archived. Decoded images are cached under a key derived from the image files (path, size, modification time, label) or raw arrays, and every cache load recomputes the pixel hash; test splits are recorded with their pixel hash too. The per-example checks require a calibrated file to carry the matched raw pass and the router-fitting inputs, recompute the fitting accuracies in the verifier as well, and use the TF32 rounding bound for jobs that recorded TF32 matrix products. `compare_runs.py` pairs differently routed groups on the experts both trained, aligns incomplete merges by their run records, derives per-entry data hashes for jobs launched before v3.0.1 from an archived per-file list (`--fingerprints`) and compares the decoded-split hashes; `paired_stats.py` aligns seeds per method and names the Holm family by the comparisons it adjusted; `build_results_package.py` keeps per-entry hashes of old fingerprints and leaves build paths out of supplementary manifests |
 | **Checkpoint re-evaluation (v3.0.5)** | `tools/evaluate_checkpoints.py` loads each persisted isolation state (`weights_only=True`), checks its file and tensor-content SHA-256 against the artifact, rebuilds the model from the artifact's configuration and execution options, re-runs the class-IL evaluation (job router and matched raw router) and compares every matrix, metric and per-example decision; on the recording hardware the comparison is exact. `tools/compare_runs.py` compares an independent re-run with retained artifacts (trained-state content hashes, every NPZ array, every per-seed metric) |
 | **Device data backend (v3)** | Bit-identical to the `DataLoader` pipeline: same `ToTensor`/`Normalize` arithmetic (tensor divisor, no CUDA reciprocal shortcut), same shuffle order and global-RNG consumption per `iter()`, same subset composition; materialisation restores the RNG state it would otherwise consume. Verified batch by batch against `DataLoader` (0 and 2 workers) and end to end through finetune / ER / LwF / DiLT-CL on synthetic on-disk CIFAR-100 and TinyImageNet trees |
 | **Fast numerics (v3)** | Shared-feature multi-head LwF, consolidated EWC quadratic, device reservoir buffer and per-row routed replay equal the v2 objective: same RNG draws, same retained/replayed items, loss and gradients equal to float tolerance, EWC gradient identical and loss offset by a parameter-independent constant. Fused 0/1 mask multiplies are bit-identical to the v2 loops. `--numerics legacy` selects the v2 arithmetic |
@@ -284,9 +285,11 @@ same-seed repeat on the target platform (the smoke profile does this and the
 verifier compares the two artifacts bit for bit).
 
 Execution options are part of a run's identity. `--data-backend`, `--numerics`,
-`--tf32` and `--eval-batch-size` are recorded under `execution` in every
-artifact and enter the suite's plan hash; a table must not mix artifacts with
-different execution options (`tools/merge_results.py` refuses to). Note that
+`--tf32`, `--eval-batch-size` and the per-job thread count (`--threads-per-job`
+of the suite) are recorded under `execution` in every artifact and enter the
+suite's plan hash, so a run directory cannot be resumed with other values; a
+table must not mix artifacts with different execution options
+(`tools/merge_results.py` refuses to). Note that
 PyTorch enables TF32 for cuDNN convolutions by default; `--tf32 default` keeps
 that behaviour, and `execution.effective` records the flags in force.
 

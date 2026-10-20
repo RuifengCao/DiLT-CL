@@ -222,6 +222,7 @@ def _assert_same_result(a, b):
 @pytest.mark.parametrize("criterion", ["entropy", "confidence", "margin"])
 @pytest.mark.parametrize("disjoint", [True, False])
 def test_recording_changes_nothing_and_recomputes_exactly(criterion, disjoint):
+    pytest.importorskip("torch")
     from diltcl.task_inference import evaluate_class_il_inference
     forward_t, loaders, _ = _forward_and_loaders()
     plain = evaluate_class_il_inference(forward_t, loaders, 3, 4, device="cpu",
@@ -245,6 +246,7 @@ def test_recording_changes_nothing_and_recomputes_exactly(criterion, disjoint):
 
 
 def test_calibrated_recording_matches_stored_routers():
+    pytest.importorskip("torch")
     from diltcl.task_calibration import fit_prefix_calibrators
     from diltcl.task_inference import collect_calibration_features, evaluate_class_il_inference
     forward_t, loaders, cal_loaders = _forward_and_loaders(seed=1)
@@ -330,6 +332,21 @@ def test_runner_persists_verifiable_predictions(calibration):
             # Fitting accuracies of every stored prefix router are reproduced.
             fit = entries[0]["fit_accuracy_check"]
             assert fit["stages_checked"] == len(record["prefix_models"]) and fit["errors"] == []
+            # The verifier's own check recomputes those fitting accuracies...
+            tampered = json.loads(json.dumps(payload))
+            tampered["calibration"]["cifar"]["wsn"]["0"]["prefix_models"][-1]["fit_accuracy"] += 0.25
+            with np.load(f"{out}.npz", allow_pickle=False) as npz:
+                errors = rp.compare_with_artifact(arrays, meta, tampered, npz, "cifar", "wsn", 0)
+                assert any("fit_accuracy recomputed" in e for e in errors)
+                # ...rejects a calibrated file without its fitting inputs or raw pass...
+                for drop in ("calibration_features", "raw_route_by_stage"):
+                    partial = {k: v for k, v in arrays.items() if k != drop}
+                    errors = rp.compare_with_artifact(partial, meta, payload, npz, "cifar", "wsn", 0)
+                    assert any("missing" in e for e in errors), drop
+                # ...and a file whose metadata names another router than the job ran.
+                errors = rp.compare_with_artifact(arrays, {**meta, "calibration": "none"},
+                                                  payload, npz, "cifar", "wsn", 0)
+                assert any("job ran" in e for e in errors)
         # Tampering with the file is detected through its recorded hash.
         with path.open("ab") as handle:
             handle.write(b"\0")
@@ -447,6 +464,8 @@ def test_shard_reports_must_cover_every_class_il_job(tmp_path):
     assert combine([shard("0/2", jobs[0:1]), shard("1/2", jobs[1::2])]) == 1   # job2 missing
     assert combine([shard("0/2", jobs[0::2]),
                     shard("1/2", jobs[1::2], methods=("wsn",))]) == 1      # a method skipped
+    assert combine([shard("0/2", jobs[0::2]),                             # any method order
+                    shard("1/2", jobs[1::2], methods=evaluator.ISOLATION[::-1])]) == 0
 
 
 def test_structural_checks_reject_malformed_recordings():
@@ -533,3 +552,88 @@ def test_logistic_router_accepts_only_float32_near_ties():
                                       "route_by_stage": routes}, record)
     assert out["disagreements"] == 1 and out["near_tie_disagreements"] == 0
     assert out["errors"]
+
+
+def test_near_tie_tolerance_follows_the_float32_error_bound():
+    # One candidate pair whose exact gap is far below the float32 bound of a
+    # 2-term product (a rounding flip), and one whose gap is far above it.
+    model0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[1.0]], "intercept": [0.0]}
+    model1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[1.0, 1.0], [1.0, 0.0]], "intercept": [0.0, 0.0]}
+    record = {"kind": "score-logreg", "prefix_models": [model0, model1]}
+    true_task = np.array([1, 1], dtype=np.int16)
+    # Row 0: d0 = 1000 + 1e-5, d1 = 1000; float32 cannot resolve 1e-5 at 1000.
+    # Row 1: d0 = 2, d1 = 1; a gap of 1 is never rounding.
+    scores = np.array([[1000.0, 1e-5], [1.0, 1.0]], dtype=np.float32)
+    routes = np.array([[-1, 1], [-1, 1]], dtype=np.int16)
+    out = rp.stored_router_agreement({"true_task": true_task, "scores": scores,
+                                      "route_by_stage": routes}, record)
+    assert out["disagreements"] == 2 and out["near_tie_disagreements"] == 1
+    assert out["errors"]
+
+
+def test_tf32_jobs_are_checked_against_the_tf32_rounding_bound():
+    # Stage 1 of a two-task bias router, d_j = -z_j. Row 0: an exact gap of
+    # 1e-4, beyond float32 rounding but within TF32 rounding of the factors;
+    # row 1: a gap of 3, never rounding. Both rows recorded the losing task.
+    model0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[-1.0]], "intercept": [0.0]}
+    model1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[-1.0, 0.0], [0.0, -1.0]], "intercept": [0.0, 0.0]}
+    arrays = {"true_task": np.array([1, 1], dtype=np.int16),
+              "scores": np.array([[1.0, 1.0001], [0.0, 3.0]], dtype=np.float32),
+              "route_by_stage": np.array([[-1, 1], [-1, 0]], dtype=np.int16),
+              "tie_by_stage": np.zeros((2, 2), bool)}
+    for kind in ("score-bias", "score-logreg"):
+        record = {"kind": kind, "prefix_models": [model0, model1]}
+        out = rp.stored_router_agreement(arrays, record)
+        assert out["disagreements"] == 1 and out["errors"], kind     # float32: not a near-tie
+        out = rp.stored_router_agreement(arrays, record, tf32=True)
+        assert out["near_tie_disagreements"] == 1 and out["errors"] == [], kind
+        flipped = {**arrays, "route_by_stage": np.array([[-1, 0], [-1, 1]], dtype=np.int16)}
+        out = rp.stored_router_agreement(flipped, record, tf32=True)
+        assert out["near_tie_disagreements"] == 0 and out["errors"], kind
+    assert rp.matmul_tf32({"execution": {"effective": {"cuda_matmul_allow_tf32": True}}})
+    assert not rp.matmul_tf32({"execution": {"effective": None}})
+
+
+def test_calibrated_recordings_need_the_raw_pass_and_the_fitting_inputs():
+    T, C, per_task = 4, 3, (7, 5, 9, 6)
+    arrays = _synthetic(T=T, C=C, per_task=per_task)
+    full = dict(arrays)
+    full.update({f"raw_{k}": v.copy() for k, v in arrays.items()})
+    rng = np.random.default_rng(0)
+    full["calibration_features"] = rng.normal(size=(12, T)).astype(np.float32)
+    full["calibration_task_ids"] = np.repeat(np.arange(T), 3).astype(np.int16)
+    meta = {"num_tasks": T, "classes_per_task": C, "calibration": "score-logreg"}
+    assert rp.structural_errors(full, meta, list(per_task)) == []
+    assert any("raw_: arrays missing" in e
+               for e in rp.structural_errors(arrays | {k: full[k] for k in
+                                                        ("calibration_features", "calibration_task_ids")},
+                                             meta, list(per_task)))
+    no_inputs = {k: v for k, v in full.items() if not k.startswith("calibration_")}
+    assert any("calibration inputs missing" in e
+               for e in rp.structural_errors(no_inputs, meta, list(per_task)))
+    bad = dict(full, calibration_features=full["calibration_features"][:, :2])
+    assert any("calibration inputs have shapes" in e
+               for e in rp.structural_errors(bad, meta, list(per_task)))
+    bad = dict(full, calibration_task_ids=np.full(12, T, np.int16))
+    assert any("task id outside" in e for e in rp.structural_errors(bad, meta, list(per_task)))
+
+
+def test_runs_without_recorded_predictions_are_reported_not_failed(tmp_path):
+    run = tmp_path / "run"
+    (run / "statuses").mkdir(parents=True)
+    job = {"job_id": "g__cifar__seed0__wsn", "benchmark": "cifar", "seed": 0, "methods": "wsn"}
+    (run / "plan.json").write_text(json.dumps({"jobs": [{"job": job}]}))
+    status = run / "statuses" / "g__cifar__seed0__wsn.json"
+    status.write_text(json.dumps({"command": ["python", "run_class_il.py"]}))
+    report = tmp_path / "report.json"
+    assert rp.main(["--run-dir", str(run), "--out", str(report)]) == 0       # v3.0.0-v3.0.4 runs
+    assert json.loads(report.read_text())["status"] == "not-recorded"
+    # A job launched to record predictions whose files are missing is an error.
+    status.write_text(json.dumps({"command": ["python", "run_class_il.py",
+                                              "--predictions-dir", "x"]}))
+    assert rp.main(["--run-dir", str(run), "--out", str(report)]) == 1
+    assert json.loads(report.read_text())["status"] == "failed"

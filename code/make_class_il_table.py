@@ -34,7 +34,8 @@ except Exception:  # noqa: BLE001 - torch may be unavailable during package init
 _PRETTY = {"finetune": "Finetune", "ewc": "EWC", "lwf": "LwF", "er": "ER",
            "derpp": "DER++", "packnet": "PackNet", "supsup": "SupSup",
            "wsn": "WSN", "diltcl": "DiLT-CL", "independent": "Independent"}
-_BENCH_NAME = {"cifar": "Split-CIFAR-100", "pmnist": "Permuted-MNIST"}
+_BENCH_NAME = {"cifar": "Split-CIFAR-100", "pmnist": "Permuted-MNIST",
+               "tinyimagenet": "Split-TinyImageNet", "fivedatasets": "5-datasets"}
 _REF = "derpp"
 
 
@@ -127,6 +128,23 @@ def _table(bench, data, *, diagnostic=False):
     verification = data.get("verification_status", "missing")
     criterion = data.get("inference_criterion", "unspecified")
     calibration = data.get("inference_calibration", "unspecified")
+    calibrated = calibration not in (None, "none", "unspecified")
+    split_note = ""
+    fraction = data.get("calibration_fraction")
+    if calibrated and isinstance(fraction, (int, float)) and 0 < fraction < 1:
+        split_note = (f"The router is fitted on a held-out {100 * fraction:g}\\% of each "
+                      "task's training data, and every method in this table trained "
+                      f"on the remaining {100 * (1 - fraction):g}\\%. ")
+    if has_ref:
+        star_note = ("Stars are uncorrected exploratory paired tests of ACC "
+                     "vs.\\ DER++ ($^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$); "
+                     "comparisons with fewer than five paired seeds receive no "
+                     "stars; best ACC bold.")
+    else:
+        star_note = "No DER++ reference row, hence no significance stars; best ACC bold."
+    # One label per (benchmark, router), so entropy and calibrated tables of
+    # the same benchmark can appear in one document.
+    label = f"tab:classil_{bench}" + (f"_{calibration}" if calibrated else "")
     diagnostic_prefix = (
         r"\textbf{DIAGNOSTIC ONLY---UNVERIFIED ARTIFACT.} "
         if diagnostic else "")
@@ -148,11 +166,8 @@ def _table(bench, data, *, diagnostic=False):
                f"{_latex_text(criterion)}; calibration="
                f"{_latex_text(calibration)}. Code="
                f"{_latex_text(code_version)}; metric schema={schema}; "
-               f"verification status={_latex_text(verification)}. Stars are "
-               "uncorrected exploratory paired tests of ACC "
-               "vs.\\ DER++ ($^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$); "
-               "comparisons with fewer than five paired seeds receive no "
-               "stars; best ACC bold.")
+               f"verification status={_latex_text(verification)}. "
+               + split_note + star_note)
     extra = int(has_oracle) + int(has_ta) + int(has_conditional)
     colspec = "l" + "c" * (4 + extra)
     header_cells = ["Method", "ACC", "BWT", "Forgetting", "LA"]
@@ -165,7 +180,7 @@ def _table(bench, data, *, diagnostic=False):
     header = " & ".join(header_cells)
     body = "\n".join(rows)
     return ("\\begin{table}[t]\n\\centering\n"
-            f"\\caption{{{caption}}}\n\\label{{tab:classil_{bench}}}\n"
+            f"\\caption{{{caption}}}\n\\label{{{label}}}\n"
             f"\\begin{{tabular}}{{{colspec}}}\n\\toprule\n"
             f"{header} \\\\\n\\midrule\n"
             f"{body}\n\\bottomrule\n\\end{{tabular}}\n\\end{{table}}\n")

@@ -35,6 +35,20 @@ task_calibration = _load("task_calibration")
 # Preflight: datasets
 # ---------------------------------------------------------------------------
 
+def test_standalone_preflight_checks_the_default_data_root():
+    # Without --data-root or $DILTCL_DATA_ROOT the loaders read ./data; the
+    # standalone check must look there too instead of skipping the datasets.
+    saved_root, saved_cwd = os.environ.pop("DILTCL_DATA_ROOT", None), os.getcwd()
+    with tempfile.TemporaryDirectory() as tmp:
+        os.chdir(tmp)
+        try:
+            assert preflight.main(["--benchmarks", "cifar", "--no-training"]) == 1
+        finally:
+            os.chdir(saved_cwd)
+            if saved_root is not None:
+                os.environ["DILTCL_DATA_ROOT"] = saved_root
+
+
 def test_missing_dataset_blocks_with_actionable_message():
     with tempfile.TemporaryDirectory() as root:
         report = preflight.check(root, ["pmnist"], require_training=False)

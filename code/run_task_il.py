@@ -136,6 +136,10 @@ def _loader_metadata(train_loaders, test_loaders):
         "test_sample_count": int(sum(test_counts)),
         "tasks": [describe_task_loader(loader, task_id)
                   for task_id, loader in enumerate(train_loaders)],
+        # Same record for the evaluation splits (v3.0.7): with the device
+        # backend it carries the hash of the test pixels as well.
+        "test_tasks": [describe_task_loader(loader, task_id)
+                       for task_id, loader in enumerate(test_loaders)],
     }
 
 

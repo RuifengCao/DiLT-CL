@@ -21,8 +21,11 @@ try:
     import matplotlib  # noqa: F401
     import torch  # noqa: F401 - the runners require it at import time
 except ImportError:  # pragma: no cover
-    print("matplotlib/torch not installed; figure tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("matplotlib/torch not installed; figure tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("matplotlib/torch not installed; figure tests skipped.", allow_module_level=True)
 
 import make_v3_figures as figures  # noqa: E402
 import merge_results as merge  # noqa: E402

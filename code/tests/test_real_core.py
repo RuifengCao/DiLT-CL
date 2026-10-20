@@ -25,8 +25,11 @@ try:
     import torch.nn as nn
     from torch.utils.data import DataLoader, TensorDataset
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch not installed; real-core regression tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch not installed; real-core regression tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch not installed; real-core regression tests skipped.", allow_module_level=True)
 
 from diltcl import masking
 from diltcl.diltcl import DiLTCL

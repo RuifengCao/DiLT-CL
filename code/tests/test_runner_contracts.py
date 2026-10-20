@@ -24,8 +24,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 try:
     import torch  # noqa: F401 - the runners require it at import time
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch not installed; runner contract tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch not installed; runner contract tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch not installed; runner contract tests skipped.", allow_module_level=True)
 
 from diltcl import preflight  # noqa: E402
 from diltcl.config import ExperimentConfig  # noqa: E402

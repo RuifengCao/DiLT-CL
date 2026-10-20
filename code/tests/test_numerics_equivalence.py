@@ -24,8 +24,11 @@ try:
     import torch
     import torch.nn as nn
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch not installed; numerics equivalence tests skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch not installed; numerics equivalence tests skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch not installed; numerics equivalence tests skipped.", allow_module_level=True)
 
 from diltcl.baselines import (  # noqa: E402
     _derpp_terms_grouped,

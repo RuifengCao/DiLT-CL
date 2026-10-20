@@ -16,6 +16,7 @@ It is NOT a substitute for the Split-CIFAR-100 rerun: 5 easy binary tasks put
 far less pressure on a shared head than 20 five-way tasks with 100 classes.
 """
 
+import argparse
 import contextlib
 import io
 import pathlib
@@ -128,9 +129,14 @@ def run_method(method, head_mode, train_loaders, test_loaders, seed):
     return float(acc), float(bwt)
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--seeds", default="0,1,2",
+                        help="Comma-separated seeds (default 0,1,2; a few minutes on a CPU).")
+    args = parser.parse_args(argv)
     methods = ["finetune", "ewc", "lwf", "er", "derpp", "diltcl", "independent"]
-    seeds = [0, 1, 2]
+    seeds = [int(s) for s in args.seeds.split(",") if s.strip()]
     results = {mode: {m: [] for m in methods} for mode in ("shared", "multi")}
 
     for seed in seeds:
@@ -148,7 +154,7 @@ def main():
                       f"ACC={acc:6.2f} BWT={bwt:7.2f}", flush=True)
 
     print("\n" + "=" * 74)
-    print("Split-Digits (5 tasks x 2 classes, real data, 3 seeds) -- task-IL")
+    print(f"Split-Digits (5 tasks x 2 classes, real data, {len(seeds)} seeds) -- task-IL")
     print("=" * 74)
     print(f"{'method':14s} {'shared ACC':>18s} {'multi ACC':>18s} {'delta':>10s}")
     for method in methods:

@@ -30,8 +30,11 @@ try:
     import torch
     from torchvision import datasets
 except ImportError:  # pragma: no cover - torch-free environment
-    print("PyTorch/torchvision not installed; end-to-end backend test skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch/torchvision not installed; end-to-end backend test skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch/torchvision not installed; end-to-end backend test skipped.", allow_module_level=True)
 
 from diltcl import AdaptiveCNN, MultiHeadModel, SimpleCNN  # noqa: E402
 from diltcl import data_backend  # noqa: E402

@@ -73,14 +73,32 @@ BENCH = {"cifar": "CIFAR-100", "pmnist": "P-MNIST", "tinyimagenet": "TinyImageNe
          "fivedatasets": "5-datasets"}
 
 
+class MissingComparison(ValueError):
+    """A requested comparison, method or seed is absent from an input."""
+
+
+def method_seeds(payload: dict, benchmark: str, method: str) -> list[int]:
+    """Seeds of one method's per-seed rows, in row order.
+
+    ``merge_results.py --allow-incomplete`` keeps every seed in ``seeds`` but
+    stores rows only for the seeds that ran; the run records align them.
+    """
+    rows = payload["per_seed"][benchmark][method]
+    seeds = [int(s) for s in payload["seeds"]]
+    if len(rows) == len(seeds):
+        return seeds
+    records = ((payload.get("per_seed_run_records") or {}).get(benchmark) or {}).get(method) or {}
+    if len(records) == len(rows):
+        return sorted(int(s) for s in records)
+    raise MissingComparison(f"{benchmark}/{method}: {len(rows)} per-seed rows for seeds {seeds} "
+                            "and no run records to align them")
+
+
 def per_seed_values(payload: dict, benchmark: str, method: str, metric: str) -> dict[int, float]:
     """Map seed -> metric value (derived metrics computed per seed)."""
-    seeds = payload["seeds"]
     rows = payload["per_seed"][benchmark][method]
-    if len(rows) != len(seeds):
-        raise ValueError(f"{benchmark}/{method}: {len(rows)} rows for {len(seeds)} seeds")
     out = {}
-    for seed, row in zip(seeds, rows):
+    for seed, row in zip(method_seeds(payload, benchmark, method), rows):
         if metric == "RecoverableFraction":
             acc, oracle = float(row["MicroACC"]), float(row["MicroOracleACC"])
             if acc >= 100.0:
@@ -143,10 +161,6 @@ def holm(pvalues: list[float | None]) -> list[float | None]:
     return adjusted
 
 
-class MissingComparison(ValueError):
-    """A requested comparison, method or seed is absent from an input."""
-
-
 def compare(payload: dict, benchmark: str, metric: str, reference: str,
             comparator: str, allow_missing: bool = False) -> dict:
     ref = per_seed_values(payload, benchmark, reference, metric)
@@ -182,9 +196,14 @@ CLASS_METRICS = ("ACC", "TA", "RecoverableFraction")
 ROUTER = {"score-logreg": "Logistic", "score-bias": "Bias-CE", "score-bias-acc": "Bias-Acc"}
 
 
-def compare_router(payload: dict, benchmark: str, metric: str, method: str) -> dict:
+def compare_router(payload: dict, benchmark: str, metric: str, method: str,
+                   allow_missing: bool = False) -> dict:
     """Calibrated router minus the matched raw router, same experts and seeds."""
-    seeds = payload["seeds"]
+    seeds = method_seeds(payload, benchmark, method)
+    expected = sorted(int(s) for s in payload["seeds"])
+    if seeds != expected and not allow_missing:
+        raise MissingComparison(f"{benchmark}/{metric} {method} router vs matched raw: seeds "
+                                f"{seeds} instead of {expected}")
     rows = payload["per_seed"][benchmark][method]
     cal = np.array([float(r[metric]) for r in rows])
     raw = np.array([float(r["Raw" + metric]) for r in rows])
@@ -202,7 +221,7 @@ def compare_router(payload: dict, benchmark: str, metric: str, method: str) -> d
         "reference": ROUTER.get(payload.get("inference_calibration"),
                                 payload.get("inference_calibration")),
         "comparator": "matched raw", "method": method, "n_seeds": n,
-        "seeds": [int(s) for s in seeds],
+        "seeds": seeds,
         "reference_mean": float(cal.mean()), "comparator_mean": float(raw.mean()),
         "mean_difference": mean, "sd_difference": sd,
         "ci95_low": mean - half, "ci95_high": mean + half,
@@ -256,7 +275,7 @@ def build(task_il: dict | None, class_il: dict | None, reference: str,
                 for m in calibrated_methods:
                     if present(payload, b, m):
                         rows.append({"family": "calibration", "protocol": "class-IL",
-                                     **compare_router(payload, b, metric, m)})
+                                     **compare_router(payload, b, metric, m, allow_missing)})
     if missing and not allow_missing:
         raise MissingComparison("requested comparisons are missing from the inputs: "
                                 + "; ".join(sorted(set(missing))))
@@ -282,6 +301,20 @@ def _num(x: float, fmt: str = ".2f") -> str:
     return "--" if x is None or not np.isfinite(x) else format(x, fmt)
 
 
+def _holm_family(rows: list[dict], where: str) -> str:
+    """Caption words for the Holm family: comparisons with a defined p-value.
+
+    A comparison whose paired differences have zero variance has no paired-t
+    p-value and is not part of the adjustment.
+    """
+    size = rows[0]["family_size"] if rows else 0
+    tested = rows[0]["holm_tests"] if rows else 0
+    where = f" {where}" if where else ""
+    if tested == size:
+        return f"{size} comparison{'s' * (size != 1)}{where}"
+    return f"{tested} comparison{'s' * (tested != 1)}{where} with a defined $p$ (of {size})"
+
+
 def _sign_flip_floor(n_seeds: list[int]) -> str:
     """Caption sentence on the smallest attainable sign-flip p-value."""
     if len(n_seeds) != 1:
@@ -304,7 +337,7 @@ def write_tex(rows: list[dict], path: Path) -> None:
          f"{'/'.join(map(str, n_seeds))} aligned seeds (percentage points). "
          "CI: unadjusted two-sided 95\\% Student-$t$ interval of the mean paired difference. "
          "$p_t$: paired $t$ test, Holm-adjusted over the "
-         f"{rows[0]['family_size'] if rows else 0} comparisons of this table. "
+         f"{_holm_family(rows, 'of this table')}. "
          "$p_{\\mathrm{sf}}$: exact sign-flip test, unadjusted (its smallest attainable value is "
          "$2/2^n$, $0.0625$ for five seeds); $+/-$: seeds with a positive/negative difference. "
          "MDD: smallest true difference an unadjusted two-sided paired $t$ test at $\\alpha=0.05$ "
@@ -349,14 +382,13 @@ def write_compact_tex(rows: list[dict], path: Path,
                              bench_order.get(k[2], 9)))
     cell = {(r["protocol"], r["metric"], r["benchmark"], r["comparator"]): r for r in rows}
     n_seeds = sorted({r["n_seeds"] for r in rows})
-    family = rows[0]["family_size"] if rows else 0
     lines = [
         "% Generated by tools/paired_stats.py -- do not edit by hand.",
         "\\begin{table}[t]", "\\centering", "\\footnotesize",
         ("\\caption{Paired differences, DiLT-CL minus each comparator (percentage points), "
          f"with unadjusted two-sided 95\\% Student-$t$ intervals over {'/'.join(map(str, n_seeds))} aligned seeds. "
          "$^{*}$: Holm-adjusted paired-$t$ $p<0.05$ within the family of "
-         f"{family} comparisons in this table; an unadjusted interval can exclude zero without a star. "
+         f"{_holm_family(rows, 'in this table')}; an unadjusted interval can exclude zero without a star. "
          + _sign_flip_floor(n_seeds) +
          "Table~\\ref{tab:paired-full} reports it with the minimum detectable difference. "
          "$\\rho$: recoverable-error fraction (Equation~\\eqref{eq:partition}).}"),
@@ -400,7 +432,7 @@ def write_calibration_tex(rows: list[dict], path: Path) -> None:
         ("\\caption{Exploratory: calibrated router minus the matched raw entropy router on the "
          f"same 90\\%-trained experts, over {'/'.join(map(str, n_seeds))} aligned seeds (percentage points). "
          "CI: unadjusted two-sided 95\\% Student-$t$ interval. $p_t$: paired $t$ test, Holm-adjusted within "
-         f"this family of {rows[0]['family_size'] if rows else 0} comparisons; it is reported "
+         f"this family of {_holm_family(rows, '')}; it is reported "
          "descriptively because the router procedures were not specified in advance "
          "(Section~\\ref{sec:calibration}).}"),
         "\\label{tab:paired-calibration}",

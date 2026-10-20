@@ -30,8 +30,11 @@ try:
     import torch  # noqa: F401
     import torchvision  # noqa: F401
 except ImportError:  # pragma: no cover
-    print("PyTorch/torchvision not installed; suite end-to-end test skipped.")
-    sys.exit(0)
+    if __name__ == "__main__":
+        print("PyTorch/torchvision not installed; suite end-to-end test skipped.")
+        sys.exit(0)
+    import pytest
+    pytest.skip("PyTorch/torchvision not installed; suite end-to-end test skipped.", allow_module_level=True)
 
 import pytest  # noqa: E402
 

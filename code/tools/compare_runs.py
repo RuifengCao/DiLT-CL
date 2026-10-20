@@ -38,7 +38,14 @@ independent trainings of the same experts are shown to agree bit for bit.
 When run directories (not only merged folders) are given on both sides, the
 per-job status records are compared too: the dataset content hashes each job
 read and the launch controls it ran with (``CUBLAS_WORKSPACE_CONFIG``, thread
-counts, ``PYTHONHASHSEED``). These are reported, not part of the verdict.
+counts, ``PYTHONHASHSEED``). Jobs launched before v3.0.1 recorded only a hash
+of the whole data root; their per-entry hashes are derived from an archived
+fingerprint with that root hash when one with entries or its per-file list is
+available (the run directory's ``dataset_fingerprints/``, or ``--fingerprints``
+folders), and are otherwise reported as not comparable. The SHA-256 of every
+decoded split recorded in the merged artifacts (``materialized_pixels_sha256``
+of the task views) is compared as well. All of these are reported, not part
+of the verdict.
 
 Torch-free (NumPy only). Exit status 0 only when the audit is complete and
 every compared run is identical (status ``identical``); otherwise the status
@@ -56,6 +63,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -98,7 +106,11 @@ LAUNCH_KEYS = ("CUBLAS_WORKSPACE_CONFIG", "OMP_NUM_THREADS", "DILTCL_NUM_THREADS
 
 
 def run_statuses(paths: list[Path]) -> dict[str, dict]:
-    """Job id -> status record, for every run directory among ``paths``."""
+    """Job id -> status record, for every run directory among ``paths``.
+
+    Each record carries the run directory it was read from (``_run_dir``),
+    where archived dataset fingerprints are looked up.
+    """
     out: dict[str, dict] = {}
     for path in paths:
         run = path if (path / "merged").is_dir() else path.parent
@@ -107,17 +119,94 @@ def run_statuses(paths: list[Path]) -> dict[str, dict]:
             continue
         for status_path in sorted(statuses.glob("*.json")):
             try:
-                out[status_path.stem] = json.loads(status_path.read_text(encoding="utf-8"))
+                record = json.loads(status_path.read_text(encoding="utf-8"))
             except ValueError:
                 continue
+            record["_run_dir"] = str(run)
+            out[status_path.stem] = record
     return out
 
 
-def compare_launch(ref_status: dict, cand_status: dict, groups: set[str]) -> dict:
+class FingerprintArchive:
+    """Archived dataset fingerprints by root hash, with per-entry hashes."""
+
+    def __init__(self, extra_dirs: list[Path] | None = None):
+        self.extra_dirs = [Path(d) for d in (extra_dirs or [])]
+        self._entries: dict[tuple[str, str], dict | None] = {}
+
+    def _candidates(self, run_dir: str | None, tree: str) -> list[Path]:
+        roots = ([Path(run_dir)] if run_dir else []) + self.extra_dirs
+        out = []
+        for root in roots:
+            out += [root / "dataset_fingerprints" / f"{tree}.json", root / f"{tree}.json",
+                    root / "dataset_fingerprint.json"]
+        return out
+
+    def entries(self, run_dir: str | None, tree: str) -> dict | None:
+        key = (run_dir or "", tree)
+        if key not in self._entries:
+            self._entries[key] = None
+            for path in self._candidates(run_dir, tree):
+                if not path.is_file():
+                    continue
+                try:
+                    data = json.loads(path.read_text(encoding="utf-8"))
+                except ValueError:
+                    continue
+                if data.get("tree_sha256") != tree:
+                    continue
+                if data.get("entries") is not None:
+                    self._entries[key] = data["entries"]
+                elif data.get("files"):
+                    fingerprint_entries, _ = _suite_helpers()
+                    self._entries[key] = fingerprint_entries(data["files"])
+                if self._entries[key] is not None:
+                    break
+        return self._entries[key]
+
+
+def _suite_helpers():
+    """The suite's own entry hashing and benchmark-to-entry map (torch-free).
+
+    ``run_suite`` loads ``diltcl/preflight.py`` by path, so importing it does
+    not import the package (and PyTorch).
+    """
+    root = str(Path(__file__).resolve().parent.parent)
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    import run_suite
+    return run_suite.fingerprint_entries, run_suite.preflight.benchmark_data_entries
+
+
+def job_entries(status: dict, archive: FingerprintArchive) -> tuple[dict | None, bool]:
+    """``(entry -> sha256, derived)`` of the data a job read, if known.
+
+    Jobs launched before v3.0.1 recorded only the whole data root's hash; their
+    entries are derived from an archived fingerprint with that hash.
+    """
+    identity = status.get("dataset_identity") or {}
+    if identity.get("entries") is not None:
+        return identity["entries"], False
+    tree = identity.get("tree_sha256")
+    benchmark = identity.get("benchmark") or (status.get("job") or {}).get("benchmark")
+    if not tree or not benchmark:
+        return None, False
+    entries = archive.entries(status.get("_run_dir"), tree)
+    if entries is None:
+        return None, False
+    _, benchmark_data_entries = _suite_helpers()
+    return {name: (entries.get(name) or {}).get("sha256")
+            for name in benchmark_data_entries(benchmark)}, True
+
+
+def compare_launch(ref_status: dict, cand_status: dict, groups: set[str],
+                   archive: FingerprintArchive | None = None) -> dict:
     """Same data and same launch controls, job by job (reported, not a verdict)."""
+    archive = archive or FingerprintArchive()
     report = {"jobs_compared": 0, "jobs_without_candidate_status": [],
-              "dataset_differences": [], "launch_differences": [],
-              "cache_dir_differences": 0}
+              "dataset_differences": [], "dataset_not_comparable": [],
+              "dataset_entries_derived": [],
+              "launch_differences": [], "cache_dir_differences": 0}
     for job_id, ref in sorted(ref_status.items()):
         if job_id.split("__")[0] not in groups or ref.get("job", {}).get("repeat_of"):
             continue
@@ -126,8 +215,15 @@ def compare_launch(ref_status: dict, cand_status: dict, groups: set[str]) -> dic
             report["jobs_without_candidate_status"].append(job_id)
             continue
         report["jobs_compared"] += 1
-        if ((ref.get("dataset_identity") or {}).get("entries")
-                != (cand.get("dataset_identity") or {}).get("entries")):
+        ref_entries, ref_derived = job_entries(ref, archive)
+        cand_entries, cand_derived = job_entries(cand, archive)
+        if ref_derived or cand_derived:
+            report["dataset_entries_derived"].append(job_id)
+        if ref_entries is None or cand_entries is None:
+            # Launched before v3.0.1 (a hash of the whole data root only) and
+            # no archived fingerprint with that hash to derive entries from.
+            report["dataset_not_comparable"].append(job_id)
+        elif ref_entries != cand_entries:
             report["dataset_differences"].append(job_id)
         rc = ref.get("child_environment_controls") or {}
         cc = cand.get("child_environment_controls") or {}
@@ -160,9 +256,63 @@ def state_file(payload: dict, benchmark: str, method: str, seed: int):
     return record.get("sha256"), record.get("serialized_bytes")
 
 
+def method_seeds(payload: dict, benchmark: str, method: str) -> list[int]:
+    """Seeds of one method, in the order of its per-seed rows.
+
+    A merge with ``--allow-incomplete`` stores fewer rows than the artifact's
+    seed list; the run records (one per seed actually present) align them.
+    """
+    rows = payload.get("per_seed", {}).get(benchmark, {}).get(method)
+    if rows is None:
+        return []
+    records = payload.get("per_seed_run_records", {}).get(benchmark, {}).get(method) or {}
+    if records and len(records) == len(rows):
+        return sorted(int(seed) for seed in records)
+    seeds = [int(seed) for seed in payload.get("seeds", [])]
+    if len(rows) == len(seeds):
+        return seeds
+    raise ValueError(f"{benchmark}/{method}: {len(rows)} per-seed rows for seeds {seeds} "
+                     "and no run records to align them")
+
+
 def seed_metrics(payload: dict, benchmark: str, method: str, seed: int) -> dict:
     rows = payload["per_seed"][benchmark][method]
-    return rows[payload["seeds"].index(seed)]
+    return rows[method_seeds(payload, benchmark, method).index(seed)]
+
+
+def pixel_hashes(payload: dict) -> dict[str, str]:
+    """``benchmark/seed/family/split/task -> materialized_pixels_sha256``.
+
+    Every task view records the hash of the decoded split it indexes (task-IL
+    under ``benchmark_metadata.<b>.per_seed``, class-IL under
+    ``per_seed_counts`` per method family); test splits since v3.0.7.
+    """
+    out: dict[str, str] = {}
+    for benchmark, meta in (payload.get("benchmark_metadata") or {}).items():
+        layouts = [(seed, "", record) for seed, record in (meta.get("per_seed") or {}).items()]
+        for seed, families in (meta.get("per_seed_counts") or {}).items():
+            layouts += [(seed, family, record) for family, record in (families or {}).items()]
+        for seed, family, record in layouts:
+            if not isinstance(record, dict):
+                continue
+            for split, keys in (("train", ("tasks", "dataset_views")),
+                                ("test", ("test_tasks", "test_dataset_views"))):
+                for key in keys:
+                    for view in record.get(key) or []:
+                        digest = (view or {}).get("materialized_pixels_sha256")
+                        if digest:
+                            out[f"{benchmark}/seed{seed}/{family or 'all'}/{split}/"
+                                f"task{view.get('task')}"] = digest
+    return out
+
+
+def compare_pixels(ref: dict, cand: dict) -> dict:
+    ref_hashes, cand_hashes = pixel_hashes(ref), pixel_hashes(cand)
+    shared = sorted(set(ref_hashes) & set(cand_hashes))
+    return {"views_compared": len(shared),
+            "different": [k for k in shared if ref_hashes[k] != cand_hashes[k]],
+            "only_in_reference": len(set(ref_hashes) - set(cand_hashes)),
+            "only_in_candidate": len(set(cand_hashes) - set(ref_hashes))}
 
 
 def run_keys(npz, benchmark: str, method: str, seed: int) -> list[str]:
@@ -178,7 +328,9 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
            "identity_differences": {}, "environment_differences": {},
            "code_versions": {"reference": ref.get("code_version"),
                              "candidate": cand.get("code_version")},
-           "runs": [], "new_runs": [], "missing_in_candidate": []}
+           "runs": [], "new_runs": [], "missing_in_candidate": [],
+           "alignment_errors": [], "methods_only_in_reference": [],
+           "methods_only_in_candidate": []}
     for field in IDENTITY_FIELDS:
         if ref.get(field) != cand.get(field):
             out["identity_differences"][field] = {"reference": ref.get(field),
@@ -188,6 +340,7 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
         if ref_env.get(field) != cand_env.get(field):
             out["environment_differences"][field] = {"reference": ref_env.get(field),
                                                      "candidate": cand_env.get(field)}
+    out["pixels"] = compare_pixels(ref, cand)
     ref_exec = (ref.get("execution") or {}).get("options")
     cand_exec = (cand.get("execution") or {}).get("options")
     if ref_exec != cand_exec:
@@ -196,11 +349,24 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
     with np.load(ref_path.with_suffix(".npz"), allow_pickle=False) as rz, \
             np.load(cand_path.with_suffix(".npz"), allow_pickle=False) as cz:
         for benchmark in sorted(set(ref["benchmarks"]) | set(cand["benchmarks"])):
-            methods = sorted(set(ref.get("per_seed", {}).get(benchmark, {}))
-                             | set(cand.get("per_seed", {}).get(benchmark, {})))
+            ref_methods = set(ref.get("per_seed", {}).get(benchmark, {}))
+            cand_methods = set(cand.get("per_seed", {}).get(benchmark, {}))
+            if states_only:
+                # Groups with different routers may train different method
+                # sets (the 90%-split calibration group also trains the five
+                # shared-backbone methods); compare the experts they share.
+                out["methods_only_in_reference"] += [f"{benchmark}/{m}" for m in sorted(ref_methods - cand_methods)]
+                out["methods_only_in_candidate"] += [f"{benchmark}/{m}" for m in sorted(cand_methods - ref_methods)]
+                methods = sorted(ref_methods & cand_methods)
+            else:
+                methods = sorted(ref_methods | cand_methods)
             for method in methods:
-                ref_seeds = set(ref["seeds"]) if method in ref.get("per_seed", {}).get(benchmark, {}) else set()
-                cand_seeds = set(cand["seeds"]) if method in cand.get("per_seed", {}).get(benchmark, {}) else set()
+                try:
+                    ref_seeds = set(method_seeds(ref, benchmark, method))
+                    cand_seeds = set(method_seeds(cand, benchmark, method))
+                except ValueError as exc:
+                    out["alignment_errors"].append(str(exc))
+                    continue
                 for seed in sorted(cand_seeds - ref_seeds):
                     out["new_runs"].append(f"{benchmark}/{method}/seed{seed}")
                 for seed in sorted(ref_seeds - cand_seeds):
@@ -253,6 +419,7 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
         "file_hash_unavailable": sum(r.get("file_identical") is None for r in runs),
         "file_different": [r["run"] for r in runs if r.get("file_identical") is False],
         "new": len(out["new_runs"]), "missing_in_candidate": len(out["missing_in_candidate"]),
+        "alignment_errors": len(out["alignment_errors"]),
     }
     return out
 
@@ -272,6 +439,10 @@ def parse_args(argv=None):
     p.add_argument("--groups", nargs="+", default=None, metavar="GROUP",
                    help="Audit only these groups (each must exist in both runs); "
                         "default: every group of the reference.")
+    p.add_argument("--fingerprints", type=Path, nargs="+", default=None, metavar="DIR",
+                   help="Folders holding archived dataset fingerprints with their per-file "
+                        "lists (e.g. an original run directory), used to derive per-entry "
+                        "data hashes for jobs launched before v3.0.1.")
     p.add_argument("--out", type=Path, default=None, help="Write a JSON report.")
     return p.parse_args(argv)
 
@@ -313,8 +484,10 @@ def main(argv=None) -> int:
     files_identical = sum(g["summary"]["file_identical"] for g in groups)
     missing_runs = sum(g["summary"]["missing_in_candidate"] for g in groups)
     no_state_hash = sum(g["summary"]["state_hash_unavailable"] for g in groups)
+    misaligned = sum(g["summary"]["alignment_errors"] for g in groups)
     clean_identity = args.states_only or all(not g["identity_differences"] for g in groups)
-    complete = not (missing_groups or missing_runs or unpaired or no_state_hash) and total > 0
+    complete = (not (missing_groups or missing_runs or unpaired or no_state_hash or misaligned)
+                and total > 0)
     if identical == total and clean_identity:
         status = "identical" if complete else "incomplete"
     else:
@@ -323,9 +496,13 @@ def main(argv=None) -> int:
     if not args.pair:
         ref_status, cand_status = run_statuses(args.reference), run_statuses(args.candidate)
         if ref_status and cand_status:
-            launch = compare_launch(ref_status, cand_status, {g["group"] for g in groups})
+            launch = compare_launch(ref_status, cand_status, {g["group"] for g in groups},
+                                    FingerprintArchive(args.fingerprints))
+    pixel_views = sum(g["pixels"]["views_compared"] for g in groups)
+    pixel_different = sum(len(g["pixels"]["different"]) for g in groups)
     report = {"status": status, "states_only": bool(args.states_only),
               "complete": complete, "data_and_launch": launch,
+              "decoded_splits": {"views_compared": pixel_views, "different": pixel_different},
               "runs_compared": total, "runs_identical": identical,
               "state_files_identical": files_identical,
               "runs_missing_in_candidate": missing_runs,
@@ -350,14 +527,30 @@ def main(argv=None) -> int:
               + (f"  env: {sorted(g['environment_differences'])}" if g["environment_differences"] else ""))
     for name in missing_groups:
         print(f"{name:28s} MISSING IN CANDIDATE")
+    for g in groups:
+        for message in g["alignment_errors"]:
+            print(f"{g['group']:28s} CANNOT ALIGN: {message}")
+        only_ref, only_cand = g["methods_only_in_reference"], g["methods_only_in_candidate"]
+        if only_ref or only_cand:
+            print(f"{g['group']:28s} not compared (trained in one group only): "
+                  f"{len(only_ref)} method(s) only in the reference, "
+                  f"{len(only_cand)} only in the candidate")
     for path in unpaired:
         print(f"merged JSON without its NPZ: {path}")
     if launch is not None:
         print(f"data and launch controls: {launch['jobs_compared']} job(s) compared, "
-              f"{len(launch['dataset_differences'])} with different data, "
+              f"{len(launch['dataset_differences'])} with different data"
+              + (f" ({len(launch['dataset_not_comparable'])} not comparable: launched before "
+                 "v3.0.1, which hashed only the whole data root; see --fingerprints)"
+                 if launch["dataset_not_comparable"] else "")
+              + (f" ({len(launch['dataset_entries_derived'])} from archived per-file lists)"
+                 if launch["dataset_entries_derived"] else "")
+              + ", "
               f"{len(launch['launch_differences'])} with different launch controls"
               + (f", {len(launch['jobs_without_candidate_status'])} without a status"
                  if launch["jobs_without_candidate_status"] else ""))
+    print(f"decoded splits: {pixel_views} task view(s) compared, {pixel_different} with "
+          "different pixels")
     print(f"{identical}/{total} runs identical (state files {files_identical}/{total} identical); "
           f"missing: {missing_runs} run(s), {len(missing_groups)} group(s) -> {status}")
     return 0 if status == "identical" else 1

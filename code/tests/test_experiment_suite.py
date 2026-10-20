@@ -185,6 +185,36 @@ class ExperimentSuiteTests(unittest.TestCase):
             self.assertEqual(suite.fingerprint_entries(legacy["files"]),
                              before["entries"])
 
+    def test_symlinked_dataset_folders_are_fingerprinted_like_real_ones(self):
+        import os
+        import shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            real = self._data_root(Path(tmp) / "real")
+            reference = suite.fingerprint_data_root(real, "full")
+            # The same files, with CIFAR-100 linked in from a shared store.
+            store = Path(tmp) / "store"
+            store.mkdir()
+            shutil.copytree(real / "cifar-100-python", store / "cifar-100-python")
+            linked = Path(tmp) / "linked"
+            linked.mkdir()
+            shutil.copytree(real / "tiny-imagenet-200", linked / "tiny-imagenet-200")
+            os.symlink(store / "cifar-100-python", linked / "cifar-100-python")
+            # A link back to the data root must not loop.
+            os.symlink(linked, linked / "tiny-imagenet-200" / "loop")
+            fingerprint = suite.fingerprint_data_root(linked, "full")
+            self.assertEqual(fingerprint["entries"], reference["entries"])
+            self.assertEqual(fingerprint["tree_sha256"], reference["tree_sha256"])
+            # Every entry a planned job reads must be recorded before it runs.
+            jobs = [suite.Job(job_id=f"g__{b}__seed0__wsn", priority="P0", purpose="t",
+                              runner="run_class_il.py", benchmark=b, seed=0, methods="wsn")
+                    for b in ("cifar", "pmnist")]
+            self.assertEqual(suite.unrecorded_entries(fingerprint, jobs), ["pmnist: MNIST"])
+            # Real trees hash exactly as v3.0.6 did (rglob order and records).
+            legacy = sorted((p for p in real.rglob("*") if p.is_file()),
+                            key=lambda p: p.relative_to(real).as_posix())
+            self.assertEqual([r["path"] for r in reference["files"]],
+                             [p.relative_to(real).as_posix() for p in legacy])
+
     def test_old_format_statuses_survive_a_data_root_change_via_archive(self):
         """The first P0 run recorded only the whole-tree hash. After MNIST is
         staged, its CIFAR/TinyImageNet jobs must still validate through the

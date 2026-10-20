@@ -104,7 +104,8 @@ def describe_task_loader(loader, task_id):
 
     Records the wrapper chain and source dataset class, the transform, the
     label mapping / pixel permutation / label offset when present and, for
-    device-resident datasets, the SHA-256 of the exact pixel tensor used.
+    device-resident datasets, the SHA-256 of the whole decoded split the view
+    indexes (one tensor shared by every task view of that split).
     """
     original = loader.dataset
     base = original

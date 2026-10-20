@@ -116,6 +116,27 @@ class PackageTests(unittest.TestCase):
             self.assertIn("not included in this package", readme)
             self.assertNotIn("source run directory", (out / "README.md").read_text())
 
+    def test_package_paths_never_leak_into_a_supplementary_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp) / "home_janedoe" / "runs"
+            root.mkdir(parents=True)
+            run = _fake_run(root, "p0")
+            code = pathlib.Path(tmp) / "code_src"
+            (code / "diltcl").mkdir(parents=True)
+            (code / "diltcl" / "__init__.py").write_text('__version__ = "3.0.7"\n')
+            out = pathlib.Path(tmp) / "supp"
+            rc = pkg.main(["--run-dirs", str(run), "--out", str(out), "--supplementary",
+                           str(code), "--anonymity-check", "janedoe", "--no-tar"])
+            self.assertEqual(rc, 0)
+            self.assertNotIn("janedoe", (out / "MANIFEST.json").read_text())
+            # The scan runs after the manifest is written: an internal package,
+            # which records its source directories, is caught by it.
+            internal = pathlib.Path(tmp) / "internal"
+            rc = pkg.main(["--run-dirs", str(run), "--out", str(internal),
+                           "--anonymity-check", "janedoe", "--no-tar"])
+            self.assertEqual(rc, 2)
+            self.assertFalse(internal.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

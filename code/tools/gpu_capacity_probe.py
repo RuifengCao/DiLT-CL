@@ -71,7 +71,15 @@ def _nvidia_smi(args):
 
 
 def device_memory():
-    out = _nvidia_smi(["--query-gpu=memory.used,memory.total",
+    """``(used, total)`` MiB of the first GPU visible to the jobs."""
+    value = os.environ.get("CUDA_VISIBLE_DEVICES")
+    selector = []
+    if value is not None:
+        first = value.split(",")[0].strip()
+        if not first or first.startswith("-"):
+            return None
+        selector = ["-i", first]
+    out = _nvidia_smi([*selector, "--query-gpu=memory.used,memory.total",
                        "--format=csv,noheader,nounits"])
     if not out or not out.strip():
         return None

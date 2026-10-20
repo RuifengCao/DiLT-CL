@@ -344,8 +344,9 @@ def enforce(data_root, benchmarks, require_training=True,
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Check dependencies and datasets before an experiment run.")
-    parser.add_argument("--data-root", default=os.environ.get(
-        "DILTCL_DATA_ROOT"), help="Directory holding the datasets.")
+    parser.add_argument("--data-root", default=None,
+                        help="Directory holding the datasets (default: "
+                             "$DILTCL_DATA_ROOT, else ./data, as the loaders resolve it).")
     parser.add_argument("--benchmarks", default="cifar",
                         help="Comma-separated: " +
                              ",".join(sorted(BENCHMARK_DATASETS)))
@@ -362,7 +363,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     benchmarks = [b.strip() for b in args.benchmarks.split(",") if b.strip()]
-    report = check(args.data_root, benchmarks,
+    report = check(resolve_data_root(args.data_root), benchmarks,
                    require_training=not args.no_training,
                    require_calibration=args.require_calibration,
                    pin_sklearn=args.pin_sklearn,

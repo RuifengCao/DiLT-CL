@@ -313,12 +313,17 @@ def _loader_count_record(setup):
     test_counts = [int(len(loader.dataset)) for loader in setup[1]]
     dataset_views = [describe_task_loader(loader, task_id)
                      for task_id, loader in enumerate(setup[0])]
+    # Same record for the evaluation splits (v3.0.7): with the device backend
+    # it carries the hash of the test pixels as well.
+    test_views = [describe_task_loader(loader, task_id)
+                  for task_id, loader in enumerate(setup[1])]
     return {
         "train_samples_per_task_before_calibration_holdout": train_counts,
         "test_samples_per_task": test_counts,
         "train_sample_count_before_calibration_holdout": int(sum(train_counts)),
         "test_sample_count": int(sum(test_counts)),
         "dataset_views": dataset_views,
+        "test_dataset_views": test_views,
     }
 
 

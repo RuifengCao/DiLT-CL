@@ -5,7 +5,7 @@ complete retraining. Every command runs from this directory (`code/`).
 
 | Level | What it establishes | Needs | Time |
 |---|---|---|---|
-| 1. Verify the released artifacts | Every reported number follows from the retained matrices; every checkpoint and per-example prediction file is the one recorded by its job; for class-IL isolation jobs that recorded them (v3.0.5 and later), every routing and oracle statistic follows from the per-example decisions | CPU, Python, the release | minutes |
+| 1. Verify the released artifacts | Every reported number follows from the retained matrices; every checkpoint and per-example prediction file is the one recorded by its job; for runs that recorded per-example predictions (v3.0.5 and later, such as a Level 3 regeneration; not the original v3.0.0 to v3.0.3 runs), every routing and oracle statistic follows from the per-example decisions | CPU, Python, the release | minutes |
 | 2. Re-evaluate the released checkpoints | The released experts regenerate every routed, task-inference, conditional and oracle result | the datasets; a GPU of the recorded type for exact equality | ~1 h on one GPU |
 | 3. Retrain from the seeds | The pipeline regenerates the experts themselves (bit for bit on the recorded stack) | the datasets and an NVIDIA GPU | ~10 GPU-hours per five seeds of all groups |
 
@@ -20,7 +20,7 @@ cuDNN versions).
 ```bash
 python3.12 -m venv .venv && . .venv/bin/activate
 pip install -r requirements-lock.txt
-python -m pytest tests -q -p no:cacheprovider       # ~1-2 min on a CPU
+python -m pytest tests -q -p no:cacheprovider       # ~2 min on a CPU
 python tools/check_environment.py --recorded-environment RUNS/p0/environment.json
 ```
 
@@ -31,8 +31,8 @@ with a run's recorded `environment.json`.
 or, with Docker and the NVIDIA Container Toolkit:
 
 ```bash
-docker build -t diltcl:3.0.6 .
-docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.6
+docker build -t diltcl:3.0.7 .
+docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.7
 ```
 
 Levels 1 and 2 also work with any recent PyTorch/NumPy/SciPy; only exact
@@ -45,9 +45,9 @@ bit-for-bit equality in levels 2 and 3 depends on the pinned stack and GPU.
 TinyImageNet (`tiny-imagenet-200/train`, `val/images`, `val/val_annotations.txt`).
 `python tools/preflight_check.py --data-root DATA --benchmarks cifar,pmnist,tinyimagenet`
 lists anything missing. Each run directory records a content fingerprint of
-the data it used (`dataset_fingerprint.json`, a SHA-256 tree hash per
-benchmark); a resumed run refuses a data root whose fingerprint changed, and
-the fingerprint of a new run can be compared with the released one.
+the data it used (`dataset_fingerprint.json`, a SHA-256 hash per top-level
+data entry); a resumed run reruns every job whose benchmark entries changed,
+and the fingerprint of a new run can be compared with the released one.
 
 ## Unpacking a release
 
@@ -65,8 +65,9 @@ for r in p0 p1_bias p1_biasacc; do
 done
 ```
 
-Each run directory's `audit/` folder holds the reports of the regeneration
-audit described under Level 3.
+The release is to be built after the regeneration audit of Level 3, which
+has not been run yet; each run directory's `audit/` folder will then hold
+that audit's reports.
 
 ## Level 1: verify the released artifacts (CPU)
 
@@ -82,7 +83,11 @@ python tools/compare_runs.py --reference RUNS/p0 RUNS/p1_bias RUNS/p1_biasacc \
 ```
 
 (`--out` keeps the released `verification_report.json` of each run
-unchanged.)
+unchanged.) The original runs were produced by v3.0.0 to v3.0.3, before
+per-example predictions were recorded, so for them
+`recompute_from_predictions.py` prints `not-recorded` and checks nothing;
+its checks apply to runs produced by v3.0.5 or later, such as the
+regeneration of Level 3.
 
 * `verify_experiment_bundle.py` checks that every planned job succeeded and
   produced exactly its planned methods, recomputes every summary metric from
@@ -181,6 +186,12 @@ python tools/compare_runs.py --reference RUNS/p0 RUNS/p1_bias RUNS/p1_biasacc \
     --candidate NEW/p0 NEW/p1_bias NEW/p1_biasacc --out regeneration_audit.json
 ```
 
+Decoded TinyImageNet images are cached in `DILTCL_CACHE_DIR` under a key
+derived from the image files (path, size, modification time), so a cache
+written by an earlier code version is not reused: the images are decoded
+again from the data root, and `compare_runs.py` reports whether the decoded
+splits of the new run hash to the recorded values (`decoded splits` line).
+
 The smoke profile takes minutes and repeats one task-IL job with the same
 seed for every method; its verification fails unless the repeat is bit for
 bit identical, so it checks the GPU's determinism before the long run. Run
@@ -200,10 +211,15 @@ lists any differences in the recorded environment. Its verdict is
 present in the new run and identical; a run that is missing anything is
 `incomplete`. Given run directories on both sides, it also reports whether
 every job read the same data (content hashes) and ran with the same launch
-controls. The environment comparison lists every recorded field that
-differs; `platform` (the kernel string) and, in the Docker image, the Python
-build differ from the recorded Anaconda installation without affecting the
-numerics. Its last line reads, for a complete bit-identical regeneration,
+controls. The 170 P0 jobs launched under v3.0.0 recorded only a hash of the
+whole data root; `--fingerprints DIR` names a folder holding that
+fingerprint with its per-file list (an original run directory or its
+`dataset_fingerprints/`), from which their per-benchmark hashes are derived;
+without it they are reported as not comparable. The environment comparison
+lists every recorded field that differs; `platform` (the kernel string) and,
+in the Docker image, the Python build differ from the recorded Anaconda
+installation without affecting the numerics. Its last line reads, for a
+complete bit-identical regeneration,
 
 ```
 410/410 runs identical (state files 410/410 identical); missing: 0 run(s), 0 group(s) -> identical

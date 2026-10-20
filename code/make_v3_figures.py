@@ -11,7 +11,8 @@ numbers behind it. No value is hard-coded.
     of each family on one scale -- forgetting ``-BWT`` for shared-backbone
     methods and routing error ``100 - TA`` for isolation methods. This is the
     LA/TA decomposition: shared backbones learn (high LA) but forget; isolation
-    methods keep what they learned (BWT ~ 0) but mis-route.
+    methods keep their experts unchanged but mis-route. Their class-IL BWT is
+    not zero: a later expert can capture earlier examples (PROTOCOL.md §3.3).
 ``calibration_effect``  (calibrated class-IL artifact, optional)
     Raw -> calibrated routing for every isolation method: paired per-seed
     lines for TA and ACC.

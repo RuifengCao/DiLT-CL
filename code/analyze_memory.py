@@ -6,9 +6,12 @@ including the ratio to an independent-task reference.
 It does **not** require running the experiments. The only run-specific inputs
 are the backbone size ``P`` (computed from the model, or passed via
 ``--params``) and DiLT-CL's observed core / expert densities, which the
-training pipeline prints as ``Core density`` / ``Expert density``. Defaults for
-the densities match the values observed in the project's reference run; replace
-them with your own run's numbers for a faithful table.
+training pipeline prints as ``Core density`` / ``Expert density``. The default
+densities (0.30 / 0.23) are not those of the v3 runs, whose artifacts record
+a core density of about 0.07 and an expert density of about 0.09 on
+CIFAR-100; pass your run's values for a faithful table. The v3 artifacts'
+own ``memory`` tables already embed the measured densities, and they are the
+source for Split-TinyImageNet, for which this tool has no preset.
 
 Examples
 --------

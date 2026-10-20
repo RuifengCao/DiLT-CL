@@ -1,4 +1,4 @@
-# DiLT-CL v3.0.6: research code
+# DiLT-CL v3.0.7: research code
 
 Disentangled Lottery-Ticket Continual Learning (DiLT-CL) and the baselines,
 protocols and infrastructure used to evaluate it. `diltcl.__version__` is the
@@ -18,8 +18,8 @@ records, are in `../evidence/results_20260906/`.
 | Package | `diltcl/`, 28 modules |
 | Runners | `run_task_il.py` (task-IL), `run_class_il.py` (class-IL) |
 | Launcher | `run_suite.py`: resumable, parallel job suite with provenance (`run_v21_experiment_suite.py` is a forwarding shim for old command lines) |
-| Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, paired statistics |
-| Tests | `tests/`, 31 files, 280 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (~1 min on CPU) |
+| Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, paired statistics, results package and release builders, environment check, wall-time summary |
+| Tests | `tests/`, 32 files, 303 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
 | Metadata | `pyproject.toml` (version read from `diltcl.__version__`), `requirements.txt` (ranges), `requirements-lock.txt` (the exact recorded stack), `Dockerfile` |
 | Reproduction | `REPRODUCE.md`: verify the released artifacts on a CPU, re-evaluate released checkpoints, re-run training and audit the regeneration |
 
@@ -69,7 +69,7 @@ code/
 │   ├── execution.py              ExecutionOptions: data backend, numerics mode, TF32, threads (recorded in artifacts)
 │   ├── metrics.py, stats.py, task_inference.py, task_calibration.py, profiling.py
 │   ├── compact_export.py, preflight.py, runner_common.py, config.py, utils.py
-│   └── __init__.py               __version__ = "3.0.6"
+│   └── __init__.py               __version__ = "3.0.7"
 └── tests/
 ```
 
@@ -136,17 +136,24 @@ its verified semantics are in `PROTOCOL.md`.
   method), merged back, equals one monolithic run exactly
   (`tests/test_merge_results.py`, task-IL and class-IL).
 * **Provenance.** Every artifact records `execution` (backend, numerics, TF32
-  policy, effective torch flags), materialised-pixel SHA-256 per task,
-  dataset content fingerprint (suite), source hashes and checkpoint hashes.
+  policy, effective torch flags), the SHA-256 of each decoded split the task
+  views index (training split; test split from v3.0.7), the dataset content
+  fingerprint (suite), source hashes and checkpoint hashes.
   Artifacts start `unverified`; only `tools/merge_results.py`, after a passing
   `verify_experiment_bundle.py` report, promotes them to `verified`.
 * **Resume that survives staging and fixes.** A job's dataset identity is the
   hash of the top-level data entries its benchmark reads, so staging another
-  benchmark's data later does not invalidate finished jobs; every fingerprint
-  ever used is archived under `dataset_fingerprints/`. A code change normally
-  reruns everything; `run_suite.py --accept-source-change "<reason>"` keeps
-  finished jobs, records old/new hashes and the reason in `plan.json`, and
-  the verifier reports the acknowledgement as a warning.
+  benchmark's data later does not invalidate finished jobs, while a change to
+  its own entries reruns it on resume; every fingerprint ever used is archived
+  under `dataset_fingerprints/`. Decoded images are cached outside the data
+  root under a key derived from the image files themselves (path, size,
+  modification time), so changed data is decoded again. A code change stops
+  a resume with an error; `run_suite.py --accept-source-change "<reason>"`
+  keeps finished jobs, records old/new hashes and the reason in `plan.json`
+  (with `--invalidate-methods` naming methods whose finished results the
+  change makes invalid), and the verifier reports the acknowledgement as a
+  warning. Any other change to the plan, including `--threads-per-job` or an
+  execution option, needs a new run directory.
 
 ## Protocols in one paragraph each
 
