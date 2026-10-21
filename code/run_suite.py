@@ -430,6 +430,32 @@ def source_manifest() -> dict[str, Any]:
             "execution_sha256": execution_digest.hexdigest()}
 
 
+PROBE_TIMEOUT_SECONDS = 900
+
+
+def run_with_time_limit(command: list[str], seconds: float) -> tuple[int, str, str] | None:
+    """``(returncode, stdout, stderr)`` of ``command``, or ``None`` if it overran.
+
+    ``subprocess.run(timeout=...)`` kills an overrunning child and then waits
+    for it without a limit, so a child stuck inside the GPU driver (which a
+    kill does not end until it leaves the driver) would still block the
+    caller. Here the wait after the kill is bounded too; a child that cannot
+    be reaped is left to the system.
+    """
+    proc = subprocess.Popen(command, text=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    try:
+        out, err = proc.communicate(timeout=seconds)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        try:
+            proc.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return None
+    return proc.returncode, out, err
+
+
 def environment_probe() -> dict[str, Any]:
     packages = {}
     for name in ("numpy", "scipy", "torch", "torchvision", "scikit-learn"):
@@ -460,26 +486,30 @@ def environment_probe() -> dict[str, Any]:
         "                              'error': type(exc).__name__ + ': ' + str(exc)}\n"
         "print(json.dumps(out))\n"
     )
-    proc = subprocess.run(
-        [sys.executable, "-c", probe_code, str(ROOT)], text=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    # Both probes have a time limit (run_with_time_limit): a driver that hangs
+    # must stop the suite with a message, not leave it waiting before the
+    # first job.
     torch_probe: dict[str, Any]
-    if proc.returncode == 0 and proc.stdout.strip():
-        torch_probe = json.loads(proc.stdout.strip().splitlines()[-1])
+    probe = run_with_time_limit([sys.executable, "-c", probe_code, str(ROOT)],
+                                PROBE_TIMEOUT_SECONDS)
+    if probe is None:
+        torch_probe = {"ok": False, "error": f"the PyTorch probe did not finish within "
+                                             f"{PROBE_TIMEOUT_SECONDS} s"}
+    elif probe[0] == 0 and probe[1].strip():
+        torch_probe = json.loads(probe[1].strip().splitlines()[-1])
     else:
-        torch_probe = {"ok": False, "error": proc.stderr.strip()}
+        torch_probe = {"ok": False, "error": probe[2].strip()}
 
     nvidia_smi = None
     executable = shutil.which("nvidia-smi")
     if executable:
-        smi = subprocess.run(
-            [executable,
-             "--query-gpu=index,name,uuid,driver_version,memory.total",
-             "--format=csv,noheader"], text=True, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, check=False)
-        nvidia_smi = {"returncode": smi.returncode,
-                      "stdout": smi.stdout.strip(),
-                      "stderr": smi.stderr.strip()}
+        smi = run_with_time_limit(
+            [executable, "--query-gpu=index,name,uuid,driver_version,memory.total",
+             "--format=csv,noheader"], 60)
+        nvidia_smi = ({"returncode": smi[0], "stdout": smi[1].strip(), "stderr": smi[2].strip()}
+                      if smi is not None else
+                      {"returncode": None, "stdout": "",
+                       "stderr": "nvidia-smi did not finish within 60 s"})
     return {
         "captured_at": utc_now(),
         "python": sys.version,
@@ -1071,9 +1101,11 @@ def resolve_max_parallel(spec: str, threads_per_job: int,
     elif shutil.which("nvidia-smi"):
         by_memory = 1
         detail["warning"] = (
-            "GPU memory could not be read (nvidia-smi and PyTorch both failed), so "
-            "jobs run one at a time; pass --max-parallel N to set the number of "
-            "parallel jobs explicitly")
+            ("GPU memory could not be read (nvidia-smi and PyTorch both failed)"
+             if visible_gpu_selector() is not None else
+             "CUDA_VISIBLE_DEVICES hides every GPU")
+            + ", so jobs run one at a time; pass --max-parallel N to set the number "
+            "of parallel jobs explicitly")
     else:
         by_memory = by_cpu
     value = max(1, min(by_cpu, by_memory, MAX_AUTO_PARALLEL))

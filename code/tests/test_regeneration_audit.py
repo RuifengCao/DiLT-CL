@@ -282,6 +282,89 @@ def test_only_the_calibrated_routers_outputs_count_as_a_precision_change():
         assert summary["same_state_unexplained"] == ["cifar/wsn/seed0"]
 
 
+def test_routers_refitted_differently_are_not_a_precision_effect():
+    """Routers are fitted on the CPU. With the same experts, a logistic or
+    tied-slope router whose coefficients or intercepts differ (a refit on
+    another host CPU) is listed as refitted, never as an effect of the routing
+    precision; any other router difference is listed as different."""
+    def payload(precision, kind="score-bias", intercept=0.0, mean=0.0):
+        out = _payload(calibration=kind)
+        state = {"classes": [0, 1], "feature_mean": [0.0, mean], "feature_scale": [1.0, 1.0],
+                 "coef": [[-0.7, -0.0], [-0.0, -0.7]], "intercept": [0.0, intercept]}
+        if precision == "float64":
+            state["routing_dtype"] = "float64"
+        out["calibration"] = {"cifar": {"wsn": {
+            str(s): {"kind": kind, "prefix_models": [copy.deepcopy(state)]} for s in (0, 1)}}}
+        return out
+
+    def routers_of(seed1_intercept, **kw):
+        cand = payload("float64", **kw)
+        cand["calibration"]["cifar"]["wsn"]["1"]["prefix_models"][0]["intercept"] = [
+            0.0, seed1_intercept]
+        return cand
+
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        arrays = _arrays()
+        arrays["cifar/wsn/seed0/task_inference"] = arrays["cifar/wsn/seed0/task_inference"] + 1.0
+
+        def compare(name, ref_payload, cand_payload, cand_arrays=arrays, ref_arrays=None):
+            _write(base / name / "ref", "g", ref_payload, ref_arrays or _arrays())
+            _write(base / name / "cand", "g", cand_payload, cand_arrays)
+            return cr.compare_group("g", base / name / "ref" / "g.json",
+                                    base / name / "cand" / "g.json")["summary"]
+
+        # Seed 0: routing outputs differ and one bias moved by 1e-12 (a refit);
+        # seed 1: same routers, same outputs.
+        summary = compare("refit", payload("float32"), routers_of(0.0, intercept=1e-12))
+        assert summary["router_precision_changed"] is True
+        assert summary["routing_precision_differences"] == []
+        assert summary["routers_refitted"] == ["cifar/wsn/seed0"]
+        assert summary["router_refit_max_difference"] == 1e-12
+        assert summary["routers_different"] == [] and summary["same_state_unexplained"] == []
+        assert summary["identical"] == 1
+        # The routing precision alone (same routers) is still named as such; a
+        # refit with identical outputs is listed and is not identical.
+        summary = compare("precision", payload("float32"), routers_of(1e-12))
+        assert summary["routing_precision_differences"] == ["cifar/wsn/seed0"]
+        assert summary["routers_refitted"] == ["cifar/wsn/seed1"]
+        assert summary["identical"] == 0
+        # A difference no CPU refit can make -- the standardisation, or any
+        # score-bias-acc router -- is listed as different and stays unexplained.
+        for name, ref_payload, cand_payload, different in (
+                ("mean", payload("float32"), routers_of(0.0, mean=1e-300),
+                 ["cifar/wsn/seed0", "cifar/wsn/seed1"]),
+                ("biasacc", payload("float32", kind="score-bias-acc"),
+                 routers_of(0.0, kind="score-bias-acc", intercept=1e-12),
+                 ["cifar/wsn/seed0"])):
+            summary = compare(name, ref_payload, cand_payload)
+            assert summary["routers_refitted"] == [], name
+            assert summary["routers_different"] == different, name
+            assert summary["routing_precision_differences"] == [], name
+            assert summary["same_state_unexplained"] == ["cifar/wsn/seed0"], name
+        # So is a router missing on one side, even with identical outputs.
+        cand = payload("float64")
+        del cand["calibration"]["cifar"]["wsn"]["1"]
+        summary = compare("missing", payload("float32"), cand, cand_arrays=_arrays())
+        assert summary["routers_different"] == ["cifar/wsn/seed1"]
+        assert summary["identical"] == 1 and summary["same_state_unexplained"] == []
+        # A raw-router difference stays unexplained even with refitted routers.
+        raw = {k: v.copy() for k, v in arrays.items()}
+        raw["cifar/wsn/seed0/raw_result"] = np.full((2, 2), 1.0)
+        old_raw = _arrays()
+        old_raw["cifar/wsn/seed0/raw_result"] = np.full((2, 2), 2.0)
+        summary = compare("refit_raw", payload("float32"), payload("float64", intercept=1e-12),
+                          cand_arrays=raw, ref_arrays=old_raw)
+        assert summary["same_state_unexplained"] == ["cifar/wsn/seed0"]
+        # Groups paired by state use different routers by design.
+        summary = cr.compare_group("g", base / "refit" / "ref" / "g.json",
+                                   base / "refit" / "cand" / "g.json", states_only=True)["summary"]
+        assert summary["routers_refitted"] == [] == summary["routers_different"]
+        code, report = _run(["--reference", str(base / "refit" / "ref"),
+                             "--candidate", str(base / "refit" / "cand")])
+        assert code == 1 and report["status"] == "differences"
+
+
 def test_states_only_pair_compares_the_experts_both_groups_trained():
     # The 90%-split calibration group also trains the shared-backbone methods;
     # the score-bias groups do not. Their shared experts must still pair.

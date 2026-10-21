@@ -60,7 +60,7 @@ under v3.0.2, so its rows for those two methods time the invalidated runs;
 ```bash
 cd code
 pip install -r requirements.txt pytest matplotlib
-python -m pytest tests -q                 # 347 tests, 346 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
+python -m pytest tests -q                 # 349 tests, 348 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
 
 # every evidence file against its recorded hash
 python - <<'EOF'
@@ -99,7 +99,7 @@ in [`code/REPRODUCE.md`](code/REPRODUCE.md).
 
 ## Status
 
-Code version 3.0.10 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
+Code version 3.0.11 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
 were produced by versions 3.0.0 to 3.0.3 on one NVIDIA RTX 5090; the exact
 software stack is pinned in `code/requirements-lock.txt` and recorded in each
 run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
@@ -120,9 +120,17 @@ fitted in, instead of the float32 of the routing scores, so the deployed
 router is the fitted one; training and uncalibrated routing are unchanged,
 and `code/tools/routing_precision_audit.py` measures which calibrated
 decisions the change moves. It also closes the audit gaps and minor issues
-found by the fourth and fifth code reviews (`code/PROTOCOL.md`). The test suite and a
+found by the fourth and fifth code reviews (`code/PROTOCOL.md`). Version
+3.0.11 changes no training, evaluation, routing or recording code: a run
+whose fitted routers differ from the original ones (routers are fitted on
+the CPU) is reported as such -- as a refit when only the coefficients of a
+logistic or tied-slope router differ -- with a check whether the original
+routers reproduce the original results, instead of being attributed to the
+routing precision; tests that could fail on a GPU server without a fault in
+the code no longer do; and the suite's environment probes have a time
+limit. The test suite and a
 synthetic end-to-end run pass on Python 3.13 and on the recorded software
-stack (Python 3.12.3, PyTorch 2.12.1) on a CPU. Whether 3.0.10 regenerates the
+stack (Python 3.12.3, PyTorch 2.12.1) on a CPU. Whether 3.0.11 regenerates the
 recorded experts bit for bit on the recorded stack is what the Level 3
 regeneration audit in `code/REPRODUCE.md` checks; that audit has not been run
 yet.

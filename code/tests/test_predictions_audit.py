@@ -823,10 +823,41 @@ def test_float32_rebuild_reproduces_a_float32_routed_run(calibration, monkeypatc
     code = audit.main(["--run-dir", str(tmp_path / "new"), "--reference",
                        str(tmp_path / "old_merged"), "--out", str(report)])
     result = json.loads(report.read_text())
-    assert code == 0 and result["status"] == "explained", result["summary"]
     entry = result["entries"][0]
-    assert entry["routing_dtype"] == "float64" and entry["reference"]["identical"]
-    assert entry["reference"]["matrix_differences"] == {}
+    assert result["summary"]["problems"] == [] and entry["errors"] == []
+    assert entry["routing_dtype"] == "float64"
+    reference = entry["reference"]
+    assert reference["trained_state_identical"] and reference["routers_identical"]
+    assert reference["fixed_matrix_differences"] == {} == reference["fixed_metric_differences"]
+    # The rebuild is NumPy's float32: it must reproduce the float32-routed run
+    # wherever the device applies float32 routers as NumPy does (always on a
+    # CPU; on a GPU the routing self-test reports it, float32_ok).
+    from diltcl.task_inference import float64_routing_self_test
+    if float64_routing_self_test(_runner_device())["float32_ok"]:
+        assert code == 0 and result["status"] == "explained", result["summary"]
+        assert reference["identical"] and reference["matrix_differences"] == {}
+    # A router that differs from the reference's: a refit on another host CPU
+    # when only the coefficients or intercepts of a logistic (or tied-slope)
+    # router differ, any other difference otherwise -- in both tools.
+    import shutil
+    changed = tmp_path / "changed_reference"
+    shutil.copytree(tmp_path / "old_merged", changed)
+    changed_payload = json.loads((changed / "grp.json").read_text())
+    last = changed_payload["calibration"]["cifar"]["wsn"]["0"]["prefix_models"][-1]
+    last["intercept"][0] = float(np.nextafter(last["intercept"][0], np.inf))
+    (changed / "grp.json").write_text(json.dumps(changed_payload))
+    changed_report = tmp_path / "precision_changed.json"
+    assert audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(changed),
+                       "--out", str(changed_report)]) == 1
+    changed_result = json.loads(changed_report.read_text())
+    refit = calibration == "score-logreg"
+    assert changed_result["entries"][0]["reference"]["router_refit"] is refit
+    assert changed_result["summary"]["reference_routers_refitted" if refit else
+                                     "reference_routers_different"] == ["grp/cifar/wsn/seed0"]
+    changed_summary = compare.compare_group("grp", changed / "grp.json",
+                                            tmp_path / "new_merged" / "grp.json")["summary"]
+    assert changed_summary["routers_refitted" if refit else
+                           "routers_different"] == ["cifar/wsn/seed0"]
     # compare_runs names the precision change instead of calling it an anomaly.
     out = compare.compare_group("grp", tmp_path / "old_merged" / "grp.json",
                                 tmp_path / "new_merged" / "grp.json")
@@ -1188,6 +1219,42 @@ def test_saturated_experts_pass_every_audit_and_the_float32_rebuild(monkeypatch,
         assert summary["same_state_unexplained"] == ["cifar/supsup/seed0"], name
         assert summary["routing_precision_differences"] == [], name
 
+    # Routers that differ from the reference's: the job differs from the
+    # reference, and the reference's own routers are applied to its scores for
+    # the diagnosis. A score-bias-acc router cannot change with the host CPU,
+    # so this is a router difference, not a refit, in both tools.
+    # Stage 0 has a single candidate, so a different intercept there moves no
+    # decision; a large bias on task 0 at the last stage moves many.
+    for name, stage, reproduced in (("refit_stage0", 0, True), ("refit_large", -1, False)):
+        folder = tmp_path / name
+        shutil.copytree(tmp_path / "ref", folder)
+        payload_ = json.loads((folder / "grp.json").read_text())
+        models = payload_["calibration"]["cifar"]["supsup"]["0"]["prefix_models"]
+        models[stage]["intercept"][0] += 0.5 if reproduced else 100.0
+        (folder / "grp.json").write_text(json.dumps(payload_))
+        out = tmp_path / f"precision_{name}.json"
+        assert audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(folder),
+                           "--out", str(out)]) == 1
+        result = json.loads(out.read_text())
+        assert result["status"] == "unexplained", name
+        reference = result["entries"][0]["reference"]
+        assert reference["routers_identical"] is False and reference["router_differences"], name
+        assert reference["router_refit"] is False, name
+        check = reference["with_reference_routers"]
+        assert (check["routes_moved_by_router_change"] > 0) is (not reproduced), (name, check)
+        assert result["summary"]["reference_routers_different"] == ["grp/cifar/supsup/seed0"]
+        assert result["summary"]["reference_routers_refitted"] == []
+        if exact32 or not reproduced:      # as above: the rebuild is NumPy's float32
+            assert check["identical"] is reproduced, (name, check)
+            assert result["summary"][
+                "reference_router_differences_reproduced_with_reference_routers"] == int(reproduced)
+        summary = compare.compare_group("grp", folder / "grp.json",
+                                        tmp_path / "cand" / "grp.json")["summary"]
+        assert summary["routers_different"] == ["cifar/supsup/seed0"], name
+        assert summary["routers_refitted"] == [] and summary["identical"] == 0, name
+        assert summary["routing_precision_differences"] == [], name
+        assert summary["same_state_unexplained"] == summary["same_state_different_outputs"], name
+
     # Nothing to audit, or a group the reference lacks, is a failure.
     (tmp_path / "empty").mkdir()
     assert audit.main(["--run-dir", str(tmp_path / "empty")]) == 1
@@ -1235,7 +1302,14 @@ def test_saturated_experts_pass_every_audit_and_the_float32_rebuild(monkeypatch,
     shutil.copytree(tmp_path / "new", forged)
     pred_path = forged / "artifacts" / job / record["predictions"]["relative_path"]
     forged_arrays, forged_meta = rp.load_predictions(pred_path)
-    rows = np.flatnonzero(forged_arrays["raw_true_task"] <= 1)
+    # Forge a raw route that both routers had sent to the example's own task:
+    # the forged one then leaves the own task and the calibrated route, so no
+    # structural check applies to it and only the argmin check can catch it.
+    raw_s1 = forged_arrays["raw_route_by_stage"][:, 1]
+    rows = np.flatnonzero((forged_arrays["raw_true_task"] <= 1)
+                          & (raw_s1 == forged_arrays["raw_true_task"])
+                          & (forged_arrays["route_by_stage"][:, 1] == raw_s1))
+    assert rows.size, "no example routed home by both routers at stage 1"
     forged_arrays["raw_route_by_stage"][rows[0], 1] = 1 - forged_arrays["raw_route_by_stage"][rows[0], 1]
     np.savez_compressed(pred_path, meta_json=np.asarray(json.dumps(forged_meta)), **forged_arrays)
     forged_json = forged / "artifacts" / job / "result.json"

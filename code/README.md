@@ -1,4 +1,4 @@
-# DiLT-CL v3.0.10: research code
+# DiLT-CL v3.0.11: research code
 
 Disentangled Lottery-Ticket Continual Learning (DiLT-CL) and the baselines,
 protocols and infrastructure used to evaluate it. `diltcl.__version__` is the
@@ -19,7 +19,7 @@ records, are in `../evidence/results_20260906/`.
 | Runners | `run_task_il.py` (task-IL), `run_class_il.py` (class-IL) |
 | Launcher | `run_suite.py`: resumable, parallel job suite with provenance (`run_v21_experiment_suite.py` is a forwarding shim for old command lines) |
 | Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, routing-precision audit, paired statistics, results package and release builders, environment check, wall-time summary |
-| Tests | `tests/`, 32 files, 346 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
+| Tests | `tests/`, 32 files, 348 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
 | Metadata | `pyproject.toml` (version read from `diltcl.__version__`), `requirements.txt` (ranges), `requirements-lock.txt` (the exact recorded stack), `Dockerfile` |
 | Reproduction | `REPRODUCE.md`: verify the released artifacts on a CPU, re-evaluate released checkpoints, re-run training and audit the regeneration |
 
@@ -70,7 +70,7 @@ code/
 │   ├── execution.py              ExecutionOptions: data backend, numerics mode, TF32, threads (recorded in artifacts)
 │   ├── metrics.py, stats.py, task_inference.py, task_calibration.py, profiling.py
 │   ├── compact_export.py, preflight.py, runner_common.py, config.py, utils.py
-│   └── __init__.py               __version__ = "3.0.10"
+│   └── __init__.py               __version__ = "3.0.11"
 └── tests/
 ```
 

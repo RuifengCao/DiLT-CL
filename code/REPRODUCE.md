@@ -31,8 +31,8 @@ with a run's recorded `environment.json`.
 or, with Docker and the NVIDIA Container Toolkit:
 
 ```bash
-docker build -t diltcl:3.0.10 .
-docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.10
+docker build -t diltcl:3.0.11 .
+docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.11
 ```
 
 Levels 1 and 2 also work with any recent PyTorch/NumPy/SciPy; only exact
@@ -292,8 +292,15 @@ outputs saturate it can be a large share of the decisions (593 of 1,260 on a
 CPU in the saturated case of `tests/test_predictions_audit.py`).
 `compare_runs.py` reports `differences` for the runs concerned and
 names the change of routing precision when only the calibrated router's
-arrays and metrics differ (`ROUTERS float32->float64`); any other difference
-for the same experts is reported as `SAME STATE, DIFFERENT OUTPUTS`.
+arrays and metrics differ and the stored routers are the original ones
+(`ROUTERS float32->float64`). The routers are fitted on the CPU: the
+iterative fits of the logistic and tied-slope routers rest on BLAS results
+that another host CPU can round differently, so a run with the same experts
+whose routers of those kinds differ only in their coefficients and
+intercepts is listed as `ROUTERS REFITTED` (with the largest change), and any
+other router difference as `ROUTERS DIFFER`; a run counts as identical only
+with the same routers. Any other difference for the same experts is
+reported as `SAME STATE, DIFFERENT OUTPUTS`.
 `routing_precision_audit.py` takes each calibrated job's own per-example
 records, checks them as the verifier does, re-applies the stored routers in
 float32 as the original code did, counts the decisions the precision moved,
@@ -312,7 +319,13 @@ the example to its own task and gained only where the own task is within
 rounding without winning; correct predictions move with those routes whose
 own expert is right (with shared label sets, by any such decision, since
 another expert may predict the right label); a tie can disappear only where
-the rebuild ties and appear only on other such decisions. The audit must also cover the original runs: every
+the rebuild ties and appear only on other such decisions. A job whose stored
+routers differ from the original ones counts as different, reported as a
+refit or as a router difference as above; the audit then also applies the
+original routers, in float32, to the job's recorded scores and reports
+whether that reproduces the original run (`with_reference_routers`, printed
+on the job's `DIFFERS` line with the largest parameter change), which
+separates a difference in the routers from one in the experts' test scores. The audit must also cover the original runs: every
 calibrated original run must be audited, and every isolation method of an
 audited job must carry its calibration record. Its last line ends in
 `-> explained` when the change of precision accounts for every difference;

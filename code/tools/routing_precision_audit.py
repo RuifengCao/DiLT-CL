@@ -51,6 +51,18 @@ job's own artifacts, the stored routers and their fitting records), and then
    float32 near-ties``; anything else is a difference. The bias routers are
    rebuilt exactly and get no such tolerance, unless the reference ran its
    matmuls in TF32 (then every router gets it, with TF32's rounding bound).
+   A job whose stored routers differ from the reference's counts as
+   different. The routers are fitted on the CPU, and the iterative fits of
+   the logistic and tied-slope routers rest on BLAS results that another
+   host CPU can round differently; a difference confined to their
+   coefficients and intercepts is reported as a refit (``router_refit``,
+   with the largest change), any other as a router difference. Either way
+   the reference's own routers are also applied in float32 to the job's
+   recorded scores, and the report states whether that reproduces the
+   reference (``with_reference_routers``) and how many decisions the change
+   of routers moved: this separates a difference in the routers from one in
+   the experts' test scores, not a refit from another cause of a router
+   difference.
 
 The audit must cover the reference: every calibrated run of every
 calibrated reference group must be audited, every isolation method of an
@@ -349,6 +361,21 @@ def router_differences(models: list, ref_models: list) -> dict:
     return out
 
 
+def refit_only(differences: dict, record: dict, ref_record: dict) -> bool:
+    """Whether stored routers differ only as a refit on another host CPU can make them.
+
+    The logistic and tied-slope routers (``compare_runs.REFITTABLE_KINDS``)
+    are fitted iteratively on BLAS results, so another CPU can move their
+    coefficients and intercepts; nothing else of a router depends on it.
+    """
+    if not differences or record.get("kind") != ref_record.get("kind"):
+        return False
+    if record.get("kind") not in cr.REFITTABLE_KINDS:
+        return False
+    return all(key.split("/", 1)[-1] in cr.REFITTABLE_FIELDS and isinstance(value, float)
+               for key, value in differences.items())
+
+
 def compare_with_reference(job: dict, ref_payload: dict, ref_npz) -> dict:
     """Compare one job (its float32 rebuild and its fixed parts) with the reference.
 
@@ -360,7 +387,7 @@ def compare_with_reference(job: dict, ref_payload: dict, ref_npz) -> dict:
     key = f"{benchmark}/{method}/seed{seed}"
     counts = job["counts"]
     out = {"run": key, "test_counts_identical": None, "trained_state_identical": None,
-           "routers_identical": None, "router_differences": {},
+           "routers_identical": None, "router_differences": {}, "router_refit": False,
            "fixed_matrix_differences": {}, "fixed_metric_differences": {},
            "reference_inconsistent_metrics": {},
            "matrix_differences": {}, "within_near_ties": [], "metric_differences": {},
@@ -379,6 +406,7 @@ def compare_with_reference(job: dict, ref_payload: dict, ref_npz) -> dict:
         out["router_differences"] = router_differences(job["record"].get("prefix_models") or [],
                                                        ref_record["prefix_models"])
         out["routers_identical"] = not out["router_differences"]
+        out["router_refit"] = refit_only(out["router_differences"], job["record"], ref_record)
     for label, field in (("test-set sizes", "test_counts_identical"),
                          ("trained-state hash", "trained_state_identical"),
                          ("stored routers", "routers_identical")):
@@ -577,7 +605,52 @@ def _audit_record(result_json: Path, payload: dict, npz, group: str, benchmark: 
            "fixed": fixed_metrics(current, raw), "disjoint": disjoint,
            "cells": near_tie_cells(rebuild, arrays, T)}
     entry["reference"] = compare_with_reference(job, ref_payload, ref_npz)
+    if entry["reference"]["routers_identical"] is False:
+        entry["reference"]["with_reference_routers"] = reference_router_check(
+            job, arrays, rebuild, ref_payload, ref_npz, T, tf32)
     return entry
+
+
+def reference_router_check(job: dict, arrays: dict, rebuild: dict, ref_payload: dict,
+                           ref_npz, T: int, tf32: bool) -> dict:
+    """Diagnosis for a job whose stored routers differ from the reference's.
+
+    The routers are fitted on the CPU, so another host CPU or BLAS can refit
+    them differently even when the experts are the same (see
+    :func:`refit_only`). This job's float32 rebuild then cannot be expected
+    to match the reference. Here the reference's own routers are applied, in
+    float32, to this job's recorded scores instead: if that reproduces the
+    reference (up to the same near-ties), the experts' test scores and the
+    evaluation are unchanged and the job differs from the reference only
+    through its routers and the routing precision. It does not say why the
+    routers differ. ``routes_moved_by_router_change`` counts the decisions on
+    which the two routers disagree in float32. Reported only; the job still
+    counts as different from the reference.
+    """
+    ref_record = (((ref_payload.get("calibration") or {}).get(job["benchmark"]) or {})
+                  .get(job["method"]) or {}).get(str(job["seed"])) or {}
+    models = ref_record.get("prefix_models") or []
+    record = dict(job["record"], prefix_models=models)
+    try:
+        ref_rebuild = float32_rebuild(arrays, record, tf32=tf32)
+    except (ValueError, KeyError, IndexError, TypeError) as exc:
+        return {"error": f"the reference's routers cannot be applied to this job: "
+                         f"{type(exc).__name__}: {exc}"}
+    if not job["disjoint"] and ref_rebuild["unknown_prediction_mask"].any():
+        return {"error": "shared label sets: a decision of the reference's routers chose "
+                         "an expert whose prediction was not recorded"}
+    rebuilt = rp.recompute(ref_rebuild["arrays"], T, job["disjoint"])
+    check = compare_with_reference(
+        dict(job, record=record, rebuilt=rebuilt,
+             metrics=per_seed_metrics(rebuilt["stats"], rebuilt["result_matrix"]),
+             cells=near_tie_cells(ref_rebuild, arrays, T)),
+        ref_payload, ref_npz)
+    return {"identical": check["identical"],
+            "within_near_ties": check["within_near_ties"],
+            "matrix_differences": check["matrix_differences"],
+            "metric_differences": check["metric_differences"],
+            "routes_moved_by_router_change": int(np.sum(ref_rebuild["arrays"]["route_by_stage"]
+                                                != rebuild["arrays"]["route_by_stage"]))}
 
 
 def coverage_problems(entries: list[dict], reference: dict, cache: dict) -> list[str]:
@@ -668,6 +741,17 @@ def main(argv=None) -> int:
         "reference_identical": len(compared) - len(differing) - len(near),
         "reference_within_float32_near_ties": len(near),
         "reference_different": [f"{e['group']}/{e['reference']['run']}" for e in differing],
+        # Routers refitted on another host CPU (refit_only), other router
+        # differences, and how many jobs with different routers the
+        # reference's own routers reproduce (reference_router_check).
+        "reference_routers_refitted": [f"{e['group']}/{e['reference']['run']}" for e in compared
+                                       if e["reference"]["router_refit"]],
+        "reference_routers_different": [f"{e['group']}/{e['reference']['run']}" for e in compared
+                                        if e["reference"]["routers_identical"] is False
+                                        and not e["reference"]["router_refit"]],
+        "reference_router_differences_reproduced_with_reference_routers": sum(
+            1 for e in compared
+            if (e["reference"].get("with_reference_routers") or {}).get("identical")),
         "reference_not_compared": [f"{e['group']}/{e['benchmark']}/{e['method']}/seed{e['seed']}"
                                    for e in not_compared],
         "device_float32_routing_matches_numpy": {str(run_dir): device_float32_routing(run_dir)
@@ -712,8 +796,14 @@ def main(argv=None) -> int:
               f"{e.get('not_rebuilt', 'not rebuilt')}")
     for e in differing[:10]:
         r = e["reference"]
-        parts = [f"{label} {sorted(r[field])[:3]}" for label, field in (
-            ("missing", "missing_in_reference"), ("routers", "router_differences"),
+        parts = []
+        if r["router_differences"]:
+            numbers = [v for v in r["router_differences"].values() if isinstance(v, float)]
+            parts.append(("routers refitted (coefficients/intercepts)" if r["router_refit"]
+                          else "routers differ") + f" {sorted(r['router_differences'])[:3]}"
+                         + (f", largest change {max(numbers):.3g}" if numbers else ""))
+        parts += [f"{label} {sorted(r[field])[:3]}" for label, field in (
+            ("missing", "missing_in_reference"),
             ("raw matrices", "fixed_matrix_differences"),
             ("raw/oracle metrics", "fixed_metric_differences"),
             ("reference metrics not implied by its matrices", "reference_inconsistent_metrics"),
@@ -722,6 +812,13 @@ def main(argv=None) -> int:
                              ("trained state", "trained_state_identical")):
             if r[field] is False:
                 parts.append(f"{label} differ")
+        check = r.get("with_reference_routers")
+        if check is not None:
+            parts.append(check["error"] if "error" in check else
+                         "with the reference's routers the float32 rebuild "
+                         + ("matches" if check["identical"] else "does not match")
+                         + f" the reference ({check['routes_moved_by_router_change']} "
+                         "decision(s) moved by the change of routers)")
         print(f"DIFFERS {e['group']}/{r['run']}: " + "; ".join(parts))
     print(f"{summary['routes_moved']} of {summary['decisions_compared']} calibrated test "
           f"decision(s) moved in {summary['jobs_with_moved_routes']} of {summary['jobs']} job(s)"
@@ -729,6 +826,12 @@ def main(argv=None) -> int:
              f"{summary['reference_within_float32_near_ties']} within float32 near-ties, "
              f"{len(differing)} different"
              + (f", {len(not_compared)} not compared" if not_compared else "")
+             + (f"; routers refitted in {len(summary['reference_routers_refitted'])}, "
+                f"otherwise different in {len(summary['reference_routers_different'])}, "
+                f"{summary['reference_router_differences_reproduced_with_reference_routers']} "
+                "of these reproduced with the reference's routers"
+                if summary["reference_routers_refitted"] or summary["reference_routers_different"]
+                else "")
              if args.reference else "")
           + f" -> {status}")
     return 0 if status in ("explained", "measured") else 1

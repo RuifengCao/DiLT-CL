@@ -396,6 +396,37 @@ class ExecutorTests(unittest.TestCase):
                 if value is not None:
                     os.environ[key] = value
 
+    def test_a_hanging_probe_is_reported_instead_of_waited_for(self):
+        """The PyTorch probe and nvidia-smi run with a time limit; a hang is an
+        error in environment.json (and stops the suite), never a silent wait."""
+        import time
+        # The helper returns the output, or None after a bounded wait.
+        self.assertEqual(suite.run_with_time_limit(
+            [sys.executable, "-c", "print('done')"], 60), (0, "done\n", ""))
+        started = time.monotonic()
+        self.assertIsNone(suite.run_with_time_limit(
+            [sys.executable, "-c", "import time; time.sleep(60)"], 1))
+        self.assertLess(time.monotonic() - started, 30)
+        # Both probes go through it, each with its own limit.
+        original, calls = suite.run_with_time_limit, []
+
+        def hanging(command, seconds):
+            calls.append((command[0], seconds))
+            return None
+
+        suite.run_with_time_limit = hanging
+        try:
+            environment = suite.environment_probe()
+        finally:
+            suite.run_with_time_limit = original
+        self.assertEqual(calls[0], (sys.executable, suite.PROBE_TIMEOUT_SECONDS))
+        self.assertFalse(environment["torch_probe"]["ok"])
+        self.assertIn("did not finish", environment["torch_probe"]["error"])
+        if environment["nvidia_smi"] is not None:
+            self.assertEqual(len(calls), 2)
+            self.assertIsNone(environment["nvidia_smi"]["returncode"])
+            self.assertIn("did not finish", environment["nvidia_smi"]["stderr"])
+
     def test_the_environment_probe_runs_the_float64_routing_self_test(self):
         try:
             import torch  # noqa: F401
@@ -588,9 +619,23 @@ class ExecutorTests(unittest.TestCase):
             self.assertEqual(detail["gpu_memory_source"], "torch")
             self.assertNotIn("warning", detail)
             suite.gpu_memory_from_torch = lambda: None
-            value, detail = suite.resolve_max_parallel("auto", 3, 2048)
-            self.assertEqual(value, 1)
-            self.assertIn("--max-parallel", detail["warning"])
+            import os
+            hidden = os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+            try:
+                value, detail = suite.resolve_max_parallel("auto", 3, 2048)
+                self.assertEqual(value, 1)
+                self.assertIn("--max-parallel", detail["warning"])
+                self.assertIn("both failed", detail["warning"])
+                # With every GPU hidden the warning says so, not that tools failed.
+                os.environ["CUDA_VISIBLE_DEVICES"] = ""
+                value, detail = suite.resolve_max_parallel("auto", 3, 2048)
+                self.assertEqual(value, 1)
+                self.assertIn("hides every GPU", detail["warning"])
+            finally:
+                if hidden is None:
+                    os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+                else:
+                    os.environ["CUDA_VISIBLE_DEVICES"] = hidden
             # An explicit value never probes and never warns.
             suite.gpu_memory_from_torch = lambda: self.fail("probed for an explicit value")
             value, detail = suite.resolve_max_parallel("6", 3, 2048)

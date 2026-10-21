@@ -291,10 +291,15 @@ def test_cache_entries_follow_the_source_files():
         Image.fromarray(np.full((8, 8, 3), 255, np.uint8)).save(target)
         stat = target.stat()
         os.utime(target, ns=(stat.st_atime_ns, stat.st_mtime_ns + 10**9))
+        before = set(cache.glob("t_*.npz"))
         changed = train(tmp / "a")
         assert changed.content_sha256 != first.content_sha256 and int(changed.x[0].max()) == 255
-        # A damaged cache file is refused instead of passing as the data.
-        newest = max(cache.glob("t_*.npz"), key=lambda p: p.stat().st_mtime_ns)
+        # A damaged cache file is refused instead of passing as the data. The
+        # entry just written is the one new file (not the newest timestamp:
+        # two writes within one clock tick share a modification time).
+        written = set(cache.glob("t_*.npz")) - before
+        assert len(written) == 1, sorted(written)
+        newest = written.pop()
         with np.load(newest) as archive:
             stored = {k: archive[k] for k in archive.files}
         stored["x"] = stored["x"].copy()

@@ -37,14 +37,25 @@ independent trainings of the same experts are shown to agree bit for bit.
 
 Fitted routers are applied in float64 since v3.0.10 (``routing_dtype``) and
 were applied in float32 before, so a calibrated group can route differently
-with the same experts. A run with an identical trained state whose
-differences are confined to the calibrated router's four arrays and the
-metrics computed from them is listed as a routing-precision difference
-(``ROUTERS float32->float64`` in the printed summary), and
+with the same experts. A run with an identical trained state and identical
+stored routers (classes and parameters, stage by stage) whose differences
+are confined to the calibrated router's four arrays and the metrics computed
+from them is listed as a routing-precision difference (``ROUTERS
+float32->float64`` in the printed summary), and
 ``tools/routing_precision_audit.py`` then checks that its decisions rebuilt
-in float32 reproduce the reference. Any other difference for the same state
--- the matched raw router's outputs, the oracle accuracies -- is reported as
-``SAME STATE, DIFFERENT OUTPUTS``. Both count as differences in the status.
+in float32 reproduce the reference. The routers are fitted on the CPU, and
+the iterative fits of the logistic and tied-slope routers (score-logreg,
+score-bias) rest on BLAS results that another host CPU can round
+differently: a run with the same experts whose stored routers of those kinds
+differ only in their coefficients and intercepts is listed as ``ROUTERS
+REFITTED`` with the largest change, since its calibrated outputs can then
+differ in any precision. Any other router difference (another kind, shape,
+class list or standardisation, any score-bias-acc router, or a router
+missing on one side) is listed as ``ROUTERS DIFFER``. Any other difference
+for the same state -- the matched raw router's outputs, the oracle
+accuracies -- is reported as ``SAME STATE, DIFFERENT OUTPUTS``. A run counts
+as identical only with the same state, the same outputs and the same
+routers.
 
 When run directories (not only merged folders) are given on both sides, the
 per-job status records are compared too: the dataset content hashes each job
@@ -311,6 +322,71 @@ def seed_metrics(payload: dict, benchmark: str, method: str, seed: int) -> dict:
     return rows[method_seeds(payload, benchmark, method).index(seed)]
 
 
+ROUTER_FIELDS = ("classes", "feature_mean", "feature_scale", "coef", "intercept")
+# What a refit on another host CPU can change. The logistic and tied-slope
+# routers are fitted iteratively (scikit-learn, SciPy) on BLAS results, so
+# another CPU or BLAS kernel can move their coefficients and intercepts in
+# the last bits. Their standardisation (NumPy means and deviations) and the
+# score-bias-acc search (exact integer objective, no BLAS) do not depend on it.
+REFITTABLE_KINDS = ("score-logreg", "score-bias")
+REFITTABLE_FIELDS = ("coef", "intercept")
+
+
+def calibration_record(payload: dict, benchmark: str, method: str, seed: int) -> dict:
+    return ((((payload.get("calibration") or {}).get(benchmark) or {}).get(method) or {})
+            .get(str(seed))) or {}
+
+
+def stored_routers(payload: dict, benchmark: str, method: str, seed: int) -> list | None:
+    """The fitted prefix routers of one run, stage by stage (``None`` if none).
+
+    Only what decides a route: the classes and the four parameters, not the
+    precision they are applied in (``routing_dtype``) or the fitting records.
+    """
+    models = calibration_record(payload, benchmark, method, seed).get("prefix_models")
+    if not models:
+        return None
+    return [{name: (state or {}).get(name) for name in ROUTER_FIELDS} for state in models]
+
+
+def compare_routers(ref: dict, cand: dict, benchmark: str, method: str,
+                    seed: int) -> tuple[str | None, float | None]:
+    """How the stored routers of one run compare, and their largest change.
+
+    ``None`` when neither side has fitted routers (raw routing, task-IL);
+    ``"identical"``; ``"refit"`` when both are routers of a kind whose fit can
+    depend on the host CPU (``REFITTABLE_KINDS``) and only their coefficients
+    and intercepts differ; ``"missing"`` when one side has none; otherwise
+    ``"different"`` (another kind, number of stages or shape, other classes,
+    other standardisation, or a score-bias-acc router: none of these follows
+    from refitting on another CPU). The float is the largest absolute
+    difference of a differing parameter (``None`` if not comparable).
+    """
+    ra, rb = (stored_routers(ref, benchmark, method, seed),
+              stored_routers(cand, benchmark, method, seed))
+    if ra is None and rb is None:
+        return None, None
+    if ra is None or rb is None:
+        return "missing", None
+    if ra == rb:
+        return "identical", 0.0
+    kinds = {calibration_record(p, benchmark, method, seed).get("kind") for p in (ref, cand)}
+    largest, refit = 0.0, len(ra) == len(rb) and len(kinds) == 1 and kinds <= set(REFITTABLE_KINDS)
+    for a, b in zip(ra, rb):
+        for name in ROUTER_FIELDS:
+            if a[name] == b[name]:
+                continue
+            try:
+                x, y = np.asarray(a[name], dtype=float), np.asarray(b[name], dtype=float)
+            except (TypeError, ValueError):
+                return "different", None
+            if x.shape != y.shape:
+                return "different", None
+            largest = max(largest, float(np.max(np.abs(x - y))) if x.size else 0.0)
+            refit = refit and name in REFITTABLE_FIELDS
+    return ("refit" if refit else "different"), largest
+
+
 def pixel_hashes(payload: dict) -> dict[str, str]:
     """``benchmark/seed/family/split/task -> materialized_pixels_sha256``.
 
@@ -448,15 +524,23 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
                         run["array_keys_match"]
                         and all(key[len(base):] in ROUTING_ARRAY_SUFFIXES for key in diffs)
                         and all(key in ROUTING_METRICS for key in run["metric_differences"]))
+                    # The fitted routers themselves (compare_routers).
+                    run["routers"], run["router_max_difference"] = compare_routers(
+                        ref, cand, benchmark, method, seed)
                     if states_only:
+                        # Groups paired by state may use different routers by design.
                         run["outputs_identical"] = None
+                        run["routers"] = run["router_max_difference"] = None
                         run["identical"] = run["state_identical"] is True
                         out["runs"].append(run)
                         continue
                     # A run without a state hash on either side cannot show that
-                    # the experts were regenerated, so it never counts as identical.
+                    # the experts were regenerated, so it never counts as identical;
+                    # nor does one whose stored routers differ, even when its
+                    # outputs happen to agree.
                     run["identical"] = bool(run["state_identical"] is True
-                                            and run["outputs_identical"])
+                                            and run["outputs_identical"]
+                                            and run["routers"] in (None, "identical"))
                     out["runs"].append(run)
     runs = out["runs"]
     out["summary"] = {
@@ -484,11 +568,24 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
         "alignment_errors": len(out["alignment_errors"]),
     }
     summary = out["summary"]
+    # A precision effect needs the very routers of the reference. Routers
+    # refitted on another host CPU (coefficients and intercepts of a logistic
+    # or tied-slope router) route differently in any precision and are listed
+    # apart; any other router difference is never benign.
     precision = [r["run"] for r in runs if r["state_identical"] and r["outputs_identical"] is False
-                 and r["routing_outputs_only"] and summary["router_precision_changed"]]
+                 and r["routing_outputs_only"] and r.get("routers") == "identical"
+                 and summary["router_precision_changed"]]
+    refitted = [r for r in runs if r["state_identical"] and r.get("routers") == "refit"]
     summary["routing_precision_differences"] = precision
+    summary["routers_refitted"] = [r["run"] for r in refitted]
+    summary["router_refit_max_difference"] = max(
+        (r["router_max_difference"] for r in refitted), default=None)
+    summary["routers_different"] = [r["run"] for r in runs if r["state_identical"]
+                                    and r.get("routers") in ("different", "missing")]
+    refit_outputs = [r["run"] for r in refitted
+                     if r["outputs_identical"] is False and r["routing_outputs_only"]]
     summary["same_state_unexplained"] = [run for run in summary["same_state_different_outputs"]
-                                         if run not in precision]
+                                         if run not in precision and run not in refit_outputs]
     return out
 
 
@@ -591,6 +688,16 @@ def main(argv=None) -> int:
                                 f"{len(s['routing_precision_differences'])} run(s) with the "
                                 "same experts route differently (check with "
                                 "tools/routing_precision_audit.py)")
+        if s["routers_refitted"]:
+            same_state_note += (f"  ROUTERS REFITTED: {len(s['routers_refitted'])} run(s) with "
+                                "the same experts store routers whose coefficients or "
+                                "intercepts differ (largest change "
+                                f"{s['router_refit_max_difference']:.3g}), e.g. "
+                                f"{s['routers_refitted'][:3]}")
+        if s["routers_different"]:
+            same_state_note += (f"  ROUTERS DIFFER: {len(s['routers_different'])} run(s) with "
+                                "the same experts store other or missing routers, e.g. "
+                                f"{s['routers_different'][:3]}")
         if s["same_state_unexplained"]:
             same_state_note += (f"  SAME STATE, DIFFERENT OUTPUTS: "
                                 f"{len(s['same_state_unexplained'])} run(s), e.g. "
@@ -629,8 +736,11 @@ def main(argv=None) -> int:
                  if launch["jobs_without_candidate_status"] else ""))
     print(f"decoded splits: {pixel_views} task view(s) compared, {pixel_different} with "
           "different pixels")
+    refitted = sum(len(g["summary"].get("routers_refitted") or []) for g in groups)
     print(f"{identical}/{total} runs identical (state files {files_identical}/{total} identical); "
-          f"missing: {missing_runs} run(s), {len(missing_groups)} group(s) -> {status}")
+          f"missing: {missing_runs} run(s), {len(missing_groups)} group(s)"
+          + (f"; routers refitted in {refitted} run(s)" if refitted else "")
+          + f" -> {status}")
     return 0 if status == "identical" else 1
 
 
