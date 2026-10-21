@@ -35,10 +35,23 @@ score-logreg, score-bias and score-bias-acc groups, which all train on the
 same 90% split): only the trained-state hashes are then compared, which is how
 independent trainings of the same experts are shown to agree bit for bit.
 
+Fitted routers are applied in float64 since v3.0.10 (``routing_dtype``) and
+were applied in float32 before, so a calibrated group can route differently
+with the same experts. A run with an identical trained state whose
+differences are confined to the calibrated router's four arrays and the
+metrics computed from them is listed as a routing-precision difference
+(``ROUTERS float32->float64`` in the printed summary), and
+``tools/routing_precision_audit.py`` then checks that its decisions rebuilt
+in float32 reproduce the reference. Any other difference for the same state
+-- the matched raw router's outputs, the oracle accuracies -- is reported as
+``SAME STATE, DIFFERENT OUTPUTS``. Both count as differences in the status.
+
 When run directories (not only merged folders) are given on both sides, the
 per-job status records are compared too: the dataset content hashes each job
 read and the launch controls it ran with (``CUBLAS_WORKSPACE_CONFIG``, thread
-counts, ``PYTHONHASHSEED``). Jobs launched before v3.0.1 recorded only a hash
+counts, ``PYTHONHASHSEED`` and, recorded since v3.0.10, the environment
+variables that change GPU arithmetic, ``NUMERICS_ENVIRONMENT`` in
+``diltcl/preflight.py``). Jobs launched before v3.0.1 recorded only a hash
 of the whole data root; their per-entry hashes are derived from an archived
 fingerprint with that root hash when one with entries or its per-file list is
 available (the run directory's ``dataset_fingerprints/``, or ``--fingerprints``
@@ -102,7 +115,25 @@ def merged_groups(paths: list[Path], unpaired: list[str] | None = None) -> dict[
 
 
 LAUNCH_KEYS = ("CUBLAS_WORKSPACE_CONFIG", "OMP_NUM_THREADS", "DILTCL_NUM_THREADS",
-               "PYTHONHASHSEED", "CUDA_VISIBLE_DEVICES")
+               "PYTHONHASHSEED", "CUDA_VISIBLE_DEVICES",
+               # GPU arithmetic outside the recorded execution flags (recorded
+               # since v3.0.10; diltcl/preflight.py NUMERICS_ENVIRONMENT).
+               "NVIDIA_TF32_OVERRIDE", "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE",
+               "CUBLAS_EMULATE_SINGLE_PRECISION", "CUBLAS_EMULATE_DOUBLE_PRECISION",
+               "CUBLAS_EMULATION_STRATEGY", "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT",
+               "CUBLASLT_WORKSPACE_SIZE", "CUDNN_CONV_WSCAP_DBG", "TORCH_BLAS_PREFER_CUBLASLT",
+               "DISABLE_ADDMM_CUDA_LT", "TORCH_CUDNN_USE_HEURISTIC_MODE_B",
+               "TORCH_CUDNN_V8_API_DISABLED", "CUDNN_ERRATA_JSON_FILE",
+               "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK")
+
+# What a change of router precision can change in one run: the four arrays of
+# the job's own (calibrated) router and the metrics computed from them. The
+# matched raw router's arrays and metrics (raw_*, Raw*) and the oracle
+# accuracies depend only on the experts.
+ROUTING_ARRAY_SUFFIXES = ("", "/task_inference", "/conditional_class", "/routing_tie")
+ROUTING_METRICS = ("ACC", "BWT", "Forgetting", "LA", "MicroACC", "TA", "MicroTA",
+                   "ConditionalACC", "MicroConditionalACC", "RouteTieRate",
+                   "MicroRouteTieRate", "ZeroCorrectRouteTasks")
 
 
 def run_statuses(paths: list[Path]) -> dict[str, dict]:
@@ -320,6 +351,22 @@ def run_keys(npz, benchmark: str, method: str, seed: int) -> list[str]:
     return sorted(k for k in npz.files if k == base or k.startswith(base + "/"))
 
 
+def routing_precision(payload: dict) -> str | None:
+    """Precision the group's stored routers were applied in on the device.
+
+    ``float64`` for routers fitted since v3.0.10 (``routing_dtype``), and
+    ``float32`` for earlier ones; ``None`` for a group without fitted
+    routers (raw routing or task-IL).
+    """
+    seen: set[str] = set()
+    for by_method in (payload.get("calibration") or {}).values():
+        for by_seed in (by_method or {}).values():
+            for record in (by_seed or {}).values():
+                for state in (record or {}).get("prefix_models") or []:
+                    seen.add(state.get("routing_dtype", "float32"))
+    return "/".join(sorted(seen)) or None
+
+
 def compare_group(name: str, ref_path: Path, cand_path: Path,
                   states_only: bool = False) -> dict:
     ref = json.loads(ref_path.read_text(encoding="utf-8"))
@@ -328,6 +375,8 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
            "identity_differences": {}, "environment_differences": {},
            "code_versions": {"reference": ref.get("code_version"),
                              "candidate": cand.get("code_version")},
+           "router_precision": {"reference": routing_precision(ref),
+                                "candidate": routing_precision(cand)},
            "runs": [], "new_runs": [], "missing_in_candidate": [],
            "alignment_errors": [], "methods_only_in_reference": [],
            "methods_only_in_candidate": []}
@@ -393,6 +442,12 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
                         if rm.get(k) != cm.get(k)}
                     run["outputs_identical"] = (run["array_keys_match"] and not diffs
                                                 and not run["metric_differences"])
+                    # Whether only what the calibrated router decides differs.
+                    base = f"{benchmark}/{method}/seed{seed}"
+                    run["routing_outputs_only"] = bool(
+                        run["array_keys_match"]
+                        and all(key[len(base):] in ROUTING_ARRAY_SUFFIXES for key in diffs)
+                        and all(key in ROUTING_METRICS for key in run["metric_differences"]))
                     if states_only:
                         run["outputs_identical"] = None
                         run["identical"] = run["state_identical"] is True
@@ -412,15 +467,28 @@ def compare_group(name: str, ref_path: Path, cand_path: Path,
         "state_different": [r["run"] for r in runs if r["state_identical"] is False],
         "outputs_different": [r["run"] for r in runs if r["outputs_identical"] is False],
         # The same experts evaluated differently would mean nondeterministic
-        # evaluation, a different router, or different data -- never benign.
+        # evaluation, a different router, or different data -- never benign,
+        # unless the routers are applied in another precision (float32 before
+        # v3.0.10, float64 since) and only the calibrated router's outputs
+        # differ: then tools/routing_precision_audit.py rebuilds the float32
+        # decisions and must reproduce the reference. A difference in the raw
+        # router's outputs or the oracle accuracies is never a precision effect.
         "same_state_different_outputs": [r["run"] for r in runs
                                          if r["state_identical"] and r["outputs_identical"] is False],
+        "router_precision_changed": (out["router_precision"]["reference"]
+                                     != out["router_precision"]["candidate"]),
         "file_identical": sum(r.get("file_identical") is True for r in runs),
         "file_hash_unavailable": sum(r.get("file_identical") is None for r in runs),
         "file_different": [r["run"] for r in runs if r.get("file_identical") is False],
         "new": len(out["new_runs"]), "missing_in_candidate": len(out["missing_in_candidate"]),
         "alignment_errors": len(out["alignment_errors"]),
     }
+    summary = out["summary"]
+    precision = [r["run"] for r in runs if r["state_identical"] and r["outputs_identical"] is False
+                 and r["routing_outputs_only"] and summary["router_precision_changed"]]
+    summary["routing_precision_differences"] = precision
+    summary["same_state_unexplained"] = [run for run in summary["same_state_different_outputs"]
+                                         if run not in precision]
     return out
 
 
@@ -516,13 +584,23 @@ def main(argv=None) -> int:
         args.out.write_text(json.dumps(report, indent=2), encoding="utf-8")
     for g in groups:
         s = g["summary"]
+        precision = g["router_precision"]
+        same_state_note = ""
+        if s["routing_precision_differences"]:
+            same_state_note += (f"  ROUTERS {precision['reference']}->{precision['candidate']}: "
+                                f"{len(s['routing_precision_differences'])} run(s) with the "
+                                "same experts route differently (check with "
+                                "tools/routing_precision_audit.py)")
+        if s["same_state_unexplained"]:
+            same_state_note += (f"  SAME STATE, DIFFERENT OUTPUTS: "
+                                f"{len(s['same_state_unexplained'])} run(s), e.g. "
+                                f"{s['same_state_unexplained'][:3]}")
         print(f"{g['group']:28s} compared={s['compared']:4d} identical={s['identical']:4d} "
               f"same-state={s['state_identical']:4d} same-file={s['file_identical']:4d} "
               f"new={s['new']:4d} missing={s['missing_in_candidate']:4d}"
               + (f"  STATE DIFFERS: {len(s['state_different'])}" if s["state_different"] else "")
               + (f"  NO STATE HASH: {s['state_hash_unavailable']}" if s["state_hash_unavailable"] else "")
-              + (f"  SAME STATE, DIFFERENT OUTPUTS: {s['same_state_different_outputs'][:3]}"
-                 if s["same_state_different_outputs"] else "")
+              + same_state_note
               + (f"  IDENTITY: {sorted(g['identity_differences'])}" if g["identity_differences"] else "")
               + (f"  env: {sorted(g['environment_differences'])}" if g["environment_differences"] else ""))
     for name in missing_groups:

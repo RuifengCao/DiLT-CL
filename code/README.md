@@ -1,4 +1,4 @@
-# DiLT-CL v3.0.9: research code
+# DiLT-CL v3.0.10: research code
 
 Disentangled Lottery-Ticket Continual Learning (DiLT-CL) and the baselines,
 protocols and infrastructure used to evaluate it. `diltcl.__version__` is the
@@ -18,8 +18,8 @@ records, are in `../evidence/results_20260906/`.
 | Package | `diltcl/`, 28 modules |
 | Runners | `run_task_il.py` (task-IL), `run_class_il.py` (class-IL) |
 | Launcher | `run_suite.py`: resumable, parallel job suite with provenance (`run_v21_experiment_suite.py` is a forwarding shim for old command lines) |
-| Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, paired statistics, results package and release builders, environment check, wall-time summary |
-| Tests | `tests/`, 32 files, 311 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
+| Tools | `tools/`: preflight gate, independent verifier, result merger, GPU capacity probe, compact-storage measurement, per-example recomputation, checkpoint re-evaluation, regeneration audit, routing-precision audit, paired statistics, results package and release builders, environment check, wall-time summary |
+| Tests | `tests/`, 32 files, 346 tests + 1 opt-in end-to-end test (`DILTCL_E2E=1`, runs the real suite on a synthetic CIFAR-100 and then the verifier, per-example recomputation, checkpoint re-evaluation, merger, regeneration audit, tables and figures; ~6 min on one CPU); `python -m pytest tests` runs the rest in one session (about 2 min on a CPU) |
 | Metadata | `pyproject.toml` (version read from `diltcl.__version__`), `requirements.txt` (ranges), `requirements-lock.txt` (the exact recorded stack), `Dockerfile` |
 | Reproduction | `REPRODUCE.md`: verify the released artifacts on a CPU, re-evaluate released checkpoints, re-run training and audit the regeneration |
 
@@ -39,7 +39,7 @@ FashionMNIST / KMNIST). Layouts live in `diltcl/benchmarks.py`.
 code/
 ├── run_task_il.py              task-IL runner (--head-mode multi is the standard protocol)
 ├── run_aaai_experiments.py     forwarding shim: historical name of run_task_il.py
-├── run_class_il.py             class-IL runner (entropy / confidence / margin routing; optional score-logreg or tied-slope score-bias router calibration)
+├── run_class_il.py             class-IL runner (entropy / confidence / margin routing; optional score-logreg, tied-slope score-bias or accuracy-fitted score-bias-acc router, applied in float64 as fitted)
 ├── run_suite.py                parallel, resumable launcher: profiles smoke / p0 / p1 / all
 ├── run_experiments.py          early exploratory experiments (Exp 1-6), kept for reference
 ├── make_class_il_table.py      LaTeX tables from a verified artifact
@@ -53,11 +53,12 @@ code/
 │   ├── gpu_capacity_probe.py       measures per-job VRAM on the target GPU, recommends --max-parallel
 │   ├── build_results_package.py    bundles merged results, verification evidence and paper materials of several runs into one package (optionally anonymised supplementary material with code)
 │   ├── build_release.py            release archives of complete run directories (per-job results, checkpoints, predictions), hash-checked against the job records (v3.0.5)
-│   ├── check_environment.py        installed packages / GPU / CUDA / cuDNN versus the recorded stack (v3.0.5)
+│   ├── check_environment.py        installed packages / GPU / CUDA / cuDNN versus the recorded stack (v3.0.5), and variables that change GPU arithmetic (v3.0.10)
 │   ├── measure_compact_storage.py  compact export size with logit-equivalence check
 │   ├── recompute_from_predictions.py  checks per-example predictions and rebuilds every class-IL matrix/statistic, stored router decisions and fitting accuracies from them (v3.0.5, CPU)
 │   ├── evaluate_checkpoints.py     re-evaluates persisted isolation checkpoints and compares with the artifacts; --combine checks shard coverage (v3.0.5)
 │   ├── compare_runs.py             regeneration audit: re-run vs retained artifacts (state and file hashes, arrays, metrics, coverage; v3.0.5)
+│   ├── routing_precision_audit.py  counts the calibrated decisions float64 routing moved and checks their float32 rebuild against a float32-routed reference (v3.0.10, CPU)
 │   ├── paired_stats.py             paired CIs, paired t, exact sign-flip, Holm, minimum detectable difference (v3.0.5)
 │   ├── head_mode_digits.py         CPU-only head-protocol preview on sklearn digits
 │   └── repair_independent_matrices.py  legacy (v2.0) matrix repair; not needed for v3 artifacts
@@ -69,7 +70,7 @@ code/
 │   ├── execution.py              ExecutionOptions: data backend, numerics mode, TF32, threads (recorded in artifacts)
 │   ├── metrics.py, stats.py, task_inference.py, task_calibration.py, profiling.py
 │   ├── compact_export.py, preflight.py, runner_common.py, config.py, utils.py
-│   └── __init__.py               __version__ = "3.0.9"
+│   └── __init__.py               __version__ = "3.0.10"
 └── tests/
 ```
 

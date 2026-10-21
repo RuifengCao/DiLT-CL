@@ -83,20 +83,62 @@ def task_scores(per_task_logits, criterion="entropy"):
     return torch.stack(rows, dim=0)
 
 
+def require_finite_scores(scores, context=""):
+    """Raise a clear ``ValueError`` if any routing score is NaN or infinite.
+
+    A non-finite score means an expert produced non-finite outputs. Routing on
+    it would either pick task 0 silently (the raw ``argmin``) or index past
+    the candidates (a calibrated router, a device-side assert on CUDA), so the
+    evaluation stops here instead and names the experts concerned.
+    """
+    finite = torch.isfinite(scores)
+    if bool(finite.all()):
+        return
+    per_task = (~finite).sum(dim=tuple(range(1, scores.dim()))).tolist()
+    raise ValueError(
+        f"non-finite routing scores{' ' + context if context else ''}: "
+        f"{sum(per_task)} of {scores.numel()} (per candidate expert: {per_task}); "
+        "an expert produced NaN or infinite outputs")
+
+
+ROUTING_DTYPES = {"float64": torch.float64, "float32": torch.float32}
+
+
+def calibrator_dtype(calibrator, scores_dtype):
+    """Floating-point type in which a serialized router is applied.
+
+    Routers fitted since v3.0.10 declare ``routing_dtype = "float64"``: they
+    are fitted in float64 and applied in float64, so a deployed decision is
+    the fitted router's decision. States without the field (written by
+    earlier versions) were applied in the dtype of the scores, float32; they
+    keep that precision so their recorded decisions re-evaluate exactly.
+    """
+    name = calibrator.get("routing_dtype")
+    if name is None:
+        return scores_dtype
+    if name not in ROUTING_DTYPES:
+        raise ValueError(f"unknown routing_dtype {name!r} in calibrator state")
+    return ROUTING_DTYPES[name]
+
+
 def infer_task(per_task_logits, criterion="entropy", calibrator=None,
                return_ties=False):
     """Infer a task ID for every sample.
 
     With no calibrator this is exactly the legacy ``argmin`` score rule.  A
-    serialized score-logreg calibrator instead standardizes the full score
-    signature and applies its learned linear decision function on-device.
+    serialized calibrator instead standardizes the full score signature and
+    applies its learned linear decision function on-device, in the
+    precision the state declares (:func:`calibrator_dtype`; float64 for every
+    router fitted since v3.0.10).
 
     Exact ties are resolved deterministically in favour of the lowest task ID.
     This makes the otherwise implicit early-task bias auditable.  With
     ``return_ties=True``, return ``(task_ids, tie_mask)`` where ``tie_mask`` is
     true iff at least two candidate tasks share the winning score exactly.
+    Non-finite scores raise ``ValueError`` (:func:`require_finite_scores`).
     """
     scores = task_scores(per_task_logits, criterion)       # [T, B]
+    require_finite_scores(scores)
     if calibrator is None:
         best = scores.min(dim=0, keepdim=True).values
         winning = scores == best
@@ -105,34 +147,150 @@ def infer_task(per_task_logits, criterion="entropy", calibrator=None,
         task_ids = winning.to(dtype=torch.long).argmax(dim=0)
         tie_mask = winning.sum(dim=0) > 1
     else:
-        classes = torch.as_tensor(calibrator["classes"], device=scores.device,
-                                  dtype=torch.long)
-        mean = torch.as_tensor(calibrator["feature_mean"], device=scores.device,
-                               dtype=scores.dtype)
-        scale = torch.as_tensor(calibrator["feature_scale"], device=scores.device,
-                                dtype=scores.dtype)
-        coef = torch.as_tensor(calibrator["coef"], device=scores.device,
-                               dtype=scores.dtype)
-        intercept = torch.as_tensor(calibrator["intercept"], device=scores.device,
-                                    dtype=scores.dtype)
-        x = scores.transpose(0, 1)
-        if (x.shape[1] != mean.numel()
-                or coef.shape != (classes.numel(), x.shape[1])
-                or scale.shape != mean.shape
-                or intercept.shape != classes.shape):
-            raise ValueError("calibrator state is incompatible with task scores")
-        decision = ((x - mean) / scale) @ coef.transpose(0, 1) + intercept
-        best = decision.max(dim=1, keepdim=True).values
-        winning = decision == best
-        # Serialized class order need not be sorted, so select the minimum task
-        # ID among winning decision rows rather than merely the first row.
-        class_grid = classes.unsqueeze(0).expand_as(decision)
-        sentinel = torch.full_like(class_grid, torch.iinfo(torch.long).max)
-        task_ids = torch.where(winning, class_grid, sentinel).min(dim=1).values
-        tie_mask = winning.sum(dim=1) > 1
+        task_ids, tie_mask, _ = apply_calibrator(scores, calibrator)
     if return_ties:
         return task_ids, tie_mask
     return task_ids
+
+
+def apply_calibrator(scores, calibrator):
+    """Route ``[T, B]`` scores with a serialized router, on the scores' device.
+
+    Returns ``(task_ids, tie_mask, decision)``: the lowest task ID among the
+    exactly maximal decisions, whether two or more tied, and the ``[B, T]``
+    decisions, computed in the precision the state declares
+    (:func:`calibrator_dtype`).
+    """
+    dtype = calibrator_dtype(calibrator, scores.dtype)
+    # Validated on the host: no device synchronisation per stage.
+    values = [np.asarray(calibrator[key], dtype=np.float64) for key in
+              ("feature_mean", "feature_scale", "coef", "intercept")]
+    if (not all(np.isfinite(v).all() for v in values)
+            or (values[1] <= 0).any()):
+        raise ValueError("calibrator state contains non-finite values or a "
+                         "non-positive scale")
+    classes = torch.as_tensor(calibrator["classes"], device=scores.device,
+                              dtype=torch.long)
+    mean = torch.as_tensor(calibrator["feature_mean"], device=scores.device,
+                           dtype=dtype)
+    scale = torch.as_tensor(calibrator["feature_scale"], device=scores.device,
+                            dtype=dtype)
+    coef = torch.as_tensor(calibrator["coef"], device=scores.device,
+                           dtype=dtype)
+    intercept = torch.as_tensor(calibrator["intercept"], device=scores.device,
+                                dtype=dtype)
+    x = scores.transpose(0, 1).to(dtype)
+    if (x.shape[1] != mean.numel()
+            or coef.shape != (classes.numel(), x.shape[1])
+            or scale.shape != mean.shape
+            or intercept.shape != classes.shape
+            or classes.numel() == 0
+            or len(set(calibrator["classes"])) != classes.numel()):
+        raise ValueError("calibrator state is incompatible with task scores")
+    decision = ((x - mean) / scale) @ coef.transpose(0, 1) + intercept
+    best = decision.max(dim=1, keepdim=True).values
+    winning = decision == best
+    # Serialized class order need not be sorted, so select the minimum task
+    # ID among winning decision rows rather than merely the first row.
+    class_grid = classes.unsqueeze(0).expand_as(decision)
+    sentinel = torch.full_like(class_grid, torch.iinfo(torch.long).max)
+    task_ids = torch.where(winning, class_grid, sentinel).min(dim=1).values
+    tie_mask = winning.sum(dim=1) > 1
+    return task_ids, tie_mask, decision
+
+
+def float64_routing_self_test(device="cpu"):
+    """Check on ``device`` what exact float64 routing rests on.
+
+    :func:`apply_calibrator` applies every router fitted since v3.0.10 in
+    float64. A bias router has one non-zero coefficient per decision, so each
+    decision is a fixed sequence of correctly rounded operations (the
+    standardisation, one product, one addition), which IEEE double arithmetic
+    fixes uniquely: the device then reproduces NumPy's float64 decisions,
+    routes and tie flags exactly (what the per-example audit requires),
+    provided that
+
+    1. widening the float32 routing scores to float64 is exact, subnormal
+       scores included (saturated experts give entropies far below the
+       float32 normal range; a conversion that flushes them to zero would
+       create ties), and
+    2. the float64 matrix product is IEEE double arithmetic, not an emulation
+       (cuBLAS can emulate it on integer tensor cores when asked to, for
+       example with ``CUBLAS_EMULATE_DOUBLE_PRECISION=1``).
+
+    Both are checked here on fixed inputs: the widened scores bit for bit,
+    and the decisions of diagonal routers (compared as numbers, so ``+0`` and
+    ``-0`` are equal), their routes and their tie flags. No random state of
+    PyTorch, NumPy or Python is used. Returns a JSON-ready dict with ``ok``.
+
+    The same routers are also applied as states written before v3.0.10
+    were, in float32, and compared with NumPy's float32 decisions
+    (``float32_ok`` and the ``float32_*`` counts). This is reported, not part
+    of ``ok``: only rebuilding float32-routed results relies on it
+    (``tools/routing_precision_audit.py``), and a device that flushes
+    float32 subnormals there fails it.
+    """
+    rng = np.random.default_rng(20261021)
+    T, n = 6, 512
+    magnitude = 10.0 ** rng.uniform(-46.0, 4.0, size=(n, T))
+    scores = (np.abs(rng.standard_normal((n, T))) * magnitude).astype(np.float32)
+    scores[rng.random((n, T)) < 0.25] = 0.0            # saturated experts
+    scores[: n // 8] = scores[: n // 8, :1]            # rows of equal scores: ties
+    subnormal = (scores != 0) & (np.abs(scores) < np.finfo(np.float32).tiny)
+    report = {"device": str(device), "subnormal_scores": int(subnormal.sum()),
+              "widening_mismatches": 0, "decisions_checked": 0,
+              "decision_mismatches": 0, "route_mismatches": 0, "tie_mismatches": 0}
+    on_device = torch.from_numpy(scores.T.copy()).to(device)       # [T, B]
+    widened = on_device.to(torch.float64).cpu().numpy().T
+    expected = scores.astype(np.float64)
+    report["widening_mismatches"] = int(np.sum(
+        widened.view(np.uint64) != expected.view(np.uint64)))
+    tiny_bias = 1.1044052673094165e-29
+    states = [
+        # score-bias-acc layout: no scaling, coef = -I, biases that differ
+        # only below float32 resolution (a float32 router would tie them).
+        {"classes": list(range(T)), "feature_mean": [0.0] * T,
+         "feature_scale": [1.0] * T, "coef": (-np.eye(T)).tolist(),
+         "intercept": [tiny_bias * (1.0 + k * 2.0 ** -40) for k in range(T)]},
+        # score-bias layout: standardised scores, one shared slope.
+        {"classes": list(range(T)),
+         "feature_mean": (rng.standard_normal(T) * 1e-3).tolist(),
+         "feature_scale": (0.5 + rng.random(T)).tolist(),
+         "coef": (-0.7310585786300049 * np.eye(T)).tolist(),
+         "intercept": (rng.standard_normal(T) * 1e-2).tolist()},
+        # all-zero biases: the exact ties of the raw rule are kept as ties.
+        {"classes": list(range(T)), "feature_mean": [0.0] * T,
+         "feature_scale": [1.0] * T, "coef": (-np.eye(T)).tolist(),
+         "intercept": [0.0] * T},
+    ]
+    for prefix, dtype in (("", np.float64), ("float32_", np.float32)):
+        for key in ("decisions_checked", "decision_mismatches", "route_mismatches",
+                    "tie_mismatches"):
+            report.setdefault(prefix + key, 0)
+        for state in states:
+            if dtype is np.float64:
+                state = dict(state, routing_dtype="float64")
+            task_ids, tie_mask, decision = apply_calibrator(on_device, state)
+            mean = np.asarray(state["feature_mean"], dtype=dtype)
+            scale = np.asarray(state["feature_scale"], dtype=dtype)
+            slope = np.diag(np.asarray(state["coef"], dtype=dtype))
+            intercept = np.asarray(state["intercept"], dtype=dtype)
+            reference = ((scores.astype(dtype) - mean) / scale) * slope + intercept
+            winning = reference == reference.max(axis=1, keepdims=True)
+            route = winning.argmax(axis=1)
+            report[prefix + "decisions_checked"] += int(reference.size)
+            report[prefix + "decision_mismatches"] += int(
+                np.sum(decision.cpu().numpy() != reference))
+            report[prefix + "route_mismatches"] += int(np.sum(task_ids.cpu().numpy() != route))
+            report[prefix + "tie_mismatches"] += int(
+                np.sum(tie_mask.cpu().numpy() != (winning.sum(axis=1) > 1)))
+    report["ok"] = bool(report["subnormal_scores"] > 0 and not any(
+        report[k] for k in ("widening_mismatches", "decision_mismatches",
+                            "route_mismatches", "tie_mismatches")))
+    report["float32_ok"] = bool(report["subnormal_scores"] > 0 and not any(
+        report["float32_" + k] for k in ("decision_mismatches", "route_mismatches",
+                                         "tie_mismatches")))
+    return report
 
 
 def predict_global(per_task_logits, t_hat, offset):
@@ -277,9 +435,11 @@ def evaluate_class_il_inference(forward_t, test_loaders, num_tasks,
             oracle_local = per_task[true_t].argmax(dim=-1)
             oracle_hits[true_t] += (oracle_local == y_local).sum().item()
             g_true = true_t * offset + y_local
+            batch_scores = task_scores(per_task, criterion)
+            require_finite_scores(
+                batch_scores, f"for test examples of task {true_t}")
             if recorder is not None:
-                recorder.begin_batch(true_t, y_local, oracle_local,
-                                     task_scores(per_task, criterion))
+                recorder.begin_batch(true_t, y_local, oracle_local, batch_scores)
 
             # One set of T forward passes suffices for every historical stage:
             # stage i simply ignores candidates i+1..T-1.
@@ -388,7 +548,10 @@ def collect_calibration_features(forward_t, calibration_loaders, num_tasks,
         for x, _ in loader:
             x = x.to(device)
             logits = [forward_t(x, t) for t in range(num_tasks)]
-            batch_scores = task_scores(logits, criterion).transpose(0, 1)
+            raw_scores = task_scores(logits, criterion)
+            require_finite_scores(
+                raw_scores, f"for held-out calibration examples of task {true_t}")
+            batch_scores = raw_scores.transpose(0, 1)
             features.append(batch_scores.detach().cpu().numpy())
             task_ids.append(np.full(x.shape[0], true_t, dtype=np.int64))
             task_count += int(x.shape[0])

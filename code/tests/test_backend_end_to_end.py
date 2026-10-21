@@ -276,6 +276,40 @@ def test_tinyimagenet_loads_from_a_relative_data_root():
                 os.environ["DILTCL_CACHE_DIR"] = old_cache
 
 
+def test_a_symlinked_data_root_reuses_the_cache_of_the_real_root():
+    """The suite resolves --data-root; a check run through a symbolic link to
+    the same folder must hit the same cache entries instead of decoding the
+    images a second time (v3.0.9 keyed the cache on the unresolved root)."""
+    with tempfile.TemporaryDirectory() as root, \
+            tempfile.TemporaryDirectory() as cache, \
+            tempfile.TemporaryDirectory() as links:
+        _write_fake_tinyimagenet(root)
+        linked = os.path.join(links, "data")
+        os.symlink(root, linked)
+        old_cache = os.environ.get("DILTCL_CACHE_DIR")
+        os.environ["DILTCL_CACHE_DIR"] = cache
+        try:
+            hashes = []
+            for data_root in (root, linked):
+                train, test = get_split_tinyimagenet(
+                    num_tasks=2, classes_per_task=2, batch_size=4, seed=3,
+                    data_root=data_root, num_workers=0, backend="device",
+                    device="cpu")
+                hashes.append((describe_task_loader(train[0], 0)["materialized_pixels_sha256"],
+                               describe_task_loader(test[0], 0)["materialized_pixels_sha256"]))
+                if data_root == root:
+                    entries = sorted(f for f in os.listdir(cache) if f.endswith(".npz"))
+            assert hashes[0] == hashes[1]
+            # The linked root decoded nothing new: same cache files as before.
+            assert sorted(f for f in os.listdir(cache) if f.endswith(".npz")) == entries
+            assert len(entries) == 2          # one train, one validation split
+        finally:
+            if old_cache is None:
+                os.environ.pop("DILTCL_CACHE_DIR", None)
+            else:
+                os.environ["DILTCL_CACHE_DIR"] = old_cache
+
+
 if __name__ == "__main__":
     functions = [value for name, value in sorted(globals().items())
                  if name.startswith("test_") and callable(value)]

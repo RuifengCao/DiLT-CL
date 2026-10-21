@@ -437,22 +437,35 @@ def environment_probe() -> dict[str, Any]:
             packages[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
             packages[name] = None
+    # The probe also runs the float64 routing self-test on the device the jobs
+    # will use (diltcl.task_inference.float64_routing_self_test): calibrated
+    # routers are applied in float64 there, which the per-example audit
+    # requires to be IEEE double arithmetic.
     probe_code = (
-        "import json, torch; "
-        "print(json.dumps({'ok': True, 'torch': torch.__version__, "
-        "'cuda_available': torch.cuda.is_available(), "
-        "'cuda_count': torch.cuda.device_count(), "
-        "'cuda_version': torch.version.cuda, "
-        "'cudnn': torch.backends.cudnn.version(), "
-        "'devices': [torch.cuda.get_device_name(i) "
-        "for i in range(torch.cuda.device_count())]}))"
+        "import json, sys, torch\n"
+        "out = {'ok': True, 'torch': torch.__version__,\n"
+        "       'cuda_available': torch.cuda.is_available(),\n"
+        "       'cuda_count': torch.cuda.device_count(),\n"
+        "       'cuda_version': torch.version.cuda,\n"
+        "       'cudnn': torch.backends.cudnn.version(),\n"
+        "       'devices': [torch.cuda.get_device_name(i)\n"
+        "                   for i in range(torch.cuda.device_count())]}\n"
+        "sys.path.insert(0, sys.argv[1])\n"
+        "try:\n"
+        "    from diltcl.task_inference import float64_routing_self_test\n"
+        "    out['float64_routing'] = float64_routing_self_test(\n"
+        "        'cuda' if torch.cuda.is_available() else 'cpu')\n"
+        "except Exception as exc:\n"
+        "    out['float64_routing'] = {'ok': False,\n"
+        "                              'error': type(exc).__name__ + ': ' + str(exc)}\n"
+        "print(json.dumps(out))\n"
     )
     proc = subprocess.run(
-        [sys.executable, "-c", probe_code], text=True,
+        [sys.executable, "-c", probe_code, str(ROOT)], text=True,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     torch_probe: dict[str, Any]
-    if proc.returncode == 0:
-        torch_probe = json.loads(proc.stdout.strip())
+    if proc.returncode == 0 and proc.stdout.strip():
+        torch_probe = json.loads(proc.stdout.strip().splitlines()[-1])
     else:
         torch_probe = {"ok": False, "error": proc.stderr.strip()}
 
@@ -483,6 +496,7 @@ def environment_probe() -> dict[str, Any]:
             key: os.environ.get(key) for key in (
                 "CUDA_VISIBLE_DEVICES", "CUBLAS_WORKSPACE_CONFIG",
                 "PYTHONHASHSEED", "OMP_NUM_THREADS", "MKL_NUM_THREADS")
+            + preflight.NUMERICS_ENVIRONMENT
         },
     }
 
@@ -888,6 +902,35 @@ def status_is_valid(status_path: Path, expected_execution_sha256: str,
     return bool(status.get("outputs"))
 
 
+def jobs_still_to_run(run_dir: Path, jobs: list[Job]) -> list[Job]:
+    """Jobs without a succeeded status whose recorded outputs are all present.
+
+    Used only for the disk-space estimate, so a resumed run is not charged
+    for the checkpoints it has already written (the check is cheap: file
+    sizes, no hashes). Which jobs are actually skipped is decided later by
+    :func:`status_is_valid`.
+    """
+    pending = []
+    for job in jobs:
+        path = run_dir / "statuses" / f"{job.job_id}.json"
+        try:
+            status = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            pending.append(job)
+            continue
+        if status.get("state") != "succeeded" or not status.get("outputs"):
+            pending.append(job)
+            continue
+        for record in status["outputs"]:
+            relative = record.get("path_relative_to_run_dir")
+            output = ((run_dir / relative) if isinstance(relative, str)
+                      else Path(record.get("path", "")))
+            if not output.is_file() or output.stat().st_size != record.get("bytes"):
+                pending.append(job)
+                break
+    return pending
+
+
 class _ProcessRegistry:
     """Tracks running children so an interrupt can terminate all of them."""
 
@@ -956,6 +999,33 @@ def gpu_memory_mib() -> tuple[int, int] | None:
     return used, total
 
 
+def gpu_memory_from_torch() -> tuple[int, int] | None:
+    """``(used_mib, total_mib)`` of the first visible GPU as PyTorch sees it.
+
+    The fallback when ``nvidia-smi`` exists but its query fails: without any
+    reading the automatic parallelism would drop to one job at a time. Runs in
+    a subprocess so the suite itself never initialises CUDA.
+    """
+    code = ("import json, torch\n"
+            "if torch.cuda.is_available():\n"
+            "    free, total = torch.cuda.mem_get_info(0)\n"
+            "    print(json.dumps([int((total - free) // 2 ** 20), int(total // 2 ** 20)]))\n")
+    try:
+        proc = subprocess.run([sys.executable, "-c", code], text=True,
+                              stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                              timeout=180, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    lines = proc.stdout.strip().splitlines()
+    if proc.returncode != 0 or not lines:
+        return None
+    try:
+        used, total = json.loads(lines[-1])
+        return int(used), int(total)
+    except (ValueError, TypeError):
+        return None
+
+
 def usable_cpu_count() -> int:
     """CPUs this process may actually use.
 
@@ -973,14 +1043,22 @@ def resolve_max_parallel(spec: str, threads_per_job: int,
                          job_memory_mib: int) -> tuple[int, dict[str, Any]]:
     """Resolve ``--max-parallel`` (an integer or ``auto``) and explain it."""
     cpu_count = usable_cpu_count()
+    auto = spec.strip().lower() == "auto"
     memory = gpu_memory_mib()
+    source = "nvidia-smi" if memory is not None else None
+    if memory is None and auto and shutil.which("nvidia-smi"):
+        # A driver is installed but the query failed: ask PyTorch instead of
+        # silently running one job at a time.
+        memory = gpu_memory_from_torch()
+        source = "torch" if memory is not None else None
     detail: dict[str, Any] = {
         "cpu_count": cpu_count, "threads_per_job": threads_per_job,
         "job_memory_mib": job_memory_mib,
         "gpu_memory_used_mib": memory[0] if memory else None,
         "gpu_memory_total_mib": memory[1] if memory else None,
+        "gpu_memory_source": source,
     }
-    if spec.strip().lower() != "auto":
+    if not auto:
         value = int(spec)
         if value <= 0:
             raise ValueError("--max-parallel must be positive or 'auto'")
@@ -990,8 +1068,14 @@ def resolve_max_parallel(spec: str, threads_per_job: int,
     if memory is not None:
         free = max(0, memory[1] - memory[0])
         by_memory = max(1, free // max(1, job_memory_mib))
+    elif shutil.which("nvidia-smi"):
+        by_memory = 1
+        detail["warning"] = (
+            "GPU memory could not be read (nvidia-smi and PyTorch both failed), so "
+            "jobs run one at a time; pass --max-parallel N to set the number of "
+            "parallel jobs explicitly")
     else:
-        by_memory = 1 if shutil.which("nvidia-smi") else by_cpu
+        by_memory = by_cpu
     value = max(1, min(by_cpu, by_memory, MAX_AUTO_PARALLEL))
     detail.update({"rule": "auto=min(cpu//threads, free_vram//job_mem, "
                            f"{MAX_AUTO_PARALLEL})",
@@ -1104,6 +1188,7 @@ def run_job(job: Job, command: list[str], output_prefix: Path,
             "OMP_NUM_THREADS": child_env.get("OMP_NUM_THREADS"),
             "DILTCL_NUM_THREADS": child_env.get("DILTCL_NUM_THREADS"),
             "DILTCL_CACHE_DIR": child_env.get("DILTCL_CACHE_DIR"),
+            **{key: child_env.get(key) for key in preflight.NUMERICS_ENVIRONMENT},
         },
         "outputs": outputs,
     }
@@ -1609,6 +1694,8 @@ def _main(argv: list[str] | None) -> int:
           f"tf32={options.tf32} eval_batch={options.eval_batch_size or 'train'}; "
           f"max_parallel={max_parallel} ({parallel_detail['rule']}), "
           f"threads/job={args.threads_per_job}")
+    if parallel_detail.get("warning"):
+        print(f"[parallel] WARNING: {parallel_detail['warning']}", file=sys.stderr)
     if args.profile != "smoke" and len(seeds) < 5:
         print(f"[seed policy] WARNING: {len(seeds)} seed(s) requested. "
               "Paired significance testing needs at least five aligned "
@@ -1633,6 +1720,32 @@ def _main(argv: list[str] | None) -> int:
             "PyTorch sees no CUDA device (torch.cuda.is_available() is False), "
             "so every job would train on the CPU. Check nvidia-smi and the "
             "driver, or pass --allow-cpu to run on the CPU deliberately.")
+    numerics = preflight.numerics_environment()
+    if numerics:
+        print("[numerics] WARNING: set in this environment: "
+              + ", ".join(f"{key}={value}" for key, value in sorted(numerics.items()))
+              + ". These change GPU arithmetic (TF32, cuBLAS emulation, algorithm "
+              "choice) without showing in the recorded execution flags, so results "
+              "can differ from runs without them. They are recorded in "
+              "environment.json and in every job status.", file=sys.stderr)
+    needs_calibration = any(
+        "--inference-calibration" in job.extra_args for job in jobs)
+    routing = environment["torch_probe"].get("float64_routing")
+    if needs_calibration and routing is not None and not routing.get("ok"):
+        # Not a preflight item: a calibrated job run here would fail the
+        # per-example audit, so --skip-preflight does not bypass this.
+        raise SystemExit(
+            "Calibrated routers are applied in float64, and float64 routing on this "
+            f"device failed its self-test: {json.dumps(routing)}. Every calibrated "
+            "job would fail the per-example audit. Check that no cuBLAS emulation "
+            "variable is set (CUBLAS_EMULATE_DOUBLE_PRECISION, "
+            "CUBLAS_EMULATION_STRATEGY, CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT) "
+            "and report this message; no job was started.")
+    if needs_calibration and routing is not None and routing.get("float32_ok") is False:
+        print("[routing] WARNING: this GPU does not apply float32 routers as NumPy does "
+              f"(routing self-test: {json.dumps(routing)}). Runs are not affected; "
+              "tools/routing_precision_audit.py, which rebuilds float32-routed results "
+              "with NumPy, may then report differences it cannot explain.", file=sys.stderr)
 
     # Fail fast on everything else that is knowable now. The first v2.1 P0 run
     # lost five of seven jobs -- including two that had already finished
@@ -1640,15 +1753,15 @@ def _main(argv: list[str] | None) -> int:
     # were visible before the first batch.
     if not args.skip_preflight:
         benchmarks_needed = sorted({job.benchmark for job in jobs})
-        needs_calibration = any(
-            "--inference-calibration" in job.extra_args for job in jobs)
+        # A resumed run needs disk only for the jobs it has not finished.
+        to_run = jobs_still_to_run(run_dir, jobs) if save_checkpoints else []
         preflight_report = preflight.check(
             str(data_root), benchmarks_needed, require_training=False,
             require_calibration=needs_calibration,
             pin_sklearn=args.pin_sklearn,
             output_dir=str(run_dir) if save_checkpoints else None,
             expected_method_lists=(
-                [[m for m in job.methods.split(",") if m] for job in jobs]
+                [[m for m in job.methods.split(",") if m] for job in to_run]
                 if save_checkpoints else None))
         print(preflight.format_report(preflight_report, header="preflight"))
         atomic_json(run_dir / "preflight.json", {

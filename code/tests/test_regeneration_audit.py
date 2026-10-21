@@ -209,6 +209,79 @@ def test_data_and_launch_controls_are_compared_from_run_statuses():
         assert code == 0 and report["status"] == "identical"
 
 
+def test_numerics_variables_are_compared_as_launch_controls():
+    preflight = importlib.util.module_from_spec(importlib.util.spec_from_file_location(
+        "preflight_for_launch_keys", ROOT / "diltcl" / "preflight.py"))
+    preflight.__spec__.loader.exec_module(preflight)
+    assert set(preflight.NUMERICS_ENVIRONMENT) <= set(cr.LAUNCH_KEYS)
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        for name, controls in (("old", {}), ("new", {"NVIDIA_TF32_OVERRIDE": "0"})):
+            _write(base / name / "merged", "g", _payload(), _arrays())
+            (base / name / "statuses").mkdir()
+            (base / name / "statuses" / "g__cifar__seed0__wsn.json").write_text(json.dumps({
+                "state": "succeeded", "job": {"job_id": "g__cifar__seed0__wsn"},
+                "dataset_identity": {"entries": {}},
+                "child_environment_controls": {"PYTHONHASHSEED": "0", **controls}}))
+        _, report = _run(["--reference", str(base / "old"), "--candidate", str(base / "new")])
+        assert report["data_and_launch"]["launch_differences"] == [
+            {"job": "g__cifar__seed0__wsn", "keys": ["NVIDIA_TF32_OVERRIDE"]}]
+
+
+def test_only_the_calibrated_routers_outputs_count_as_a_precision_change():
+    """Same experts, float32-routed reference, float64-routed candidate: a
+    difference confined to the calibrated router's arrays and metrics is a
+    routing-precision effect; one in the raw router's arrays or metrics, or
+    in the oracle accuracies, is not."""
+    def payload(precision):
+        state = {"classes": [0], "intercept": [0.0]}
+        if precision == "float64":
+            state["routing_dtype"] = "float64"
+        out = _payload(calibration="score-bias-acc")
+        for row in out["per_seed"]["cifar"]["wsn"]:
+            row.update({"TA": 50.0, "RawTA": 40.0})
+        out["calibration"] = {"cifar": {"wsn": {str(s): {"prefix_models": [state]}
+                                                for s in (0, 1)}}}
+        return out
+
+    def arrays():
+        out = _arrays()
+        for s in (0, 1):
+            out[f"cifar/wsn/seed{s}/raw_result"] = np.full((2, 2), 3.0)
+        return out
+
+    cases = {
+        "routing": (lambda a, m: (a["cifar/wsn/seed0"].__setitem__((1, 1), 9.0),
+                                  m.__setitem__("TA", 51.0)), True),
+        "raw array": (lambda a, m: a["cifar/wsn/seed0/raw_result"].__setitem__((1, 1), 9.0), False),
+        "raw metric": (lambda a, m: m.__setitem__("RawTA", 41.0), False),
+        "oracle": (lambda a, m: m.__setitem__("OracleACC", 1.0), False),
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        base = pathlib.Path(tmp)
+        _write(base / "old", "g", payload("float32"), arrays())
+        for label, (edit, precision_effect) in cases.items():
+            cand_payload, cand_arrays = payload("float64"), arrays()
+            edit(cand_arrays, cand_payload["per_seed"]["cifar"]["wsn"][0])
+            _write(base / label, "g", cand_payload, cand_arrays)
+            summary = cr.compare_group("g", base / "old" / "g.json",
+                                       base / label / "g.json")["summary"]
+            assert summary["router_precision_changed"] is True, label
+            assert summary["same_state_different_outputs"] == ["cifar/wsn/seed0"], label
+            assert summary["routing_precision_differences"] == (
+                ["cifar/wsn/seed0"] if precision_effect else []), label
+            assert summary["same_state_unexplained"] == (
+                [] if precision_effect else ["cifar/wsn/seed0"]), label
+        # Without a change of precision nothing is a precision effect.
+        _write(base / "same", "g", payload("float32"), arrays())
+        cand = payload("float32")
+        cand["per_seed"]["cifar"]["wsn"][0]["TA"] = 51.0
+        _write(base / "same2", "g", cand, arrays())
+        summary = cr.compare_group("g", base / "same" / "g.json", base / "same2" / "g.json")["summary"]
+        assert summary["routing_precision_differences"] == []
+        assert summary["same_state_unexplained"] == ["cifar/wsn/seed0"]
+
+
 def test_states_only_pair_compares_the_experts_both_groups_trained():
     # The 90%-split calibration group also trains the shared-backbone methods;
     # the score-bias groups do not. Their shared experts must still pair.
@@ -375,3 +448,14 @@ def test_environment_check_parses_the_lock_and_flags_mismatches():
     assert ce.check_packages({"numpy": installed_numpy}) == []
     assert ce.check_packages({"numpy": "0.0.1"}) == [f"numpy: installed {installed_numpy}, recorded 0.0.1"]
     assert ce.check_packages({"surely-not-installed-pkg": "1.0"})[0].endswith("not installed (recorded 1.0)")
+    # Variables that change GPU arithmetic outside the recorded flags.
+    assert ce.check_numerics_environment(None, {}) == []
+    problems = ce.check_numerics_environment(None, {"NVIDIA_TF32_OVERRIDE": "0"})
+    assert len(problems) == 1 and "NVIDIA_TF32_OVERRIDE=0" in problems[0]
+    old_run = {"environment_controls": {"CUBLAS_WORKSPACE_CONFIG": ":4096:8"}}   # before v3.0.10
+    assert ce.check_numerics_environment(old_run, {"CUBLAS_EMULATE_SINGLE_PRECISION": "1"})
+    new_run = {"environment_controls": {"NVIDIA_TF32_OVERRIDE": "0",
+                                        "CUBLAS_EMULATE_DOUBLE_PRECISION": None}}
+    assert ce.check_numerics_environment(new_run, {"NVIDIA_TF32_OVERRIDE": "0"}) == []
+    assert ce.check_numerics_environment(new_run, {}) == [
+        "environment NVIDIA_TF32_OVERRIDE: now None, recorded '0'"]

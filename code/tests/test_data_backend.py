@@ -308,6 +308,34 @@ def test_cache_entries_follow_the_source_files():
             raise AssertionError("a damaged cache file was accepted")
 
 
+def test_pixel_hash_reads_arrays_in_place_with_the_old_digest():
+    """The zero-copy hash (v3.0.10) must give exactly the digest of the
+    ``tobytes()`` copy it replaces, for every layout the backend meets."""
+    import hashlib
+    import json
+
+    def reference(x, y):
+        digest = hashlib.sha256()
+        digest.update(b"x")
+        digest.update(json.dumps(list(x.shape)).encode("ascii"))
+        digest.update(np.ascontiguousarray(x).tobytes())
+        digest.update(b"y")
+        digest.update(np.ascontiguousarray(y).tobytes())
+        return digest.hexdigest()
+
+    rng = np.random.default_rng(0)
+    pixels = rng.integers(0, 256, size=(5, 3, 4, 4), dtype=np.uint8)
+    labels = rng.integers(0, 10, size=5).astype(np.int64)
+    cases = [
+        (pixels, labels),
+        (pixels.transpose(0, 1, 3, 2), labels),                 # not C-contiguous
+        (pixels[:, :, ::2, :], labels[::-1]),                  # strided views
+        (np.zeros((0, 3, 4, 4), np.uint8), np.zeros(0, np.int64)),   # empty split
+    ]
+    for x, y in cases:
+        assert db._content_hash(x, y) == reference(x, y)
+
+
 def test_unsupported_tensor_stage_is_rejected():
     transform = transforms.Compose([
         transforms.ToTensor(), transforms.RandomErasing(p=1.0)])

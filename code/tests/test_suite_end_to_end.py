@@ -143,6 +143,18 @@ def test_smoke_profile_end_to_end():
         assert audit.returncode == 0, audit.stdout + audit.stderr
         assert json.loads((base / "audit.json").read_text())["status"] == "identical"
 
+        # The calibrated job routed in float64; the precision audit rebuilds
+        # its decisions in float32 and reports how many moved.
+        precision = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "routing_precision_audit.py"),
+             "--run-dir", str(run_dir), "--out", str(base / "precision.json")],
+            cwd=ROOT, env=env, capture_output=True, text=True, check=False)
+        assert precision.returncode == 0, precision.stdout + precision.stderr
+        measured = json.loads((base / "precision.json").read_text())
+        assert measured["status"] == "measured" and measured["summary"]["jobs"] == 4
+        assert {e["routing_dtype"] for e in measured["entries"]} == {"float64"}
+        assert all("float32" in e and "current" in e for e in measured["entries"])
+
         table = subprocess.run(
             [sys.executable, str(ROOT / "make_class_il_table.py"), "--results",
              str(run_dir / "merged" / "smoke_class_entropy.json"),

@@ -79,6 +79,28 @@ _DATASET_HINTS = {
                     "(extract so '<root>/tiny-imagenet-200/train' exists)",
 }
 
+# Environment variables known to change GPU arithmetic without showing in
+# the execution flags a run records: TF32 switches, cuBLAS floating-point
+# emulation, and workspace limits or library switches that select other
+# matmul and convolution paths. Runs record them (unset ones as null) since
+# v3.0.10, and the suite warns when one is set.
+NUMERICS_ENVIRONMENT = (
+    "NVIDIA_TF32_OVERRIDE", "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE",
+    "CUBLAS_EMULATE_SINGLE_PRECISION", "CUBLAS_EMULATE_DOUBLE_PRECISION",
+    "CUBLAS_EMULATION_STRATEGY", "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT",
+    "CUBLASLT_WORKSPACE_SIZE", "CUDNN_CONV_WSCAP_DBG", "TORCH_BLAS_PREFER_CUBLASLT",
+    "DISABLE_ADDMM_CUDA_LT", "TORCH_CUDNN_USE_HEURISTIC_MODE_B",
+    "TORCH_CUDNN_V8_API_DISABLED", "CUDNN_ERRATA_JSON_FILE",
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK",
+)
+
+
+def numerics_environment(environ=None):
+    """The :data:`NUMERICS_ENVIRONMENT` variables that are set, name -> value."""
+    environ = os.environ if environ is None else environ
+    return {name: environ[name] for name in NUMERICS_ENVIRONMENT if name in environ}
+
+
 # Which datasets each benchmark needs.
 BENCHMARK_DATASETS = {
     "cifar": ["CIFAR-100"],
@@ -297,7 +319,9 @@ def check(data_root, benchmarks, require_training=True,
                 f"{free / 2 ** 30:.1f} GiB free but about "
                 f"{needed / 2 ** 30:.1f} GiB is needed for {expected_jobs} "
                 "job(s) of persisted checkpoints -> free space, point "
-                "--run-dir at a larger volume, or pass --no-save-checkpoints")
+                "--run-dir at a larger volume (only a new run can drop "
+                "checkpoints with --no-save-checkpoints; a resumed run must keep "
+                "its plan)")
         elif free < needed * 2:
             warnings_.append(
                 f"disk space at '{output_dir}' is tight: "

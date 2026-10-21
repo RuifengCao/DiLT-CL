@@ -3,10 +3,12 @@
 import json
 import pathlib
 import sys
+from fractions import Fraction
 
 import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "diltcl"))
+import task_calibration as tc  # noqa: E402
 from task_calibration import (  # noqa: E402
     deterministic_holdout_indices,
     fit_prefix_calibrators,
@@ -198,6 +200,163 @@ def test_score_bias_router_handles_offsets_and_serializes():
         pass
     else:
         raise AssertionError("unknown calibration kinds must be rejected")
+
+
+def test_fitted_states_route_in_float64_and_record_balanced_accuracies():
+    """Every newly fitted state declares float64 routing (v3.0.10) and records
+    the class-balanced fitting accuracy next to the plain one; score-bias-acc
+    guarantees noninferiority in the balanced accuracy, exactly."""
+    rng = np.random.default_rng(11)
+    T = 4
+    # Unequal task counts, so plain and balanced accuracy differ.
+    counts = np.array([40, 10, 25, 5])
+    y = np.repeat(np.arange(T), counts)
+    x = rng.normal(1.0, 0.4, size=(y.size, T))
+    x[np.arange(y.size), y] -= 0.3
+    x[:, 0] -= 0.25                       # task 0 looks systematically confident
+    for kind in tc.CALIBRATION_KINDS:
+        states = tc.fit_prefix_calibrators(x, y, T, kind=kind)
+        for stage, state in enumerate(states):
+            assert state["routing_dtype"] == "float64"
+            rows = y <= stage
+            xs, ys = x[rows, :stage + 1], y[rows]
+            fitted = tc.predict_score_logreg(xs, state)
+            assert state["fit_balanced_accuracy"] == tc.balanced_accuracy(fitted, ys)
+            assert state["raw_argmin_fit_balanced_accuracy"] == tc.balanced_accuracy(
+                np.argmin(xs, axis=1), ys)
+            if kind == "score-bias-acc":
+                # Compared exactly: equal accuracies may round apart.
+                assert tc.balanced_accuracy_exact(fitted, ys) >= tc.balanced_accuracy_exact(
+                    np.argmin(xs, axis=1), ys)
+    final = tc.fit_prefix_calibrators(x, y, T, kind="score-bias-acc")[-1]
+    assert final["fit_balanced_accuracy"] != final["fit_accuracy"]   # the fixture is unbalanced
+
+
+def test_balanced_accuracy_is_the_mean_per_task_accuracy():
+    y = np.array([0, 0, 0, 0, 1, 2, 2])
+    pred = np.array([0, 0, 1, 1, 1, 2, 0])
+    assert tc.balanced_accuracy(pred, y) == (0.5 + 1.0 + 0.5) / 3
+    assert tc.balanced_accuracy(y, y) == 1.0
+
+
+def test_single_candidate_accuracy_router_is_reported_as_degenerate():
+    """Stage 0 of score-bias-acc fits nothing; it used to be recorded as not
+    converged, which read like a failed fit."""
+    x = np.random.default_rng(0).normal(size=(6, 1))
+    state = tc.fit_score_bias_acc(x, np.zeros(6, dtype=int))
+    assert state["converged"] is True and state["n_iter"] == [0]
+    assert state["solver_backend"] == "degenerate-single-class"
+    assert state["intercept"] == [0.0] and state["routing_dtype"] == "float64"
+    assert list(tc.predict_score_logreg(x, state)) == [0] * 6
+    first = tc.fit_prefix_calibrators(np.hstack([x, x + 1.0]), np.r_[np.zeros(3, int), np.ones(3, int)],
+                                      2, kind="score-bias-acc")[0]
+    assert first["converged"] is True and first["solver_backend"] == "degenerate-single-class"
+
+
+def test_exact_balanced_accuracy_sees_ties_that_floats_round_apart():
+    """Per-task counts 2, 3, 3: hits (1, 2, 1) and (1, 0, 3) are exactly as
+    accurate (1/2 + 2/3 + 1/3 = 1/2 + 0 + 1), but their float means differ
+    in the last bit."""
+    y = np.repeat([0, 1, 2], [2, 3, 3])
+    a = np.array([0, 1, 1, 1, 0, 2, 0, 0])      # hits per task 1, 2, 1
+    b = np.array([0, 1, 0, 0, 0, 2, 2, 2])      # hits per task 1, 0, 3
+    assert tc.balanced_accuracy(a, y) < tc.balanced_accuracy(b, y)
+    assert tc.balanced_accuracy_exact(a, y) == tc.balanced_accuracy_exact(b, y)
+    assert tc.balanced_accuracy_exact(a, y) == Fraction(1, 2)
+    assert float(tc.balanced_accuracy_exact(y, y)) == 1.0
+
+
+def _float_objective_bias_acc(x, y, max_sweeps=8, grid_size=41):
+    """The score-bias-acc search as it was before v3.0.10: the balanced
+    objective summed as per-example float weights, compared with 1e-12."""
+    x = np.asarray(x, dtype=np.float64)
+    classes = np.unique(y)
+    n, T = x.shape
+    weights = tc._balanced_weights(y, classes)
+
+    def accuracy(bias):
+        return float(np.sum(weights * (np.argmin(x - bias[None, :], axis=1) == y)))
+
+    b = np.zeros(T)
+    best, sweeps, improved = accuracy(b), 0, True
+    while improved and sweeps < max_sweeps:
+        improved, sweeps = False, sweeps + 1
+        for k in range(T):
+            others = np.delete(x - b[None, :], k, axis=1).min(axis=1)
+            gaps = (x[:, k] - b[k]) - others
+            candidates = np.unique(np.concatenate([
+                [0.0], np.quantile(gaps, np.linspace(0.02, 0.98, grid_size))]))
+            best_k, best_val = b[k], best
+            for delta in candidates:
+                trial = b.copy()
+                trial[k] = b[k] + delta
+                val = accuracy(trial)
+                if val > best_val + 1e-12 or (abs(val - best_val) <= 1e-12
+                                              and abs(trial[k]) < abs(best_k)):
+                    best_k, best_val = trial[k], val
+            if best_k != b[k]:
+                b[k] = best_k
+                if best_val > best + 1e-12:
+                    improved = True
+                best = best_val
+    return b.tolist(), sweeps, not improved
+
+
+def test_accuracy_router_search_is_unchanged_for_equal_task_counts():
+    """With equal task counts (every recorded run) the exact objective is the
+    number of correct routes, as the float one was: same biases, same sweeps."""
+    rng = np.random.default_rng(11)
+    for trial in range(24):
+        T, m = int(rng.integers(2, 7)), int(rng.integers(4, 120))
+        y = np.repeat(np.arange(T), m)
+        x = rng.normal(size=(y.size, T)) + rng.normal(size=T)[None, :]
+        if trial % 3 == 1:          # saturated experts: many exact zeros and ties
+            x = np.where(rng.random(x.shape) < 0.6, 0.0, np.abs(x))
+        if trial % 3 == 2:          # informative scores
+            x[np.arange(y.size), y] -= 1.0
+        x = x.astype(np.float32).astype(np.float64)
+        state = tc.fit_score_bias_acc(x, y)
+        expected, sweeps, converged = _float_objective_bias_acc(x, y)
+        assert state["intercept"] == expected, trial
+        assert state["n_iter"] == [sweeps] and state["converged"] is converged, trial
+
+
+def _drift_case(n=4000, seed=5):
+    """Unequal task counts (n + 1, n, n) and two mirror-image tasks, so every
+    bias move trades routes one for one: the balanced accuracy can only stay
+    equal. Summed as float weights it picks up rounding noise above 1e-12
+    (from the second round-5 review)."""
+    r = np.random.default_rng(seed)
+    one = np.float32(1.0)
+    k = n // 3
+    a = r.uniform(0.01, 0.5, size=k).astype(np.float32)
+    g = r.uniform(0.01, 0.5, size=n - k).astype(np.float32)
+    correct1 = np.c_[np.full(n - k, 9.0), np.full(n - k, one), one + g]
+    task1 = np.r_[np.c_[np.full(k, 9.0), one + a, np.full(k, one)], correct1]
+    task2 = np.r_[np.c_[np.full(n - k, 9.0), np.full(n - k, one), one + g],
+                  np.c_[np.full(k, 9.0), one + a, np.full(k, one)]]
+    good0 = int(0.83 * (n + 1))
+    task0 = np.r_[np.c_[np.zeros(good0), np.full(good0, 9.0), np.full(good0, 9.0)],
+                  correct1[r.integers(0, n - k, size=n + 1 - good0)]]
+    x = np.vstack([task0, task1, task2]).astype(np.float32).astype(np.float64)
+    y = np.r_[np.zeros(n + 1, int), np.ones(n, int), np.full(n, 2)]
+    return x, y
+
+
+def test_accuracy_router_search_moves_no_bias_without_a_gain():
+    x, y = _drift_case()
+    drifted, _, _ = _float_objective_bias_acc(x, y)
+    assert drifted != [0.0, 0.0, 0.0]          # the float search moved a bias
+    raw = np.argmin(x, axis=1)
+    moved = tc.predict_score_logreg(x, {"classes": [0, 1, 2], "feature_mean": [0.0] * 3,
+                                        "feature_scale": [1.0] * 3, "coef": (-np.eye(3)).tolist(),
+                                        "intercept": drifted})
+    # ... for no gain at all, while its float balanced accuracy came out lower.
+    assert tc.balanced_accuracy_exact(moved, y) == tc.balanced_accuracy_exact(raw, y)
+    state = tc.fit_score_bias_acc(x, y)
+    assert state["intercept"] == [0.0, 0.0, 0.0] and state["converged"] is True
+    final = tc.fit_prefix_calibrators(x, y, 3, kind="score-bias-acc")[-1]
+    assert final["fit_balanced_accuracy"] == final["raw_argmin_fit_balanced_accuracy"]
 
 
 if __name__ == "__main__":

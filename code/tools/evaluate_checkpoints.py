@@ -12,7 +12,9 @@ isolation method/seed whose trained state was persisted, this tool
    artifact;
 3. re-runs the class-IL evaluation with the job's own router (the raw
    criterion, or the serialized prefix calibrators of a calibrated job, plus
-   the matched raw router);
+   the matched raw router), each calibrator applied in the precision stored
+   with it (float64 since v3.0.10, float32 for earlier states), as the job
+   applied it;
 4. compares every matrix (routed, task-inference, conditional, tie; raw_*
    for calibrated jobs) and every per-seed metric, including the oracle
    accuracy, with ``result.npz`` / ``result.json``, and, when the job wrote

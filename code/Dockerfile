@@ -1,4 +1,4 @@
-# Version-locked environment for DiLT-CL v3.0.9.
+# Version-locked environment for DiLT-CL v3.0.10.
 #
 # The image pins the exact Python packages recorded by every run behind the
 # submitted results (requirements-lock.txt, taken from the runs' pip_freeze.txt).
@@ -6,9 +6,9 @@
 # with CUDA 13.0 on an RTX 5090. Bit-identical results are expected only on the
 # same GPU architecture with the same libraries; see REPRODUCE.md.
 #
-# Build:  docker build -t diltcl:3.0.9 .
-# Test:   docker run --rm diltcl:3.0.9 python -m pytest tests -q -p no:cacheprovider
-# Use:    docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.9
+# Build:  docker build -t diltcl:3.0.10 .
+# Test:   docker run --rm diltcl:3.0.10 python -m pytest tests -q -p no:cacheprovider
+# Use:    docker run --gpus all --rm -it -v /path/to/data:/data -v /path/to/runs:/runs diltcl:3.0.10
 #
 # The interpreter matches the recorded Python 3.12.3 (the runs used Anaconda's
 # build of 3.12.3; this image uses the official CPython 3.12.3 build).

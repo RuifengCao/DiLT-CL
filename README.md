@@ -60,7 +60,7 @@ under v3.0.2, so its rows for those two methods time the invalidated runs;
 ```bash
 cd code
 pip install -r requirements.txt pytest matplotlib
-python -m pytest tests -q                 # 312 tests, 311 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
+python -m pytest tests -q                 # 347 tests, 346 run (about 2 min); the opt-in end-to-end test (DILTCL_E2E=1, ~6 min) is skipped
 
 # every evidence file against its recorded hash
 python - <<'EOF'
@@ -99,7 +99,7 @@ in [`code/REPRODUCE.md`](code/REPRODUCE.md).
 
 ## Status
 
-Code version 3.0.9 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
+Code version 3.0.10 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
 were produced by versions 3.0.0 to 3.0.3 on one NVIDIA RTX 5090; the exact
 software stack is pinned in `code/requirements-lock.txt` and recorded in each
 run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
@@ -114,12 +114,18 @@ tests that failed on any machine with a GPU and made a second suite launcher
 stop on a run directory that is in use; 3.0.9 fixes TinyImageNet loading from a
 relative data root, stops P0/P1 suites when PyTorch sees no GPU (unless
 `--allow-cpu`), keeps the other jobs' results when one checkpoint
-re-evaluation fails, and runs every router kind through the audit tests
-(`code/PROTOCOL.md`). The test suite and a synthetic end-to-end run pass on
-Python 3.13 and on the recorded software stack (Python 3.12.3, PyTorch
-2.12.1) on a CPU. Whether 3.0.9 regenerates the recorded results bit for bit
-on the recorded stack is what the Level 3 regeneration audit in
-`code/REPRODUCE.md` checks; that audit has not been run yet.
+re-evaluation fails, and runs every router kind through the audit tests.
+Version 3.0.10 applies every fitted router in float64, the precision it is
+fitted in, instead of the float32 of the routing scores, so the deployed
+router is the fitted one; training and uncalibrated routing are unchanged,
+and `code/tools/routing_precision_audit.py` measures which calibrated
+decisions the change moves. It also closes the audit gaps and minor issues
+found by the fourth and fifth code reviews (`code/PROTOCOL.md`). The test suite and a
+synthetic end-to-end run pass on Python 3.13 and on the recorded software
+stack (Python 3.12.3, PyTorch 2.12.1) on a CPU. Whether 3.0.10 regenerates the
+recorded experts bit for bit on the recorded stack is what the Level 3
+regeneration audit in `code/REPRODUCE.md` checks; that audit has not been run
+yet.
 
 ## License
 

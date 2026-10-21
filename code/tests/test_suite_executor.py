@@ -320,6 +320,96 @@ class ExecutorTests(unittest.TestCase):
             for name, value in saved.items():
                 setattr(suite, name, value)
 
+    def test_calibrated_runs_stop_when_float64_routing_fails_its_self_test(self):
+        failed = {"ok": False, "device": "cuda", "decision_mismatches": 3}
+        stubs = {"execute_jobs": lambda *a, **k: [],
+                 "environment_probe": lambda: {"torch_probe": {
+                     "ok": True, "cuda_available": True, "float64_routing": failed}},
+                 "write_pip_freeze": lambda run_dir: None}
+        saved = {name: getattr(suite, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(suite, name, stub)
+            with tempfile.TemporaryDirectory() as tmp:
+                data_root = pathlib.Path(tmp) / "data"
+                data_root.mkdir()
+
+                def run(*groups):
+                    run_dir = pathlib.Path(tmp) / "_".join(groups)
+                    return suite.main(["--profile", "all", "--only-groups", *groups,
+                                       "--seeds", "0", "--run-dir", str(run_dir),
+                                       "--max-parallel", "1", "--skip-preflight",
+                                       "--skip-verify", "--dataset-hash", "none",
+                                       "--data-root", str(data_root)])
+
+                for group in ("p0_class_entropy_cal", "p1_class_entropy_biasacc"):
+                    with self.assertRaises(SystemExit) as stopped:
+                        run(group)
+                    self.assertIn("float64 routing", str(stopped.exception))
+                    self.assertIn("no job was started", str(stopped.exception))
+                # Runs without fitted routers do not depend on it.
+                self.assertEqual(run("p0_class_entropy"), 0)
+                # float32 application that differs from NumPy's only warns: it
+                # matters for rebuilding float32-routed results, not for this run.
+                import contextlib
+                import io
+                probe = {"ok": True, "device": "cuda", "float32_ok": False}
+                suite.environment_probe = lambda: {"torch_probe": {
+                    "ok": True, "cuda_available": True, "float64_routing": probe}}
+                stderr = io.StringIO()
+                with contextlib.redirect_stderr(stderr):
+                    self.assertEqual(run("p1_class_entropy_bias"), 0)
+                self.assertIn("[routing] WARNING", stderr.getvalue())
+        finally:
+            for name, value in saved.items():
+                setattr(suite, name, value)
+
+    def test_numerics_environment_is_recorded_and_announced(self):
+        import contextlib
+        import io
+        import os
+        saved = {key: os.environ.pop(key, None) for key in suite.preflight.NUMERICS_ENVIRONMENT}
+        os.environ["NVIDIA_TF32_OVERRIDE"] = "0"
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                run_dir = pathlib.Path(tmp)
+                job = _fake_jobs()[:1]
+                self._run(run_dir, job)
+                status = json.loads((run_dir / "statuses" / f"{job[0].job_id}.json").read_text())
+                controls = status["child_environment_controls"]
+                self.assertEqual(controls["NVIDIA_TF32_OVERRIDE"], "0")
+                for key in suite.preflight.NUMERICS_ENVIRONMENT:
+                    self.assertIn(key, controls)
+                self.assertIsNone(controls["CUBLAS_EMULATE_DOUBLE_PRECISION"])
+                data_root = pathlib.Path(tmp) / "data"
+                data_root.mkdir()
+                stderr = io.StringIO()
+                with contextlib.redirect_stderr(stderr):
+                    self.assertEqual(_prepare(["--profile", "smoke", "--run-dir",
+                                               str(pathlib.Path(tmp) / "run"),
+                                               "--max-parallel", "1"], data_root), 0)
+                self.assertIn("[numerics] WARNING", stderr.getvalue())
+                self.assertIn("NVIDIA_TF32_OVERRIDE=0", stderr.getvalue())
+        finally:
+            os.environ.pop("NVIDIA_TF32_OVERRIDE", None)
+            for key, value in saved.items():
+                if value is not None:
+                    os.environ[key] = value
+
+    def test_the_environment_probe_runs_the_float64_routing_self_test(self):
+        try:
+            import torch  # noqa: F401
+        except ImportError:
+            self.skipTest("needs PyTorch")
+        environment = suite.environment_probe()
+        probe = environment["torch_probe"]
+        self.assertTrue(probe["ok"], probe)
+        routing = probe["float64_routing"]
+        self.assertTrue(routing["ok"], routing)
+        self.assertEqual(routing["device"], "cuda" if probe["cuda_available"] else "cpu")
+        for key in suite.preflight.NUMERICS_ENVIRONMENT:
+            self.assertIn(key, environment["environment_controls"])
+
     def test_main_acknowledges_a_source_change_only_when_asked(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = pathlib.Path(tmp) / "run"
@@ -482,6 +572,52 @@ class ExecutorTests(unittest.TestCase):
         ordered = sorted(_fake_jobs(), key=suite.estimate_cost, reverse=True)
         self.assertEqual(ordered[0].methods, "diltcl")
         self.assertEqual(ordered[1].methods, "lwf")
+
+    def test_auto_parallelism_never_drops_to_one_job_silently(self):
+        """When nvidia-smi exists but its query fails, PyTorch's reading is
+        used; when that fails too the fallback to one job is announced."""
+        saved = (suite.gpu_memory_mib, suite.gpu_memory_from_torch,
+                 suite.shutil.which, suite.usable_cpu_count)
+        try:
+            suite.usable_cpu_count = lambda: 24
+            suite.shutil.which = lambda name: "/usr/bin/nvidia-smi"
+            suite.gpu_memory_mib = lambda: None
+            suite.gpu_memory_from_torch = lambda: (500, 32000)
+            value, detail = suite.resolve_max_parallel("auto", 3, 2048)
+            self.assertEqual(value, min(8, suite.MAX_AUTO_PARALLEL))
+            self.assertEqual(detail["gpu_memory_source"], "torch")
+            self.assertNotIn("warning", detail)
+            suite.gpu_memory_from_torch = lambda: None
+            value, detail = suite.resolve_max_parallel("auto", 3, 2048)
+            self.assertEqual(value, 1)
+            self.assertIn("--max-parallel", detail["warning"])
+            # An explicit value never probes and never warns.
+            suite.gpu_memory_from_torch = lambda: self.fail("probed for an explicit value")
+            value, detail = suite.resolve_max_parallel("6", 3, 2048)
+            self.assertEqual((value, detail["rule"]), (6, "explicit"))
+            # Without a driver (a CPU machine) the CPU count decides, quietly.
+            suite.shutil.which = lambda name: None
+            suite.gpu_memory_from_torch = lambda: self.fail("probed without a driver")
+            value, detail = suite.resolve_max_parallel("auto", 3, 2048)
+            self.assertEqual(value, min(8, suite.MAX_AUTO_PARALLEL))
+            self.assertNotIn("warning", detail)
+        finally:
+            (suite.gpu_memory_mib, suite.gpu_memory_from_torch,
+             suite.shutil.which, suite.usable_cpu_count) = saved
+
+    def test_disk_estimate_of_a_resumed_run_counts_only_unfinished_jobs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = pathlib.Path(tmp)
+            jobs = _fake_jobs()
+            self._run(run_dir, jobs[:2], max_parallel=1)
+            pending = suite.jobs_still_to_run(run_dir, jobs)
+            self.assertEqual([j.job_id for j in pending], [j.job_id for j in jobs[2:]])
+            # An output that went missing makes its job count again.
+            status = json.loads((run_dir / "statuses" / f"{jobs[0].job_id}.json").read_text())
+            output = status["outputs"][0]
+            (run_dir / output["path_relative_to_run_dir"]).unlink()
+            pending = suite.jobs_still_to_run(run_dir, jobs)
+            self.assertIn(jobs[0].job_id, [j.job_id for j in pending])
 
 
 if __name__ == "__main__":

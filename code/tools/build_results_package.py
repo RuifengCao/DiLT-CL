@@ -268,8 +268,10 @@ def write_how_to_verify(root: Path, runs: list[dict]) -> None:
    (per-job artifacts); this package ships the verifier's report per run
    (`<run>/verification_report.json`). To re-check the merged artifacts against their
    own raw matrices without the run directory:
-   `python code/tools/merge_results.py --inputs <run>/merged/<group>.json --out /tmp/x`
-   refuses to write if any per-seed metric disagrees with the NPZ matrices.
+   `python code/tools/merge_results.py --inputs <run>/merged/<group>.json --out /tmp/x --allow-unverified`
+   refuses to write if any per-seed metric disagrees with the NPZ matrices
+   (`--allow-unverified` because a re-merged copy is not bound to the run's
+   verification report; without it the tool exits with status 3 after writing).
 4. Tables: `python code/make_class_il_table.py --results <run>/merged/p0_class_entropy.json --out table.tex`.
 5. Figures: `python code/make_v3_figures.py --class-results ... --task-results ... --output-dir figs`.
 

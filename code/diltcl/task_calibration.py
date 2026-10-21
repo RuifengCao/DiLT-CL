@@ -8,11 +8,22 @@ subnetworks.  This module fits a small multinomial logistic classifier to the
 The implementation is NumPy-first so fitting, validation, and serialization can
 be tested without PyTorch.  Every returned state contains plain Python lists and
 scalars and can therefore be written directly to the experiment JSON.
+
+Every state fitted here records ``routing_dtype = "float64"``: the router is
+fitted in float64 and :func:`diltcl.task_inference.infer_task` applies it in
+float64 as well, so the deployed decisions are those of the fitted router (for
+the two bias routers exactly, since each decision is a fixed sequence of
+correctly rounded operations: the standardisation, one product and one
+addition). States without the field were written before v3.0.10 and were
+applied in the scores' float32; ``infer_task`` keeps doing so for them, so
+their recorded decisions can still be re-evaluated exactly.
 """
 
 from __future__ import annotations
 
+import math
 import warnings
+from fractions import Fraction
 
 import numpy as np
 
@@ -58,6 +69,39 @@ def _validated_xy(features, task_ids):
     if (y < 0).any():
         raise ValueError("task_ids must be non-negative")
     return x, y
+
+
+ROUTING_DTYPE = "float64"
+
+
+def balanced_accuracy(pred, y):
+    """Mean over the tasks present in ``y`` of the fraction routed correctly.
+
+    This is the class-balanced accuracy that score-bias-acc maximises; as a
+    fraction it equals plain accuracy when every task has the same number of
+    examples (the two floats can differ in the last bit).
+    """
+    pred = np.asarray(pred)
+    y = np.asarray(y)
+    tasks = np.unique(y)
+    return float(np.mean([np.mean(pred[y == t] == t) for t in tasks]))
+
+
+def balanced_accuracy_exact(pred, y):
+    """:func:`balanced_accuracy` as an exact fraction, without rounding.
+
+    Two routers whose float balanced accuracies differ in the last bit can
+    still be exactly as accurate; comparisons that must not depend on
+    rounding use this value.
+    """
+    pred = np.asarray(pred)
+    y = np.asarray(y)
+    tasks = np.unique(y)
+    if not tasks.size:
+        return Fraction(0)
+    total = sum((Fraction(int(np.sum(pred[y == t] == t)), int(np.sum(y == t)))
+                 for t in tasks), Fraction(0))
+    return total / int(tasks.size)
 
 
 def _sklearn_available():
@@ -235,6 +279,7 @@ def fit_score_logreg(features, task_ids, *, C=1.0, random_state=0,
     return {
         "kind": "score-logreg",
         "solver_backend": backend,
+        "routing_dtype": ROUTING_DTYPE,
         "classes": classes.astype(int).tolist(),
         "feature_mean": mean.tolist(),
         "feature_scale": scale.tolist(),
@@ -307,6 +352,7 @@ def fit_score_bias(features, task_ids, *, C=1.0, max_iter=2000):
     return {
         "kind": "score-bias",
         "solver_backend": "scipy-lbfgs",
+        "routing_dtype": ROUTING_DTYPE,
         "classes": classes.astype(int).tolist(),
         "feature_mean": mean.tolist(),
         "feature_scale": scale.tolist(),
@@ -328,13 +374,24 @@ def fit_score_bias_acc(features, task_ids, *, max_sweeps=8, grid_size=41):
 
     Decision ``argmin_k (x_k - b_k)`` on the raw scores. ``b = 0`` is the raw
     rule and is the starting point, so the fitted router can never be worse
-    than ``argmin`` on its own fitting data in class-balanced accuracy (the
-    objective; the recorded ``fit_accuracy`` is plain accuracy, which matches
-    it when every task contributes the same number of examples). With a single
-    candidate nothing is fitted and ``converged`` is reported as False with
-    zero sweeps. Each bias is chosen by
+    than ``argmin`` on its own fitting data in class-balanced accuracy, the
+    objective. :func:`fit_prefix_calibrators` records that quantity as
+    ``fit_balanced_accuracy`` next to the plain ``fit_accuracy`` (the same
+    fraction when every task contributes the same number of examples; the
+    stored floats can differ in the last bit). The
+    search evaluates decisions in float64, the precision in which
+    ``infer_task`` applies the router (``routing_dtype``), so the recorded
+    accuracies describe the deployed router exactly. With a single candidate
+    there is nothing to fit: the state is the raw rule, reported like the
+    single-class score-logreg fit (``converged`` True, zero sweeps,
+    ``solver_backend = "degenerate-single-class"``). Each bias is chosen by
     coordinate ascent over a grid of candidate offsets (quantiles of the
-    score gaps), keeping the smallest ``|b_k|`` among ties. With ``T``
+    score gaps), keeping the smallest ``|b_k|`` among ties. The objective is
+    compared exactly, in integer arithmetic, so a move is accepted only if
+    it raises the balanced accuracy or keeps it exactly and shrinks
+    ``|b_k|`` (with equal task counts this is the same search as before
+    v3.0.10; with unequal counts float rounding no longer moves biases
+    without a gain). With ``T``
     parameters and a monotone objective, it is the most conservative
     correction that can still fix a systematically over- or under-confident
     expert. Motivated by the P0 finding that both likelihood-fitted routers
@@ -349,23 +406,51 @@ def fit_score_bias_acc(features, task_ids, *, max_sweeps=8, grid_size=41):
     if classes.size != x.shape[1] or not np.array_equal(classes, np.arange(classes.size)):
         raise ValueError("score-bias-acc calibration needs one score column per task 0..T-1")
     n, T = x.shape
-    weights = _balanced_weights(y, classes)
     b = np.zeros(T)
+    counts = np.bincount(y, minlength=T)
+    state = {
+        "kind": "score-bias-acc",
+        "solver_backend": "coordinate-ascent",
+        "routing_dtype": ROUTING_DTYPE,
+        "classes": classes.astype(int).tolist(),
+        "feature_mean": [0.0] * T,
+        "feature_scale": [1.0] * T,
+        "coef": (-np.eye(T)).tolist(),
+        "slope": 1.0,
+        "C": None,
+        "max_iter": int(max_sweeps),
+        "sample_count": int(n),
+        "feature_count": int(T),
+        "class_counts": {str(int(c)): int(counts[c]) for c in classes},
+    }
+    if T == 1:          # a single candidate: nothing to route, nothing to fit
+        state.update({"solver_backend": "degenerate-single-class",
+                      "intercept": [0.0], "n_iter": [0], "converged": True})
+        return state
 
-    def accuracy(bias):
+    # The objective, the class-balanced accuracy sum_t hits_t / n_t, is kept
+    # as an exact integer (scaled by the least common multiple of the task
+    # counts). Per-example float weights summed in float64 carry rounding
+    # noise when the task counts differ, which can make an exactly equal
+    # objective look higher and accept a move that gains nothing. With equal
+    # task counts every weight is one: the objective is the number of correct
+    # routes, as it always was.
+    common = math.lcm(*(int(c) for c in counts))
+    task_weight = [common // int(c) for c in counts]
+
+    def objective(bias):
         decision = (x - bias[None, :])
         # lowest task id wins exact ties, as in infer_task
         pred = np.argmin(decision, axis=1)
-        return float(np.sum(weights * (pred == y)))
+        hits = np.bincount(y[pred == y], minlength=T).tolist()
+        return sum(int(h) * w for h, w in zip(hits, task_weight))
 
     # Candidate offsets: quantiles of "this candidate's score minus the best
     # other candidate's score" -- the amounts by which shifting b_k changes
     # decisions -- plus zero.
-    best = accuracy(b)
+    best = objective(b)
     sweeps = 0
     improved = True
-    if T == 1:          # a single candidate: nothing to route
-        max_sweeps = 0
     while improved and sweeps < max_sweeps:
         improved = False
         sweeps += 1
@@ -378,33 +463,17 @@ def fit_score_bias_acc(features, task_ids, *, max_sweeps=8, grid_size=41):
             for delta in candidates:
                 trial = b.copy()
                 trial[k] = b[k] + delta
-                val = accuracy(trial)
-                if val > best_val + 1e-12 or (abs(val - best_val) <= 1e-12
-                                              and abs(trial[k]) < abs(best_k)):
+                val = objective(trial)
+                if val > best_val or (val == best_val and abs(trial[k]) < abs(best_k)):
                     best_k, best_val = trial[k], val
             if best_k != b[k]:
                 b[k] = best_k
-                if best_val > best + 1e-12:
+                if best_val > best:
                     improved = True
                 best = best_val
-    counts = np.bincount(y, minlength=T)
-    return {
-        "kind": "score-bias-acc",
-        "solver_backend": "coordinate-ascent",
-        "classes": classes.astype(int).tolist(),
-        "feature_mean": [0.0] * T,
-        "feature_scale": [1.0] * T,
-        "coef": (-np.eye(T)).tolist(),
-        "intercept": b.tolist(),
-        "slope": 1.0,
-        "C": None,
-        "max_iter": int(max_sweeps),
-        "n_iter": [int(sweeps)],
-        "converged": bool(not improved),
-        "sample_count": int(n),
-        "feature_count": int(T),
-        "class_counts": {str(int(c)): int(counts[c]) for c in classes},
-    }
+    state.update({"intercept": b.tolist(), "n_iter": [int(sweeps)],
+                  "converged": bool(not improved)})
+    return state
 
 
 CALIBRATION_KINDS = ("score-logreg", "score-bias", "score-bias-acc")
@@ -480,9 +549,14 @@ def fit_prefix_calibrators(features, task_ids, num_tasks, *, C=1.0,
         # calibration samples. Comparing these with the test-time TA tells a
         # router that cannot fit (low fit accuracy) from one that fits the
         # holdout but does not transfer (fit accuracy high, test TA low).
-        state["fit_accuracy"] = float(
-            np.mean(predict_score_logreg(x_stage, state) == y_stage))
-        state["raw_argmin_fit_accuracy"] = float(
-            np.mean(np.argmin(x_stage, axis=1) == y_stage))
+        # The fitted router's decisions are computed in float64, as
+        # infer_task applies it (routing_dtype). Both plain and class-balanced
+        # accuracies are recorded; score-bias-acc maximises the balanced one.
+        fitted = predict_score_logreg(x_stage, state)
+        raw = np.argmin(x_stage, axis=1)
+        state["fit_accuracy"] = float(np.mean(fitted == y_stage))
+        state["raw_argmin_fit_accuracy"] = float(np.mean(raw == y_stage))
+        state["fit_balanced_accuracy"] = balanced_accuracy(fitted, y_stage)
+        state["raw_argmin_fit_balanced_accuracy"] = balanced_accuracy(raw, y_stage)
         states.append(state)
     return states

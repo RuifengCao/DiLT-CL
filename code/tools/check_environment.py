@@ -8,8 +8,16 @@ differs, plus missing ones. With ``--recorded-environment RUN/environment.json``
 it also compares the Python version, GPU model, driver, CUDA and cuDNN
 versions with those recorded by a run.
 
-Exit status 0 when everything matches. Needs no PyTorch for the package check;
-the GPU check imports PyTorch and calls ``nvidia-smi`` when available.
+It also lists the environment variables that change GPU arithmetic without
+showing in a run's recorded execution flags (TF32 switches, cuBLAS
+floating-point emulation, workspace limits; ``NUMERICS_ENVIRONMENT`` in
+``diltcl/preflight.py``). A run recorded since v3.0.10 lists their values
+(null when unset), and any difference from them is a mismatch; an earlier
+run recorded none of them, and one set now is reported as a mismatch.
+
+Exit status 0 when everything matches. Needs no PyTorch for the package and
+environment-variable checks; the GPU check imports PyTorch and calls
+``nvidia-smi`` when available.
 
 Example::
 
@@ -20,13 +28,42 @@ Example::
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
+import os
 import platform
 import re
 import subprocess
 from importlib import metadata
 from pathlib import Path
 from urllib.parse import unquote
+
+
+def _preflight():
+    """``diltcl/preflight.py`` loaded by path (torch-free)."""
+    spec = importlib.util.spec_from_file_location(
+        "diltcl_preflight_for_environment",
+        Path(__file__).resolve().parent.parent / "diltcl" / "preflight.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_numerics_environment(recorded: dict | None, environ=None) -> list[str]:
+    """Numerics-affecting environment variables that differ from a recorded run."""
+    environ = os.environ if environ is None else environ
+    controls = (recorded or {}).get("environment_controls") or {}
+    problems = []
+    for name in _preflight().NUMERICS_ENVIRONMENT:
+        now = environ.get(name)
+        if name in controls:
+            if now != controls[name]:
+                problems.append(f"environment {name}: now {now!r}, recorded {controls[name]!r}")
+        elif now is not None:
+            problems.append(f"environment {name}={now} is set; the recorded run did not "
+                            "record it (runs before v3.0.10), so it ran without it unless "
+                            "set there too: unset it to reproduce that run")
+    return problems
 
 # Packages whose version strings in a wheel URL carry the local tag (+cu130).
 _URL_VERSION = re.compile(r"/(?P<name>[A-Za-z0-9_.]+)-(?P<version>[^-]+)-cp\d+")
@@ -108,8 +145,11 @@ def main(argv=None) -> int:
                    help="A run's environment.json to compare Python/GPU/CUDA/cuDNN with.")
     args = p.parse_args(argv)
     problems = check_packages(parse_lock(args.lock))
+    recorded = None
     if args.recorded_environment:
-        problems += check_runtime(json.loads(args.recorded_environment.read_text(encoding="utf-8")))
+        recorded = json.loads(args.recorded_environment.read_text(encoding="utf-8"))
+        problems += check_runtime(recorded)
+    problems += check_numerics_environment(recorded)
     for line in problems:
         print("MISMATCH", line)
     blocking = [x for x in problems if not x.startswith("driver:")]

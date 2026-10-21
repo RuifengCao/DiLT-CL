@@ -34,6 +34,11 @@ prevent. Completeness is enforced too: every ``(benchmark, method)`` pair must
 cover the same seeds unless ``--allow-incomplete`` is given, in which case the
 gaps are recorded in the merged artifact rather than hidden.
 
+Exit status: 0 when every merged artifact is ``verified``; 3 when an artifact
+was written but is ``unverified`` (the reasons are printed and recorded in
+it), unless ``--allow-unverified`` accepts that deliberately; 2 when the
+merge itself was refused.
+
 Usage
 -----
 Merge a whole suite run directory (one output per job group)::
@@ -773,7 +778,20 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--allow-mismatch", action="append", default=[],
                         metavar="KEY",
                         help="Top-level key allowed to differ between inputs.")
+    parser.add_argument("--allow-unverified", action="store_true",
+                        help="Exit 0 even if a merged artifact is unverified "
+                             "(by default that is exit status 3).")
     return parser.parse_args(argv)
+
+
+def _unverified_status(count: int, allow: bool) -> int:
+    """Exit status after writing ``count`` unverified merged artifacts."""
+    if count and not allow:
+        print(f"merge_results: {count} merged artifact(s) are unverified (reasons "
+              "above); exit status 3. Pass --allow-unverified to accept them.",
+              file=sys.stderr)
+        return 3
+    return 0
 
 
 def main(argv=None) -> int:
@@ -794,7 +812,8 @@ def main(argv=None) -> int:
                   f"({merged['verification_status']})")
             for reason in reasons[:5]:
                 print(f"  not verified: {reason}")
-            return 0
+            return _unverified_status(int(merged["verification_status"] != "verified"),
+                                      args.allow_unverified)
         if args.run_dir is None:
             raise MergeError("give a run directory or --inputs")
         out_dir = args.out_dir or (args.run_dir / "merged")
@@ -841,7 +860,9 @@ def main(argv=None) -> int:
         (out_dir / "merge_summary.json").write_text(
             json.dumps({"merged_at": utc_now(), "run_dir": str(args.run_dir),
                         "groups": summary}, indent=2), encoding="utf-8")
-        return 0
+        return _unverified_status(
+            sum(1 for item in summary.values() if item["verification_status"] != "verified"),
+            args.allow_unverified)
     except MergeError as exc:
         print(f"merge_results: {exc}", file=sys.stderr)
         return 2

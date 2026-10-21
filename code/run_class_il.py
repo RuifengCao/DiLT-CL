@@ -590,6 +590,9 @@ def _run_isolation(method, cfg, setup, device, criterion, *,
             "split_seed": int(calibration_seed),
             "observed_counts": observed_counts,
             "split_counts": split_counts or [],
+            # Every prefix router is applied in float64, the precision it was
+            # fitted in (each state's routing_dtype; v3.0.10).
+            "routing_dtype": "float64",
             "prefix_models": calibrators,
             "final_serving_float_count": _state_floats(calibrators[-1]),
             "serialized_prefix_float_count": sum(

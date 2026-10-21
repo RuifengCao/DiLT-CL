@@ -161,13 +161,25 @@ class MaterializedArrays:
         return int(self.x.shape[0])
 
 
+def _update_with_array(digest, array):
+    """Feed an array's bytes to ``digest`` without copying them.
+
+    Same digest as ``digest.update(array.tobytes())``, but a C-contiguous
+    array is read in place: ``tobytes`` would allocate a full copy, about
+    1.2 GB for the TinyImageNet training split on every cache load.
+    """
+    array = np.ascontiguousarray(array)
+    if array.size:
+        digest.update(memoryview(array).cast("B"))
+
+
 def _content_hash(x, y):
     digest = hashlib.sha256()
     digest.update(b"x")
     digest.update(json.dumps(list(x.shape)).encode("ascii"))
-    digest.update(np.ascontiguousarray(x).tobytes())
+    _update_with_array(digest, x)
     digest.update(b"y")
-    digest.update(np.ascontiguousarray(y).tobytes())
+    _update_with_array(digest, y)
     return digest.hexdigest()
 
 
@@ -292,12 +304,13 @@ def _source_signature(dataset):
     if not samples:
         data = getattr(dataset, "data", None)
         if isinstance(data, np.ndarray):
-            digest = hashlib.sha256(np.ascontiguousarray(data).tobytes())
+            digest = hashlib.sha256()
+            _update_with_array(digest, data)
             labels = getattr(dataset, "targets", None)
             if labels is None:
                 labels = getattr(dataset, "labels", None)
             if labels is not None:
-                digest.update(np.asarray(labels, dtype=np.int64).tobytes())
+                _update_with_array(digest, np.asarray(labels, dtype=np.int64))
             return digest.hexdigest()
         return None
     # ImageFolder lists every file with its root already joined (a relative
@@ -318,10 +331,24 @@ def _source_signature(dataset):
     return digest.hexdigest()
 
 
+def _dataset_root(dataset):
+    """The dataset's root folder with symbolic links resolved.
+
+    The suite resolves ``--data-root`` before starting the jobs, while a tool
+    or a hand-run check may pass the same folder through a symbolic link;
+    both must select the same cache entry. A dataset without a root keys on
+    the empty string.
+    """
+    root = getattr(dataset, "root", "")
+    if isinstance(root, (str, os.PathLike)) and str(root):
+        return os.path.realpath(root)
+    return str(root)
+
+
 def _cache_key(dataset, transform_repr):
     parts = {
         "class": f"{type(dataset).__module__}.{type(dataset).__name__}",
-        "root": str(getattr(dataset, "root", "")),
+        "root": _dataset_root(dataset),
         "train": getattr(dataset, "train", None),
         "split": getattr(dataset, "split", None),
         "len": len(dataset),

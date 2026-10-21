@@ -1,6 +1,6 @@
 # DiLT-CL v3.0 experimental protocol
 
-This document is the normative protocol for new experiments (code v3.0.9). If
+This document is the normative protocol for new experiments (code v3.0.10). If
 code, tables, or older documentation disagree with it, stop and resolve the
 disagreement before running or reporting results.
 
@@ -11,7 +11,7 @@ disagreement before running or reporting results.
 > the declared hardware, the independent verifier has passed, and
 > `tools/merge_results.py` has produced `verified` artifacts.
 
-## Verified semantics (v3.0.9)
+## Verified semantics (v3.0.10)
 
 Each item below was checked by constructing a scenario with a known answer and
 comparing against an independent reference implementation, not by reading the
@@ -41,6 +41,7 @@ code. The v2 items live in `tests/test_real_core.py`; the v3 items in
 | **Second review: resume, data identity, audit inputs (v3.0.7)** | No training or evaluation arithmetic changed. `run_suite.py`: `--dry-run` writes nothing; `--invalidate-methods` given after the change was acknowledged is added to that acknowledgement instead of being ignored; dataset folders linked into the data root are fingerprinted like real ones (real trees hash as before) and every entry a job reads must be in the fingerprint; an `artifacts/` folder on another volume no longer loses the job status; a failing post-run verifier is recorded in `suite_summary.json`; a replaced `pip_freeze.txt` is archived. Decoded images are cached under a key derived from the image files (path, size, modification time, label) or raw arrays, and every cache load recomputes the pixel hash; test splits are recorded with their pixel hash too. The per-example checks require a calibrated file to carry the matched raw pass and the router-fitting inputs, recompute the fitting accuracies in the verifier as well, and use the TF32 rounding bound for jobs that recorded TF32 matrix products. `compare_runs.py` pairs differently routed groups on the experts both trained, aligns incomplete merges by their run records, derives per-entry data hashes for jobs launched before v3.0.1 from an archived per-file list (`--fingerprints`) and compares the decoded-split hashes; `paired_stats.py` aligns seeds per method and names the Holm family by the comparisons it adjusted; `build_results_package.py` keeps per-entry hashes of old fingerprints and leaves build paths out of supplementary manifests |
 | **Third review: GPU test run, one launcher per run directory (v3.0.8)** | No training, evaluation or recording code changed. Two checkpoint re-evaluation tests trained on the runner's device (the GPU when one is present) but re-evaluated on the CPU; CPU and GPU kernels round differently, so they failed on any machine with a GPU. They now re-evaluate on the device the runner used, as `tools/evaluate_checkpoints.py` does by default. `run_suite.py` holds an exclusive lock on its run directory (`.run_suite.lock`) while it runs: a second launcher started on the same directory stops before writing anything instead of launching the same jobs again; a filesystem without lock support gets a warning and runs unlocked. The test suite and the synthetic end-to-end run also pass on the recorded software stack (Python 3.12.3, PyTorch 2.12.1, NumPy 2.4.6, SciPy 1.18.1, scikit-learn 1.9.0) on a CPU |
 | **Fourth review: relative data roots, no silent CPU runs (v3.0.9)** | No training, evaluation or recording code changed. The decoded-image cache key read every `ImageFolder` file as `root/path`, although `ImageFolder` already lists paths joined with its root; a relative data root (for example `evaluate_checkpoints.py --data-root data`) therefore failed on the first TinyImageNet job. Paths are now used as listed; cache keys of absolute roots are unchanged. `run_suite.py` stops a P0, P1 or all profile when PyTorch sees no CUDA device (the runners would otherwise fall back to the CPU silently); `--allow-cpu` runs it deliberately, and the smoke profile runs anywhere. `evaluate_checkpoints.py` records a job whose re-evaluation raises as an error entry and still evaluates and reports the others. The runner-to-audit tests now cover all four routers (raw, score-logreg, score-bias, score-bias-acc) through the verifier, the per-example recomputation and the checkpoint re-evaluation |
+| **Fifth review: routers applied as fitted, audit gaps closed (v3.0.10)** | Training is unchanged; calibrated routing changed. Every fitted router is applied in float64, the precision of its fit (`routing_dtype`), instead of the float32 of the scores, so its decisions and its recorded fitting accuracy describe the same router; decisions can move only where float32 rounding mattered (ties and near-ties), and `tools/routing_precision_audit.py` counts them and rebuilds the float32 results from the job's own records. States without `routing_dtype` keep float32, so earlier artifacts re-evaluate exactly. Router states also record class-balanced fitting accuracies; a one-candidate score-bias-acc stage is reported as `degenerate-single-class` and converged, and the score-bias-acc search compares its objective exactly (unchanged with equal holdout sizes, as in every recorded run; with unequal ones float rounding no longer shifts a bias without a gain). Non-finite routing scores raise a clear error instead of routing to task 0 or failing on an index. Before calibrated jobs start, the suite checks on the GPU that float64 routing is IEEE double arithmetic (exact widening of float32 scores, subnormals included; diagonal routers' decisions equal to NumPy's) and stops if not. Environment variables that change GPU arithmetic outside the recorded flags (`NVIDIA_TF32_OVERRIDE`, cuBLAS emulation, workspace limits) are recorded for the run and every job, the suite warns when one is set, and `check_environment.py` reports it. Per-example checks now also require: an example routed to its own task to carry its own expert's prediction, and raw and calibrated routers that chose the same task to agree; the stored router-fitting rows per task to equal the held-out split (`split_counts`, `observed_counts`); a score-logreg tie flag to have a higher task within rounding of the recorded route; score-bias-acc never to fit below the raw rule (compared as exact fractions). The TF32 rounding bound covers subnormal scores, the score-logreg fitting accuracy tolerates float64 near-ties (another CPU's BLAS; every task within rounding of the winner counts), and `--refit` compares every router parameter in the routing precision. `routing_precision_audit.py` (new) checks each job's records as the verifier does, counts the decisions the precision moved and, against a float32-routed reference, requires the test-set sizes, trained state, stored routers, the raw router's outputs and the oracle accuracies to be recorded there and match exactly, the reference's calibrated metrics to follow from its matrices, and the float32 rebuild to reproduce the calibrated outputs, up to the score-logreg near-ties that can move each count of a cell, in the direction they can move it; it also requires every calibrated reference run to be audited; `compare_runs.py` attributes a difference to the routing precision only when it is confined to the calibrated router's arrays and metrics. `merge_results.py` exits 3 when it writes an unverified artifact (`--allow-unverified` to accept). `run_suite.py` asks PyTorch for GPU memory when `nvidia-smi` fails and warns instead of silently running one job at a time, and a resumed run's disk check counts only unfinished jobs. The decoded-image cache hashes pixels without a 1.2 GB copy and keys on the resolved data root, so a symbolic link to the same data reuses the cache |
 | **Checkpoint re-evaluation (v3.0.5)** | `tools/evaluate_checkpoints.py` loads each persisted isolation state (`weights_only=True`), checks its file and tensor-content SHA-256 against the artifact, rebuilds the model from the artifact's configuration and execution options, re-runs the class-IL evaluation (job router and matched raw router) and compares every matrix, metric and per-example decision; on the recording hardware the comparison is exact. `tools/compare_runs.py` compares an independent re-run with retained artifacts (trained-state content hashes, every NPZ array, every per-seed metric) |
 | **Device data backend (v3)** | Bit-identical to the `DataLoader` pipeline: same `ToTensor`/`Normalize` arithmetic (tensor divisor, no CUDA reciprocal shortcut), same shuffle order and global-RNG consumption per `iter()`, same subset composition; materialisation restores the RNG state it would otherwise consume. Verified batch by batch against `DataLoader` (0 and 2 workers) and end to end through finetune / ER / LwF / DiLT-CL on synthetic on-disk CIFAR-100 and TinyImageNet trees |
 | **Fast numerics (v3)** | Shared-feature multi-head LwF, consolidated EWC quadratic, device reservoir buffer and per-row routed replay equal the v2 objective: same RNG draws, same retained/replayed items, loss and gradients equal to float tolerance, EWC gradient identical and loss offset by a parameter-independent constant. Fused 0/1 mask multiplies are bit-identical to the v2 loops. `--numerics legacy` selects the v2 arithmetic |
@@ -136,14 +137,53 @@ nondegradation guarantee. It is serialized in the same state layout, so the
 common inference path applies it unchanged. ``score-bias-acc`` (v3.0.3)
 fits the per-task biases for *class-balanced routing accuracy* by coordinate
 ascent from ``b = 0`` on the raw scores, so on its fitting data its balanced
-accuracy is never below the raw rule's; every router state records
-``fit_accuracy`` and ``raw_argmin_fit_accuracy``, which are plain (not
-balanced) accuracies. With equal holdout sizes per task, as on
-Split-CIFAR-100 and Split-TinyImageNet, the two coincide; with unequal sizes
-the recorded plain accuracy can fall below the raw rule's. The stage-0 router
-(one candidate) is never fitted, so its state records ``converged: false``
-with zero iterations; this is a reporting artefact, not a failed fit. All are
-leakage-safe:
+accuracy is never below the raw rule's. Its search compares that objective
+exactly (integer arithmetic since v3.0.10, which with equal holdout sizes per
+task, as in every recorded run, is the search it always was); with unequal
+holdout sizes the earlier float sums could accept a move that gained nothing
+and shift a bias for no reason. Every router state records
+``fit_accuracy`` and ``raw_argmin_fit_accuracy`` (plain accuracies) and,
+since v3.0.10, ``fit_balanced_accuracy`` and
+``raw_argmin_fit_balanced_accuracy``; the noninferiority holds for the
+balanced pair, and with equal holdout sizes per task, as on Split-CIFAR-100
+and Split-TinyImageNet, the plain and balanced accuracies are the same
+fraction (the two stored floats can differ in the last bit, because they are
+computed in different orders). A stage with
+one candidate has nothing to fit; since v3.0.10 its score-bias-acc state is
+reported like the single-class score-logreg fit (``converged: true``, zero
+iterations, ``solver_backend: degenerate-single-class``), where earlier
+versions recorded ``converged: false``.
+
+Routers are fitted in float64. Since v3.0.10 every fitted state declares
+``routing_dtype: "float64"`` and is applied on the device in float64, so the
+deployed decisions are those of the fitted router: exactly for the two bias
+routers (per decision, the standardisation, one product and one addition,
+each correctly rounded), and up to float64 summation order for score-logreg. Earlier versions applied the float64 fit in
+the float32 of the routing scores; biases that differ only below float32
+resolution then collapsed, an exact tie fell back to the lowest task ID, and
+the recorded fitting accuracy could describe a router slightly different from
+the deployed one (score-bias-acc on saturated experts: 1--4 calibration
+examples at some stages). States without the field are applied in float32,
+as they were, so their recorded decisions still re-evaluate exactly;
+``tools/routing_precision_audit.py`` rebuilds a float64-routed job's decisions
+in float32 to measure what the change moved. How much moves depends on the
+experts: float32 rounding merges biases and decisions closer than its
+resolution into ties (which go to the lowest task ID) and can reorder two
+such decisions, which is rare for continuous scores -- the 120 calibrated runs
+of September 2026 recorded no exact float32 tie in any test cell -- but
+common when experts saturate and many scores are exactly zero (593 of 1,260
+test decisions on a CPU in the saturated case of
+``tests/test_predictions_audit.py``).
+Exact float64 routing assumes IEEE double arithmetic on the device; the suite
+checks it before starting calibrated jobs (``float64_routing_self_test`` in
+``diltcl/task_inference.py``: exact widening of float32 scores, subnormals
+included, and diagonal routers' decisions equal to NumPy's) and stops if it
+fails. It also reports, without stopping, whether float32 application of a
+router matches NumPy's (``float32_ok``), which the float32 rebuild of the
+original runs relies on; the suite and the audit warn when it does not. Non-finite routing scores stop
+the evaluation with an error naming the experts concerned (earlier versions
+routed them to task 0, or failed with an index error on calibrated routers).
+All routers are leakage-safe:
 
 - each task's calibration examples come from a deterministic training holdout;
 - shared and isolation methods train on the same reduced training split;

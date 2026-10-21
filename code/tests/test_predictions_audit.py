@@ -52,17 +52,19 @@ def _synthetic(T=4, C=3, per_task=(7, 5, 9, 6), seed=0, disjoint=True):
     route = np.full((N, T), -1, np.int16)
     tie = np.zeros((N, T), bool)
     pred = np.full((N, T), -1, np.int16)
+    oracle = np.where(rng.random(N) < 0.7, label, rng.integers(0, C, N)).astype(np.int16)
     for s in range(T):
         rows = true_task <= s
         cand = scores[rows, :s + 1]
         win = cand == cand.min(axis=1, keepdims=True)
         route[rows, s] = win.argmax(axis=1)
         tie[rows, s] = win.sum(axis=1) > 1
-        # A correctly routed example mostly predicts its label.
+        # An example routed to its own task reads its own (oracle) expert;
+        # elsewhere the routed expert mostly predicts the label.
         guess = rng.integers(0, C, rows.sum())
         keep = rng.random(rows.sum()) < 0.6
-        pred[rows, s] = np.where(keep, label[rows], guess)
-    oracle = np.where(rng.random(N) < 0.7, label, rng.integers(0, C, N)).astype(np.int16)
+        other = np.where(keep, label[rows], guess)
+        pred[rows, s] = np.where(route[rows, s] == true_task[rows], oracle[rows], other)
     return {"true_task": true_task, "label_local": label, "oracle_pred_local": oracle,
             "scores": scores, "route_by_stage": route, "tie_by_stage": tie,
             "routed_pred_local_by_stage": pred}
@@ -325,13 +327,34 @@ def test_runner_persists_verifiable_predictions(calibration):
             assert errors == []
         entries = rp.check_job(out.with_suffix(".json"), refit=calibration != "none")
         assert len(entries) == 1 and entries[0]["errors"] == []
+        # A prediction read from another expert than the chosen one is
+        # caught: an example routed to its own task must predict what its
+        # own expert predicts.
+        home = np.argwhere(arrays["route_by_stage"] == arrays["true_task"][:, None])
+        i, s = (int(v) for v in home[0])
+        wrong = {k: v.copy() for k, v in arrays.items()}
+        wrong["routed_pred_local_by_stage"][i, s] = (wrong["oracle_pred_local"][i] + 1) % 4
+        with np.load(f"{out}.npz", allow_pickle=False) as npz:
+            errors = rp.compare_with_artifact(wrong, meta, payload, npz, "cifar", "wsn", 0)
+        assert any("predicted differently from that task's expert" in e for e in errors)
         if calibration != "none":
-            if calibration in ("score-bias", "score-bias-acc"):
-                # One non-zero coefficient per decision: reproduced exactly.
-                assert entries[0]["stored_router"]["route_agreement"] == 1.0
+            assert all(m["routing_dtype"] == "float64" for m in record["prefix_models"])
+            # Routers are applied in float64, as fitted: every kind reproduces
+            # the recorded routes, and a re-fit gives the same parameters.
+            assert entries[0]["stored_router"]["routing_precision"] == "float64"
+            assert entries[0]["stored_router"]["route_agreement"] == 1.0
             assert entries[0]["stored_router"]["errors"] == []
-            if calibration == "score-bias":
-                assert entries[0]["refit"]["route_agreement"] == 1.0
+            assert entries[0]["refit"]["parameters_identical"] is True
+            assert entries[0]["refit"]["route_agreement"] == 1.0
+            assert set(entries[0]["refit"]["max_abs_parameter_difference"]) == {
+                "feature_mean", "feature_scale", "coef", "intercept"}
+            # A router fitted on other data than the held-out split (here the
+            # test scores) has the wrong number of fitting rows per task.
+            on_test = dict(arrays, calibration_features=arrays["scores"],
+                           calibration_task_ids=arrays["true_task"])
+            with np.load(f"{out}.npz", allow_pickle=False) as npz:
+                errors = rp.compare_with_artifact(on_test, meta, payload, npz, "cifar", "wsn", 0)
+            assert any("held-out split sizes" in e for e in errors)
             # Fitting accuracies of every stored prefix router are reproduced.
             fit = entries[0]["fit_accuracy_check"]
             assert fit["stages_checked"] == len(record["prefix_models"]) and fit["errors"] == []
@@ -358,6 +381,873 @@ def test_runner_persists_verifiable_predictions(calibration):
             verifier.validate_predictions(record, payload, npz, out.with_suffix(".json"),
                                           "cifar", "wsn", 0, "wsn", errors)
         assert any("SHA-256" in e for e in errors)
+
+
+def _saturated_bias_acc_case():
+    """Two saturated experts (entropy exactly zero) and biases that differ
+    only below float32 resolution: the fitted float64 router picks task 1,
+    while applying it in float32 makes a tie that falls back to task 0 (the
+    C1 finding of the fourth review)."""
+    torch = pytest.importorskip("torch")
+    b = [1.1044052673094165e-29, 1.1044052673202787e-29]
+    assert np.float32(b[0]) == np.float32(b[1]) and b[0] < b[1]
+    state = {"kind": "score-bias-acc", "classes": [0, 1], "feature_mean": [0.0, 0.0],
+             "feature_scale": [1.0, 1.0], "coef": [[-1.0, -0.0], [-0.0, -1.0]],
+             "intercept": b, "routing_dtype": "float64"}
+    logits = [torch.tensor([[60.0, -60.0, -60.0]]), torch.tensor([[-60.0, 60.0, -60.0]])]
+    return torch, state, logits
+
+
+def test_routers_are_applied_in_the_precision_they_were_fitted_in():
+    torch, state, logits = _saturated_bias_acc_case()
+    from diltcl.task_calibration import predict_score_logreg
+    from diltcl.task_inference import infer_task, task_scores
+    scores = task_scores(logits)
+    assert float(scores.abs().max()) == 0.0                   # fully saturated
+    route, tie = infer_task(logits, calibrator=state, return_ties=True)
+    fitted = predict_score_logreg(scores.T.double().numpy(), state)
+    assert int(route) == int(fitted[0]) == 1 and not bool(tie)
+    # A state written before v3.0.10 has no routing_dtype and keeps its
+    # float32 application, so old recordings re-evaluate exactly.
+    legacy = {k: v for k, v in state.items() if k != "routing_dtype"}
+    route, tie = infer_task(logits, calibrator=legacy, return_ties=True)
+    assert int(route) == 0 and bool(tie)
+    # The audit applies each state in its own precision.
+    arrays = {"true_task": np.array([1], np.int16),
+              "scores": scores.T.numpy().astype(np.float32),
+              "route_by_stage": np.array([[-1, 1]], np.int16),
+              "tie_by_stage": np.array([[False, False]])}
+    stage0 = {"kind": "score-bias-acc", "classes": [0], "feature_mean": [0.0],
+              "feature_scale": [1.0], "coef": [[-1.0]], "intercept": [0.0],
+              "routing_dtype": "float64"}
+    out = rp.stored_router_agreement(arrays, {"kind": "score-bias-acc",
+                                              "prefix_models": [stage0, state]})
+    assert out["errors"] == [] and out["routing_precision"] == "float64"
+    out = rp.stored_router_agreement(arrays, {"kind": "score-bias-acc",
+                                              "prefix_models": [stage0, legacy]})
+    assert out["errors"] and "expected exact" in out["errors"][0]
+    try:
+        infer_task(logits, calibrator={**state, "routing_dtype": "float16"})
+    except ValueError as exc:
+        assert "routing_dtype" in str(exc)
+    else:
+        raise AssertionError("an unknown routing precision must be rejected")
+
+
+@pytest.mark.parametrize("calibrated", [False, True])
+def test_non_finite_scores_stop_the_evaluation_with_a_clear_error(calibrated):
+    torch = pytest.importorskip("torch")
+    from diltcl.task_calibration import fit_prefix_calibrators
+    from diltcl.task_inference import (collect_calibration_features,
+                                       evaluate_class_il_inference, infer_task)
+    forward_t, loaders, cal_loaders = _forward_and_loaders(seed=2)
+    calibrators = None
+    if calibrated:
+        features, task_ids, _ = collect_calibration_features(forward_t, cal_loaders, 3,
+                                                             device="cpu")
+        calibrators = fit_prefix_calibrators(features, task_ids, 3, kind="score-bias")
+
+    def broken(x, t):
+        out = forward_t(x, t)
+        return out * float("nan") if t == 1 else out
+
+    for value in (float("nan"), float("inf")):
+        try:
+            evaluate_class_il_inference(
+                lambda x, t: forward_t(x, t) * value if t == 1 else forward_t(x, t),
+                loaders, 3, 4, device="cpu", calibrators=calibrators)
+        except ValueError as exc:
+            assert "non-finite routing scores for test examples of task 0" in str(exc)
+            assert "per candidate expert: [0, 4, 0]" in str(exc)
+        else:
+            raise AssertionError("non-finite scores must stop the evaluation")
+    try:
+        collect_calibration_features(broken, cal_loaders, 3, device="cpu")
+    except ValueError as exc:
+        assert "held-out calibration examples of task 0" in str(exc)
+    else:
+        raise AssertionError("non-finite calibration scores must stop the fit")
+    x = next(iter(loaders[0]))[0]
+    try:
+        infer_task([broken(x, t) for t in range(3)],
+                   calibrator=None if calibrators is None else calibrators[-1])
+    except ValueError as exc:
+        assert "non-finite routing scores" in str(exc)
+    else:
+        raise AssertionError("infer_task must reject non-finite scores")
+
+
+def test_logistic_tie_flags_must_be_near_ties():
+    model0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[1.0]], "intercept": [0.0]}
+    model1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[1.0, 0.0], [0.0, 1.0]], "intercept": [0.0, 0.0]}
+    for dtype in (None, "float64"):
+        states = [dict(m, **({"routing_dtype": dtype} if dtype else {})) for m in (model0, model1)]
+        record = {"kind": "score-logreg", "prefix_models": states}
+        arrays = {"true_task": np.array([1, 1], np.int16),
+                  "scores": np.array([[0.5, 0.5], [0.0, 3.0]], np.float32),
+                  "route_by_stage": np.array([[-1, 0], [-1, 1]], np.int16),
+                  "tie_by_stage": np.array([[False, True], [False, False]])}
+        out = rp.stored_router_agreement(arrays, record)
+        assert out["errors"] == [] and out["tie_flag_errors"] == 0, dtype
+        # Row 1 has a clear winner: a recorded tie there is impossible.
+        flagged = dict(arrays, tie_by_stage=np.array([[False, True], [False, True]]))
+        out = rp.stored_router_agreement(flagged, record)
+        assert out["tie_flag_errors"] == 1 and out["errors"], dtype
+        # A single candidate never ties.
+        flagged = dict(arrays, route_by_stage=np.array([[0, 0], [0, 1]], np.int16),
+                       true_task=np.array([0, 0], np.int16),
+                       tie_by_stage=np.array([[True, True], [False, False]]))
+        out = rp.stored_router_agreement(flagged, record)
+        assert out["tie_flag_errors"] == 1, dtype
+
+
+def test_tf32_bound_covers_subnormal_scores():
+    """Tensor cores may flush subnormal float32 inputs to zero, which no
+    relative bound covers: saturated experts give entropies like 1e-42, and a
+    correct TF32 run then ties where float32 does not (C4 of the fourth
+    review; only for routers applied in float32, i.e. before v3.0.10)."""
+    model0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[-1.0]], "intercept": [0.0]}
+    model1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[-1.0, -0.0], [-0.0, -1.0]], "intercept": [0.0, 0.0]}
+    arrays = {"true_task": np.array([1], np.int16),
+              "scores": np.array([[3e-42, 1e-42]], np.float32),
+              "route_by_stage": np.array([[-1, 0]], np.int16),     # TF32: [0, 0] ties -> 0
+              "tie_by_stage": np.array([[False, True]])}
+    record = {"kind": "score-bias-acc", "prefix_models": [model0, model1]}
+    out = rp.stored_router_agreement(arrays, record, tf32=True)
+    assert out["errors"] == [] and out["near_tie_disagreements"] == 1
+    out = rp.stored_router_agreement(arrays, record, tf32=False)
+    assert out["errors"] and "float32" in out["errors"][0]
+
+
+def test_calibration_inputs_must_be_the_recorded_holdout():
+    arrays = {"calibration_task_ids": np.repeat(np.arange(3), [4, 4, 4]).astype(np.int16)}
+    record = {"split_counts": [{"train": 36, "calibration": 4}] * 3, "observed_counts": [4, 4, 4]}
+    assert rp.calibration_count_errors(arrays, record, 3) == []
+    assert any("held-out split sizes" in e for e in rp.calibration_count_errors(
+        arrays, dict(record, split_counts=[{"calibration": 5}, {"calibration": 4},
+                                           {"calibration": 3}]), 3))
+    assert any("examples scored for fitting" in e for e in rp.calibration_count_errors(
+        arrays, dict(record, observed_counts=[4, 4, 5]), 3))
+    assert any("without recorded held-out split sizes" in e for e in rp.calibration_count_errors(
+        arrays, {"split_counts": []}, 3))
+
+
+def test_fit_accuracy_check_tolerates_only_float64_near_ties():
+    """A score-logreg decision is a full matrix product: on another CPU's BLAS
+    an exact float64 tie may resolve the other way, so the check allows one
+    example per near-tie and no more; the bias routers are exact everywhere."""
+    tc = rp._task_calibration()
+    y = np.array([0, 0, 1, 1])
+    x = np.array([[0.5, 0.5], [1.0, 0.0], [0.0, 1.0], [0.2, 0.9]], np.float32)
+    identity = {"kind": "score-logreg", "classes": [0, 1], "feature_mean": [0.0, 0.0],
+                "feature_scale": [1.0, 1.0], "coef": [[1.0, 0.0], [0.0, 1.0]],
+                "intercept": [0.0, 0.0], "routing_dtype": "float64"}
+    single = {"kind": "score-logreg", "classes": [0], "feature_mean": [0.0],
+              "feature_scale": [1.0], "coef": [[0.0]], "intercept": [0.0],
+              "routing_dtype": "float64", "fit_accuracy": 1.0}
+    fitted = tc.predict_score_logreg(x, identity)
+    assert list(fitted) == [0, 0, 1, 1]               # row 0 ties; lowest task wins
+    stage1 = dict(identity, fit_accuracy=float(np.mean(fitted == y)),
+                  fit_balanced_accuracy=tc.balanced_accuracy(fitted, y))
+    arrays = {"calibration_features": x, "calibration_task_ids": y.astype(np.int16)}
+    record = {"kind": "score-logreg", "prefix_models": [single, stage1]}
+    out = rp.fit_accuracy_check(arrays, record)
+    assert out["errors"] == [] and out["near_tie_examples"] == 1
+    # The tied example resolved the other way on the fitting machine: allowed.
+    flipped = json.loads(json.dumps(record))
+    flipped["prefix_models"][1]["fit_accuracy"] -= 0.25
+    flipped["prefix_models"][1]["fit_balanced_accuracy"] -= 0.25
+    assert rp.fit_accuracy_check(arrays, flipped)["errors"] == []
+    # Two examples' worth is beyond the single near-tie.
+    flipped["prefix_models"][1]["fit_accuracy"] -= 0.25
+    assert rp.fit_accuracy_check(arrays, flipped)["errors"]
+    # The bias routers are exact: no slack at all.
+    rng = np.random.default_rng(5)
+    yb = np.repeat(np.arange(3), 6)
+    xb = rng.normal(size=(yb.size, 3)).astype(np.float32)
+    bias = tc.fit_prefix_calibrators(xb, yb, 3, kind="score-bias-acc")
+    arrays = {"calibration_features": xb, "calibration_task_ids": yb.astype(np.int16)}
+    record = {"kind": "score-bias-acc", "prefix_models": bias}
+    assert rp.fit_accuracy_check(arrays, record)["errors"] == []
+    nudged = json.loads(json.dumps(record))
+    nudged["prefix_models"][-1]["fit_balanced_accuracy"] += 1.0 / yb.size
+    assert rp.fit_accuracy_check(arrays, nudged)["errors"]
+
+
+def _self_consistent(states, x, y):
+    """Recompute every stage's recorded fitting accuracies from its own router,
+    as the runner records them (a forged state that is consistent with itself)."""
+    tc = rp._task_calibration()
+    for stage, state in enumerate(states):
+        rows = y <= stage
+        xs, ys = np.asarray(x, np.float64)[rows, :stage + 1], y[rows]
+        fitted, raw = tc.predict_score_logreg(xs, state), np.argmin(xs, axis=1)
+        state["fit_accuracy"] = float(np.mean(fitted == ys))
+        state["raw_argmin_fit_accuracy"] = float(np.mean(raw == ys))
+        if "fit_balanced_accuracy" in state:
+            state["fit_balanced_accuracy"] = tc.balanced_accuracy(fitted, ys)
+            state["raw_argmin_fit_balanced_accuracy"] = tc.balanced_accuracy(raw, ys)
+    return states
+
+
+def test_accuracy_router_may_never_fit_below_the_raw_rule():
+    rng = np.random.default_rng(9)
+    T = 3
+    y = np.repeat(np.arange(T), 5)
+    x = rng.normal(size=(y.size, T))
+    x[np.arange(y.size), y] -= 2.0                  # the raw rule is mostly right
+    x = x.astype(np.float32)
+    tc = rp._task_calibration()
+    states = tc.fit_prefix_calibrators(x, y, T, kind="score-bias-acc")
+    arrays = {"calibration_features": x, "calibration_task_ids": y.astype(np.int16)}
+    record = {"kind": "score-bias-acc", "prefix_models": states}
+    assert rp.fit_accuracy_check(arrays, record)["errors"] == []
+    # A degraded router whose recorded accuracies are its own: every example
+    # goes to task 0. Recomputing the fields cannot catch it; the rule can.
+    degraded = json.loads(json.dumps(record))
+    degraded["prefix_models"][-1]["intercept"] = [1e6, 0.0, 0.0]
+    _self_consistent(degraded["prefix_models"], x, y)
+    errors = rp.fit_accuracy_check(arrays, degraded)["errors"]
+    assert errors and all("below the raw rule" in e for e in errors), errors
+    # Records written before v3.0.10 (no routing_dtype, plain accuracies
+    # only) are held to the same rule: with equal task counts their search
+    # compared exact integers too.
+    legacy = json.loads(json.dumps(degraded))
+    for s in legacy["prefix_models"]:
+        for key in ("routing_dtype", "fit_balanced_accuracy", "raw_argmin_fit_balanced_accuracy"):
+            s.pop(key, None)
+    errors = rp.fit_accuracy_check(arrays, legacy)["errors"]
+    assert errors and all("below the raw rule" in e for e in errors), errors
+
+
+def test_accuracy_router_rule_compares_balanced_accuracies_exactly():
+    """Task counts 2, 3, 3: the stored router (bias +0.5 on task 1) and the
+    raw rule route (1, 2, 1) and (1, 0, 3) examples per task correctly --
+    exactly as accurate, but the router's float balanced accuracy is one ulp
+    lower. Comparing the recorded floats rejected this correct fit (P1 of the
+    second round-5 review)."""
+    y = np.repeat([0, 1, 2], [2, 3, 3])
+    x = np.array([[0, 1, 1], [1, 1, 0],                     # task 0
+                  [1, 0.3, 0], [1, 0.3, 0], [0, 1, 1],      # task 1
+                  [1, 0.3, 0], [1, 0.3, 0], [1, 1, 0]],     # task 2
+                 dtype=np.float32)
+    layout = {"kind": "score-bias-acc", "routing_dtype": "float64"}
+
+    def router(bias):
+        T = len(bias)
+        return dict(layout, classes=list(range(T)), feature_mean=[0.0] * T,
+                    feature_scale=[1.0] * T, coef=(-np.eye(T)).tolist(), intercept=bias,
+                    fit_balanced_accuracy=0.0, raw_argmin_fit_balanced_accuracy=0.0)
+
+    states = _self_consistent([router([0.0]), router([0.0, 0.0]), router([0.0, 0.5, 0.0])], x, y)
+    tc = rp._task_calibration()
+    fitted = tc.predict_score_logreg(x.astype(np.float64), states[-1])
+    assert np.bincount(y[fitted == y], minlength=3).tolist() == [1, 2, 1]
+    assert states[-1]["fit_balanced_accuracy"] < states[-1]["raw_argmin_fit_balanced_accuracy"]
+    arrays = {"calibration_features": x, "calibration_task_ids": y.astype(np.int16)}
+    record = {"kind": "score-bias-acc", "prefix_models": states}
+    assert rp.fit_accuracy_check(arrays, record)["errors"] == []
+    # One more example lost is a real loss, however small the float gap.
+    worse = json.loads(json.dumps(record))
+    worse["prefix_models"][-1]["intercept"] = [0.0, 0.5, -0.5]
+    _self_consistent(worse["prefix_models"], x, y)
+    assert any("below the raw rule" in e for e in rp.fit_accuracy_check(arrays, worse)["errors"])
+
+
+def test_a_logistic_tie_is_checked_against_the_recorded_route():
+    """A legal float64 matrix product can record an exact tie between tasks 0
+    and 1 while NumPy ranks task 2 between them, with a far smaller error
+    bound than task 0's: checking NumPy's top two rejected the correct tie
+    flag (P2 of the second round-5 review). The two summation orders of the
+    decision of task 0 are RN(RN(L x0) - L) and RN(L x0 - L) (one FMA)."""
+    from fractions import Fraction
+    L = 1.0e6 + 0.1234
+    stage0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[0.0]], "intercept": [0.0], "routing_dtype": "float64"}
+    stage1 = {"classes": [0, 1], "feature_mean": [0.0] * 2, "feature_scale": [1.0] * 2,
+              "coef": [[0.0, 0.0], [0.0, 0.0]], "intercept": [0.0, 0.0],
+              "routing_dtype": "float64"}
+    for k in range(1, 4000):
+        x0 = float(np.float32(1.0) + np.float32(k) * np.float32(2.0 ** -23))
+        x = np.array([[x0, 1.0, 0.5]], np.float32)
+        probe = {"classes": [0, 1, 2], "feature_mean": [0.0] * 3, "feature_scale": [1.0] * 3,
+                 "coef": [[L, -L, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                 "intercept": [0.0, 0.0, 0.0], "routing_dtype": "float64"}
+        numpy_d0 = rp.apply_router(x, probe, "float64")["decision"][0, 0]
+        orders = ((x0 * L) - L, float(Fraction(x0) * Fraction(L) - Fraction(L)))
+        device_d0 = max(orders)
+        if device_d0 > numpy_d0:
+            break
+    else:
+        raise AssertionError("no summation order above NumPy's found")
+    gap = (device_d0 - numpy_d0) / 2
+    # Device: task 0 ties task 1 exactly (route 0, tie); NumPy: 1 > 2 > 0.
+    state = dict(probe, intercept=[0.0, device_d0, device_d0 - gap])
+    applied = rp.apply_router(x, state, "float64")
+    assert int(applied["pred"][0]) == 1 and not rp._within_rounding(applied, 0, 1, 2)
+    arrays = {"true_task": np.array([2], np.int16), "scores": x,
+              "route_by_stage": np.array([[-1, -1, 0]], np.int16),
+              "tie_by_stage": np.array([[False, False, True]])}
+    record = {"kind": "score-logreg", "prefix_models": [stage0, stage1, state]}
+    out = rp.stored_router_agreement(arrays, record)
+    assert out["errors"] == [] and out["tie_flag_errors"] == 0, out
+    assert out["near_tie_disagreements"] == 1
+    # A tie recorded at the highest candidate has no higher partner.
+    forged = dict(arrays, route_by_stage=np.array([[-1, -1, 2]], np.int16))
+    assert rp.stored_router_agreement(forged, record)["tie_flag_errors"] == 1
+
+
+def test_near_ties_compare_every_candidate_with_the_winner():
+    """A lower decision with a large error bound can overtake the winner even
+    when the runner-up, with a tiny bound, cannot."""
+    applied = {"classes": np.array([0, 1, 2]), "pred": np.array([0]),
+               "decision": np.array([[1.0, 0.9, 0.5]]),
+               "bound": np.array([[1e-6, 1e-6, 0.3]])}
+    assert bool(rp.near_tie_rows(applied)[0])
+    applied["bound"] = np.array([[1e-6, 1e-6, 1e-3]])
+    assert not bool(rp.near_tie_rows(applied)[0])
+    # A tie partner must lie above the recorded route.
+    applied["bound"] = np.array([[1e-6, 0.1, 1e-6]])
+    assert bool(rp.tie_partner_within_rounding(applied, [0])[0])
+    assert not bool(rp.tie_partner_within_rounding(applied, [1])[0])
+
+
+def test_the_float64_routing_self_test_detects_inexact_arithmetic(monkeypatch):
+    pytest.importorskip("torch")
+    import diltcl.task_inference as ti
+    report = ti.float64_routing_self_test("cpu")
+    assert report["ok"] and report["subnormal_scores"] > 0, report
+    original = ti.apply_calibrator
+
+    def float32_routing(scores, calibrator):
+        return original(scores, {k: v for k, v in calibrator.items() if k != "routing_dtype"})
+
+    monkeypatch.setattr(ti, "apply_calibrator", float32_routing)
+    report = ti.float64_routing_self_test("cpu")
+    assert not report["ok"] and report["decision_mismatches"] > 0, report
+    # A device that flushes float32 subnormals passes the float64 test but not
+    # the (reported) float32 one, which the float32 rebuild relies on.
+    torch = pytest.importorskip("torch")
+
+    def flushing(scores, calibrator):
+        if "routing_dtype" not in calibrator:
+            tiny = torch.finfo(torch.float32).tiny
+            scores = torch.where(scores.abs() < tiny, torch.zeros_like(scores), scores)
+        return original(scores, calibrator)
+
+    monkeypatch.setattr(ti, "apply_calibrator", flushing)
+    report = ti.float64_routing_self_test("cpu")
+    assert report["ok"] and not report["float32_ok"], report
+    assert report["float32_tie_mismatches"] > 0, report
+
+
+def test_routes_read_from_the_wrong_expert_are_rejected():
+    T, C, per_task = 4, 3, (7, 5, 9, 6)
+    arrays = _synthetic(T=T, C=C, per_task=per_task)
+    meta = {"num_tasks": T, "classes_per_task": C}
+    assert rp.structural_errors(arrays, meta, list(per_task)) == []
+    home = np.argwhere(arrays["route_by_stage"] == arrays["true_task"][:, None])
+    i, s = (int(v) for v in home[0])
+    wrong = {k: v.copy() for k, v in arrays.items()}
+    wrong["routed_pred_local_by_stage"][i, s] = (wrong["oracle_pred_local"][i] + 1) % C
+    assert any("predicted differently" in e
+               for e in rp.structural_errors(wrong, meta, list(per_task)))
+    # Raw and calibrated routers that chose the same task read the same expert.
+    both = dict(arrays)
+    both.update({f"raw_{k}": v.copy() for k, v in arrays.items()})
+    away = np.argwhere((arrays["route_by_stage"] >= 0)
+                       & (arrays["route_by_stage"] != arrays["true_task"][:, None]))
+    i, s = (int(v) for v in away[0])
+    both["raw_routed_pred_local_by_stage"][i, s] = (both["routed_pred_local_by_stage"][i, s] + 1) % C
+    assert any("same task chosen by the raw and the calibrated router" in e
+               for e in rp.structural_errors(both, meta, list(per_task)))
+
+
+def test_float32_rebuild_counts_the_decisions_the_precision_moved():
+    _, state, logits = _saturated_bias_acc_case()
+    audit = _load("routing_precision_audit_unit", ROOT / "tools" / "routing_precision_audit.py")
+    from diltcl.task_inference import task_scores
+    scores = task_scores(logits).T.numpy().astype(np.float32)
+    stage0 = {"kind": "score-bias-acc", "classes": [0], "feature_mean": [0.0],
+              "feature_scale": [1.0], "coef": [[-1.0]], "intercept": [0.0],
+              "routing_dtype": "float64"}
+    arrays = {"true_task": np.array([1], np.int16), "label_local": np.array([2], np.int16),
+              "oracle_pred_local": np.array([2], np.int16), "scores": scores,
+              "route_by_stage": np.array([[-1, 1]], np.int16),
+              "tie_by_stage": np.array([[False, False]]),
+              "routed_pred_local_by_stage": np.array([[-1, 2]], np.int16)}
+    rebuild = audit.float32_rebuild(arrays, {"kind": "score-bias-acc",
+                                             "prefix_models": [stage0, state]})
+    assert rebuild["routes_moved"] == 1 and rebuild["tie_flags_moved"] == 1
+    assert rebuild["routes_moved_by_stage"] == [0, 1]
+    moved = rebuild["arrays"]
+    assert moved["route_by_stage"][0, 1] == 0 and moved["tie_by_stage"][0, 1]
+    # Correct under float64 routing, wrong under float32 (routed to task 0).
+    assert rp.recompute(arrays, 2)["result_matrix"][1, 1] == 100.0
+    assert rp.recompute(moved, 2)["result_matrix"][1, 1] == 0.0
+
+
+@pytest.mark.parametrize("calibration", ["score-bias-acc", "score-logreg"])
+def test_float32_rebuild_reproduces_a_float32_routed_run(calibration, monkeypatch, tmp_path):
+    """The audit's float32 rebuild of a float64-routed job must reproduce the
+    same job run with float32 routing (v3.0.9's behaviour) exactly."""
+    import run_class_il as class_il
+    audit = _load("routing_precision_audit_e2e", ROOT / "tools" / "routing_precision_audit.py")
+    merge = _load("merge_for_precision_audit", ROOT / "tools" / "merge_results.py")
+    compare = _load("compare_for_precision_audit", ROOT / "tools" / "compare_runs.py")
+    job = "grp__cifar__seed0__wsn"
+    new = tmp_path / "new" / "artifacts" / job / "result"
+    new.parent.mkdir(parents=True)
+    _run_runner(str(new), str(new.parent / "predictions"), ("wsn",), calibration=calibration)
+    original = class_il.fit_prefix_calibrators
+
+    def float32_routed(*args, **kwargs):
+        states = original(*args, **kwargs)
+        for state in states:
+            state.pop("routing_dtype")
+        return states
+
+    monkeypatch.setattr(class_il, "fit_prefix_calibrators", float32_routed)
+    old = tmp_path / "old" / "artifacts" / job / "result"
+    old.parent.mkdir(parents=True)
+    _run_runner(str(old), str(old.parent / "predictions"), ("wsn",), calibration=calibration)
+    monkeypatch.setattr(class_il, "fit_prefix_calibrators", original)
+    for side, prefix in (("old", old), ("new", new)):
+        assert merge.main(["--inputs", f"{prefix}.json", "--out",
+                           str(tmp_path / f"{side}_merged" / "grp"), "--allow-unverified"]) == 0
+    report = tmp_path / "precision.json"
+    code = audit.main(["--run-dir", str(tmp_path / "new"), "--reference",
+                       str(tmp_path / "old_merged"), "--out", str(report)])
+    result = json.loads(report.read_text())
+    assert code == 0 and result["status"] == "explained", result["summary"]
+    entry = result["entries"][0]
+    assert entry["routing_dtype"] == "float64" and entry["reference"]["identical"]
+    assert entry["reference"]["matrix_differences"] == {}
+    # compare_runs names the precision change instead of calling it an anomaly.
+    out = compare.compare_group("grp", tmp_path / "old_merged" / "grp.json",
+                                tmp_path / "new_merged" / "grp.json")
+    assert out["router_precision"] == {"reference": "float32", "candidate": "float64"}
+    assert out["summary"]["router_precision_changed"] is True
+    assert out["summary"]["state_identical"] == 1
+
+
+class _Archive(dict):
+    """A ``result.npz`` stand-in: ``files`` and item access."""
+
+    @property
+    def files(self):
+        return list(self)
+
+
+_RECORD = {"kind": "score-logreg", "trained_state": {"content_sha256": "ab" * 32},
+           "prefix_models": [{"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+                              "coef": [[1.0]], "intercept": [0.0]},
+                             {"classes": [0, 1], "feature_mean": [0.0, 0.0],
+                              "feature_scale": [1.0, 1.0], "coef": [[1.0, 0.0], [0.0, 1.0]],
+                              "intercept": [0.0, 0.0]}]}
+
+
+def _reference_artifacts(audit, arrays, T, key="cifar/wsn/seed0"):
+    """Merged artifacts of a calibrated job recorded as ``arrays``."""
+    own, raw = rp.recompute(arrays, T), rp.recompute(arrays, T, prefix="raw_")
+    metrics = dict(audit.per_seed_metrics(own["stats"], own["result_matrix"]))
+    metrics.update(audit.fixed_metrics(own, raw))
+    npz = _Archive()
+    for name, suffix in audit.MATRICES:
+        npz[key + suffix] = own[name]
+    for name, suffix in audit.RAW_MATRICES:
+        npz[key + suffix] = raw[name]
+    counts = np.bincount(arrays["true_task"].astype(np.int64), minlength=T).tolist()
+    payload = {"seeds": [0], "per_seed": {"cifar": {"wsn": [metrics]}},
+               "benchmark_metadata": {"cifar": {"per_seed_counts": {
+                   "0": {"isolation": {"test_samples_per_task": counts}}}}},
+               "calibration": {"cifar": {"wsn": {"0": json.loads(json.dumps(_RECORD))}}}}
+    return payload, npz
+
+
+def test_the_reference_may_differ_only_by_the_near_ties_counted_in_a_cell():
+    """A score-logreg decision near a tie may go either way between NumPy's
+    float32 and the GPU's, but only among the tasks within rounding of its
+    winner. A differing cell is accepted up to the number of such decisions
+    that can move that count, by integer counts -- for the conditional
+    accuracy too, whose denominator (correct routes) moves with the decision
+    -- and never for the raw router, the oracle accuracies, or a reference
+    whose metrics do not follow from its own matrices."""
+    audit = _load("routing_precision_audit_cells", ROOT / "tools" / "routing_precision_audit.py")
+    T = 2
+    arrays = _synthetic(T=T, C=3, per_task=(8, 8), seed=4)
+    arrays.update({f"raw_{k}": v.copy() for k, v in list(arrays.items())})
+    home = [i for i in range(arrays["true_task"].size)
+            if arrays["true_task"][i] == 0 and arrays["route_by_stage"][i, 1] == 0
+            and arrays["routed_pred_local_by_stage"][i, 1] == arrays["label_local"][i]]
+    assert len(home) >= 2
+
+    def reference_with(moved_examples):
+        moved = {k: v.copy() for k, v in arrays.items()}
+        for i in moved_examples:        # sent to task 1, whose expert errs
+            moved["route_by_stage"][i, 1] = 1
+            moved["routed_pred_local_by_stage"][i, 1] = (moved["label_local"][i] + 1) % 3
+        return _reference_artifacts(audit, moved, T)
+
+    def cells(**at_stage1_task0):
+        out = {name: np.zeros((T, T), np.int64) for name in (
+            "routes_lost_right", "routes_gained_right", "routes_lost_wrong",
+            "routes_gained_wrong", "ties_lost", "ties_gained", "near")}
+        for name, value in at_stage1_task0.items():
+            out[name][1, 0] = value
+        return out
+
+    own, raw = rp.recompute(arrays, T), rp.recompute(arrays, T, prefix="raw_")
+    job = {"benchmark": "cifar", "method": "wsn", "seed": 0, "disjoint": True,
+           "record": json.loads(json.dumps(_RECORD)),
+           "counts": np.bincount(arrays["true_task"].astype(np.int64), minlength=T),
+           "rebuilt": own, "raw": raw,
+           "metrics": audit.per_seed_metrics(own["stats"], own["result_matrix"]),
+           "fixed": audit.fixed_metrics(own, raw), "cells": cells()}
+    same, same_npz = _reference_artifacts(audit, arrays, T)
+    assert audit.compare_with_reference(job, same, same_npz)["identical"]
+    payload, npz = reference_with(home[:1])
+    assert not np.array_equal(npz["cifar/wsn/seed0/conditional_class"],
+                              own["conditional_class_matrix"])
+    out = audit.compare_with_reference(job, payload, npz)
+    assert not out["identical"] and "cifar/wsn/seed0/conditional_class" in out["matrix_differences"]
+    # One near-tie decision of task 0 at stage 1 routed home here, whose own
+    # expert is right: the reference may have lost that correct route.
+    job["cells"] = cells(routes_lost_right=1, ties_gained=1, near=1)
+    out = audit.compare_with_reference(job, payload, npz)
+    assert out["identical"] and out["matrix_differences"] == {}, out
+    assert "cifar/wsn/seed0/conditional_class" in out["within_near_ties"]
+    assert out["metric_differences"]             # explained by the cells
+    # ...but not gained one: a near-tie can move a count only one way.
+    job["cells"] = cells(routes_gained_right=1, ties_gained=1, near=1)
+    assert not audit.compare_with_reference(job, payload, npz)["identical"]
+    # ...and not with a wrong own expert, which moves no correct prediction.
+    job["cells"] = cells(routes_lost_wrong=1, ties_gained=1, near=1)
+    assert not audit.compare_with_reference(job, payload, npz)["identical"]
+    # A near-tie between two other tasks can change only the tie count.
+    job["cells"] = cells(ties_gained=1, near=1)
+    out = audit.compare_with_reference(job, payload, npz)
+    assert not out["identical"] and "cifar/wsn/seed0/task_inference" in out["matrix_differences"]
+    # Two decisions moved where one near-tie was counted: a real difference.
+    job["cells"] = cells(routes_lost_right=1, ties_gained=1, near=1)
+    payload2, npz2 = reference_with(home[:2])
+    assert not audit.compare_with_reference(job, payload2, npz2)["identical"]
+    # The raw router and the oracle accuracies get no tolerance.
+    bad = _Archive(npz)
+    bad["cifar/wsn/seed0/raw_result"] = npz["cifar/wsn/seed0/raw_result"] + 1.0
+    assert not audit.compare_with_reference(job, payload, bad)["identical"]
+    worse = json.loads(json.dumps(payload))
+    worse["per_seed"]["cifar"]["wsn"][0]["MicroOracleACC"] += 1.0
+    out = audit.compare_with_reference(job, worse, npz)
+    assert not out["identical"] and "MicroOracleACC" in out["fixed_metric_differences"]
+    # A reference metric that its own matrices do not imply is never accepted,
+    # even where the matrices are within near-ties.
+    inconsistent = json.loads(json.dumps(payload))
+    inconsistent["per_seed"]["cifar"]["wsn"][0]["ACC"] += 5.0
+    out = audit.compare_with_reference(job, inconsistent, npz)
+    assert not out["identical"] and "ACC" in out["reference_inconsistent_metrics"]
+    # What the precision cannot change must be in the reference to be compared.
+    for field, label in (("benchmark_metadata", "test-set sizes"),
+                         ("calibration", "trained-state hash")):
+        partial = {k: v for k, v in same.items() if k != field}
+        out = audit.compare_with_reference(job, partial, same_npz)
+        assert not out["identical"] and label in out["missing_in_reference"], field
+    other = json.loads(json.dumps(same))
+    other["calibration"]["cifar"]["wsn"]["0"]["prefix_models"][1]["intercept"] = [0.0, 1e-9]
+    out = audit.compare_with_reference(job, other, same_npz)
+    assert not out["identical"] and "stage1/intercept" in out["router_differences"]
+
+
+def test_near_tie_cells_follow_the_direction_a_decision_can_move():
+    """float32_rebuild classifies every score-logreg near-tie decision: routed
+    home here (another order can only lose the route), own task within
+    rounding but not winning (can only gain it), or neither (only its tie
+    flag can change); TF32 references make the bias routers inexact too."""
+    audit = _load("routing_precision_audit_direction", ROOT / "tools" / "routing_precision_audit.py")
+    stage0 = {"classes": [0], "feature_mean": [0.0], "feature_scale": [1.0],
+              "coef": [[1.0]], "intercept": [0.0]}
+    stage1 = {"classes": [0, 1], "feature_mean": [0.0, 0.0], "feature_scale": [1.0, 1.0],
+              "coef": [[1.0, 0.0], [0.0, 1.0]], "intercept": [0.0, 0.0]}
+    scores = np.array([[0.5, 0.5], [0.5, 0.5], [0.9, 0.1], [0.1, 0.9]], np.float32)
+    true_task = np.array([0, 1, 0, 1], np.int16)
+    arrays = {"true_task": true_task, "label_local": np.array([1, 1, 1, 1], np.int16),
+              "oracle_pred_local": np.array([1, 0, 1, 1], np.int16), "scores": scores,
+              "route_by_stage": np.array([[0, 0], [-1, 0], [0, 0], [-1, 1]], np.int16),
+              "tie_by_stage": np.array([[False, True], [False, True], [False, False],
+                                        [False, False]]),
+              "routed_pred_local_by_stage": np.array([[1, 1], [-1, 1], [1, 1], [-1, 1]],
+                                                     np.int16)}
+    record = {"kind": "score-logreg", "prefix_models": [stage0, stage1]}
+    rebuild = audit.float32_rebuild(arrays, record)
+    assert rebuild["routes_moved"] == 0 and rebuild["precision"] == "float32"
+    # Rows 0 and 1 tie exactly (task 0 wins both); rows 2 and 3 are clear.
+    assert rebuild["near_tie_mask"][:, 1].tolist() == [True, True, False, False]
+    assert rebuild["near_home_mask"][:, 1].tolist() == [True, False, False, False]
+    assert rebuild["near_away_mask"][:, 1].tolist() == [False, True, False, False]
+    cells = audit.near_tie_cells(rebuild, arrays, 2)
+    assert cells["routes_lost_right"][1].tolist() == [1, 0]     # row 0: home, expert right
+    assert cells["routes_gained_wrong"][1].tolist() == [0, 1]   # row 1: own task 1 within rounding
+    assert cells["ties_lost"][1].tolist() == [1, 1] and cells["ties_gained"][1].tolist() == [0, 0]
+    # A bias router is exact in float32, but not under a TF32 reference.
+    bias = {"kind": "score-bias-acc", "prefix_models": [
+        dict(stage0, coef=[[-1.0]]), dict(stage1, coef=[[-1.0, -0.0], [-0.0, -1.0]])]}
+    assert not audit.float32_rebuild(arrays, bias)["near_tie_mask"].any()
+    tf32 = audit.float32_rebuild(arrays, bias, tf32=True)
+    assert tf32["precision"] == "tf32" and tf32["near_tie_mask"][:, 1].tolist()[:2] == [True, True]
+
+
+def test_the_audit_reports_a_gpu_whose_float32_routing_is_not_numpys(tmp_path):
+    audit = _load("routing_precision_audit_env", ROOT / "tools" / "routing_precision_audit.py")
+    assert audit.device_float32_routing(tmp_path) is None
+    for value in (True, False):
+        (tmp_path / "environment.json").write_text(json.dumps(
+            {"torch_probe": {"float64_routing": {"ok": True, "float32_ok": value}}}))
+        assert audit.device_float32_routing(tmp_path) is value
+
+
+def _saturated_setup(tasks=6, classes=3, scale=300.0):
+    """Fake isolation setup whose experts' logits are scaled until most
+    softmax entropies are exactly zero: the tie-heavy regime in which float32
+    and float64 application of a fitted router differ."""
+    torch = pytest.importorskip("torch")
+    import torch.nn as nn
+    from torch.utils.data import DataLoader, TensorDataset
+    import run_class_il as class_il
+
+    class Saturated(nn.Module):
+        def __init__(self, num_classes):
+            super().__init__()
+            self.fc1 = nn.Linear(12, 16)
+            self.fc2 = nn.Linear(16, num_classes)
+            self.relu = nn.ReLU()
+
+        def forward(self, x):
+            return self.fc2(self.relu(self.fc1(x.view(x.size(0), -1)))) * scale
+
+    def fake_isolation(benchmark, cfg, seed, **_):
+        g = torch.Generator().manual_seed(seed)
+        train, test = [], []
+        for t in range(tasks):
+            x = torch.randn(120, 12, generator=g) + 0.5 * t
+            y = torch.randint(0, classes, (120,), generator=g)
+            xt = torch.randn(60, 12, generator=g) + 0.5 * t
+            yt = torch.randint(0, classes, (60,), generator=g)
+            train.append(DataLoader(TensorDataset(x, y), batch_size=16))
+            test.append(DataLoader(TensorDataset(xt, yt), batch_size=16))
+        return class_il.IsolationSetup(train, test, (lambda: Saturated(classes)),
+                                       tasks, classes, True)
+    return fake_isolation
+
+
+def _run_saturated(out_prefix, calibration, *, seed=0, tasks=6, classes=3):
+    """The real runner on saturated experts (:func:`_saturated_setup`)."""
+    pytest.importorskip("torch")
+    import test_runner_integration as tri
+    import run_class_il as class_il
+
+    cfg = tri._fast_config()
+    cfg.c100_num_tasks, cfg.c100_classes_per_task = tasks, classes
+    with tri._Patched(class_il, {"_isolation_setup": _saturated_setup(tasks, classes),
+                                 "preflight": tri._NoPreflight}):
+        class_il.run(cfg, ["cifar"], ["supsup"], [seed], out_prefix=out_prefix,
+                     calibration=calibration,
+                     predictions_dir=str(pathlib.Path(out_prefix).parent / "predictions"),
+                     checkpoint_dir=str(pathlib.Path(out_prefix).parent / "checkpoints"))
+    with open(f"{out_prefix}.json") as handle:
+        return json.load(handle)
+
+
+def test_saturated_experts_pass_every_audit_and_the_float32_rebuild(monkeypatch, tmp_path):
+    """Tie-heavy outputs of the real runner (on the GPU when there is one):
+    every enforced check passes, the checkpoints re-evaluate exactly, and
+    rebuilding the float64-routed decisions in float32 reproduces the same
+    job run with float32 routing (v3.0.9) decision by decision."""
+    import run_class_il as class_il
+    audit = _load("routing_precision_audit_saturated", ROOT / "tools" / "routing_precision_audit.py")
+    evaluator = _load("evaluate_checkpoints_saturated", ROOT / "tools" / "evaluate_checkpoints.py")
+    job = "grp__cifar__seed0__supsup"
+    new = tmp_path / "new" / "artifacts" / job / "result"
+    new.parent.mkdir(parents=True)
+    payload = _run_saturated(str(new), "score-bias-acc")
+    arrays, _ = rp.load_predictions(new.parent / payload["calibration"]["cifar"]["supsup"]["0"]
+                                    ["predictions"]["relative_path"])
+    assert float(np.mean(arrays["scores"] == 0)) > 0.2          # saturated, as intended
+    entries = rp.check_job(new.with_suffix(".json"), refit=True)
+    assert len(entries) == 1 and entries[0]["errors"] == [], entries[0]["errors"]
+    assert entries[0]["refit"]["parameters_identical"] is True
+    evaluated = evaluator.evaluate_job(new.with_suffix(".json"), device=_runner_device(),
+                                       methods=("supsup",), setup_fn=_saturated_setup())
+    assert len(evaluated) == 1 and evaluated[0]["errors"] == [] and evaluated[0]["exact"]
+    assert evaluated[0]["per_example_differences"] == {}
+    original = class_il.fit_prefix_calibrators
+
+    def float32_routed(*args, **kwargs):
+        states = original(*args, **kwargs)
+        for state in states:
+            state.pop("routing_dtype")
+        return states
+
+    monkeypatch.setattr(class_il, "fit_prefix_calibrators", float32_routed)
+    old = tmp_path / "old" / "artifacts" / job / "result"
+    old.parent.mkdir(parents=True)
+    _run_saturated(str(old), "score-bias-acc")
+    monkeypatch.setattr(class_il, "fit_prefix_calibrators", original)
+    merge = _load("merge_for_saturated", ROOT / "tools" / "merge_results.py")
+    assert merge.main(["--inputs", f"{old}.json", "--out", str(tmp_path / "ref" / "grp"),
+                       "--allow-unverified"]) == 0
+    report = tmp_path / "precision.json"
+    code = audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(tmp_path / "ref"),
+                       "--out", str(report)])
+    result = json.loads(report.read_text())
+    entry = result["entries"][0]
+    reference = entry["reference"]
+    # What the precision cannot change matches the float32-routed run on any device.
+    assert result["summary"]["problems"] == [] and entry["errors"] == []
+    assert reference["trained_state_identical"] is True and reference["routers_identical"] is True
+    assert reference["test_counts_identical"] is True
+    assert reference["fixed_matrix_differences"] == {} == reference["fixed_metric_differences"]
+    assert reference["reference_inconsistent_metrics"] == {}
+    # Decision by decision, the float32 rebuild equals the float32-routed run
+    # wherever the device's float32 routing is NumPy's: always on a CPU; on a
+    # GPU the routing self-test reports it (float32_ok), and saturated scores
+    # full of subnormals would expose a device that flushes them.
+    from diltcl.task_inference import float64_routing_self_test
+    exact32 = float64_routing_self_test(_runner_device())["float32_ok"]
+    old_payload = json.loads(old.with_suffix(".json").read_text())
+    old_arrays, _ = rp.load_predictions(old.parent / old_payload["calibration"]["cifar"]["supsup"]["0"]
+                                        ["predictions"]["relative_path"])
+    record = payload["calibration"]["cifar"]["supsup"]["0"]
+    rebuild = audit.float32_rebuild(arrays, record)
+    rebuilt = rebuild["arrays"]
+    known = ~rebuild["unknown_prediction_mask"]
+    same = (np.array_equal(rebuilt["route_by_stage"], old_arrays["route_by_stage"])
+            and np.array_equal(rebuilt["tie_by_stage"], old_arrays["tie_by_stage"])
+            and np.array_equal(rebuilt["routed_pred_local_by_stage"][known],
+                               old_arrays["routed_pred_local_by_stage"][known]))
+    if exact32:
+        assert same
+        assert code == 0 and result["status"] == "explained", result["summary"]
+    if str(_runner_device()) == "cpu":
+        # On the CPU these experts are known to move decisions; on a GPU the
+        # scores differ in their last bits and the count may differ too.
+        assert entry["routes_moved"] > 0
+    print(f"saturated supsup: {entry['routes_moved']} of {entry['decisions_compared']} "
+          f"decisions moved by float64 routing; float32 rebuild "
+          f"{'equals' if same else 'differs from'} the float32-routed run "
+          f"(device float32 routing {'is' if exact32 else 'is not'} NumPy's)")
+
+    # compare_runs: only the calibrated router's outputs may differ, and are
+    # then named a routing-precision effect.
+    compare = _load("compare_for_saturated", ROOT / "tools" / "compare_runs.py")
+    assert merge.main(["--inputs", f"{new}.json", "--out", str(tmp_path / "cand" / "grp"),
+                       "--allow-unverified"]) == 0
+    summary = compare.compare_group("grp", tmp_path / "ref" / "grp.json",
+                                    tmp_path / "cand" / "grp.json")["summary"]
+    assert summary["state_identical"] == 1 and summary["same_state_unexplained"] == []
+    assert summary["routing_precision_differences"] == summary["same_state_different_outputs"]
+
+    # Everything the precision cannot change must match the reference exactly:
+    # the raw router's arrays and metrics, and the oracle accuracies.
+    import shutil
+
+    def tampered(name, edit):
+        folder = tmp_path / name
+        shutil.copytree(tmp_path / "ref", folder)
+        with np.load(folder / "grp.npz", allow_pickle=False) as archive:
+            arrays_ = {k: np.asarray(archive[k]) for k in archive.files}
+        payload_ = json.loads((folder / "grp.json").read_text())
+        edit(arrays_, payload_["per_seed"]["cifar"]["supsup"][0])
+        np.savez(folder / "grp.npz", **arrays_)
+        (folder / "grp.json").write_text(json.dumps(payload_))
+        return folder
+
+    def bump_raw(arrays_, metrics):
+        arrays_["cifar/supsup/seed0/raw_result"][-1, 0] += 1.0
+
+    def bump(metric):
+        def edit(arrays_, metrics):
+            metrics[metric] += 1.0
+        return edit
+
+    for name, edit, field in (("raw_matrix", bump_raw, "fixed_matrix_differences"),
+                              ("raw_metric", bump("RawTA"), "fixed_metric_differences"),
+                              ("oracle", bump("MicroOracleACC"), "fixed_metric_differences")):
+        folder = tampered(name, edit)
+        out = tmp_path / f"precision_{name}.json"
+        assert audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(folder),
+                           "--out", str(out)]) == 1
+        result = json.loads(out.read_text())
+        assert result["status"] == "unexplained", name
+        assert result["entries"][0]["reference"][field], name
+        summary = compare.compare_group("grp", folder / "grp.json",
+                                        tmp_path / "cand" / "grp.json")["summary"]
+        assert summary["same_state_unexplained"] == ["cifar/supsup/seed0"], name
+        assert summary["routing_precision_differences"] == [], name
+
+    # Nothing to audit, or a group the reference lacks, is a failure.
+    (tmp_path / "empty").mkdir()
+    assert audit.main(["--run-dir", str(tmp_path / "empty")]) == 1
+    other = tmp_path / "other_reference"
+    other.mkdir()
+    for suffix in (".json", ".npz"):
+        shutil.copy(tmp_path / "ref" / f"grp{suffix}", other / f"other{suffix}")
+    out = tmp_path / "precision_other.json"
+    assert audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(other),
+                       "--out", str(out)]) == 1
+    result = json.loads(out.read_text())
+    assert result["status"] == "failed"
+    assert "group grp is not in the reference" in result["summary"]["problems"]
+    assert any("reference group other" in p and "not audited" in p
+               for p in result["summary"]["problems"])
+    # The audit must cover the reference: a calibrated reference run that was
+    # not audited fails it...
+    extra = tmp_path / "extra_reference"
+    shutil.copytree(tmp_path / "ref", extra)
+    ref_payload = json.loads((extra / "grp.json").read_text())
+    by_seed = ref_payload["calibration"]["cifar"]["supsup"]
+    by_seed["1"] = json.loads(json.dumps(by_seed["0"]))
+    (extra / "grp.json").write_text(json.dumps(ref_payload))
+    out = tmp_path / "precision_extra.json"
+    assert audit.main(["--run-dir", str(tmp_path / "new"), "--reference", str(extra),
+                       "--out", str(out)]) == 1
+    problems = json.loads(out.read_text())["summary"]["problems"]
+    assert problems == ["reference group grp: 1 of 2 calibrated run(s) not audited, "
+                        "e.g. cifar/supsup/seed1"], problems
+    # ...and so does an isolation method of a calibrated job without its record.
+    bare = tmp_path / "bare"
+    shutil.copytree(tmp_path / "new", bare)
+    job_json = bare / "artifacts" / job / "result.json"
+    bare_payload = json.loads(job_json.read_text())
+    bare_payload["calibration"] = {"cifar": {}}
+    job_json.write_text(json.dumps(bare_payload))
+    out = tmp_path / "precision_bare.json"
+    assert audit.main(["--run-dir", str(bare), "--reference", str(tmp_path / "ref"),
+                       "--out", str(out)]) == 1
+    result = json.loads(out.read_text())
+    assert result["status"] == "failed"
+    assert any("without a calibration record" in e for x in result["entries"] for e in x["errors"])
+    # The records are checked as the verifier checks them before any rebuild.
+    forged = tmp_path / "forged"
+    shutil.copytree(tmp_path / "new", forged)
+    pred_path = forged / "artifacts" / job / record["predictions"]["relative_path"]
+    forged_arrays, forged_meta = rp.load_predictions(pred_path)
+    rows = np.flatnonzero(forged_arrays["raw_true_task"] <= 1)
+    forged_arrays["raw_route_by_stage"][rows[0], 1] = 1 - forged_arrays["raw_route_by_stage"][rows[0], 1]
+    np.savez_compressed(pred_path, meta_json=np.asarray(json.dumps(forged_meta)), **forged_arrays)
+    forged_json = forged / "artifacts" / job / "result.json"
+    forged_payload = json.loads(forged_json.read_text())
+    forged_payload["calibration"]["cifar"]["supsup"]["0"]["predictions"]["sha256"] = \
+        rp.sha256_file(pred_path)
+    forged_json.write_text(json.dumps(forged_payload))
+    out = tmp_path / "precision_forged.json"
+    assert audit.main(["--run-dir", str(forged), "--reference", str(tmp_path / "ref"),
+                       "--out", str(out)]) == 1
+    entry = json.loads(out.read_text())["entries"][0]
+    assert any("argmin of the recorded scores" in e for e in entry["errors"]), entry["errors"]
 
 
 def _runner_device():
