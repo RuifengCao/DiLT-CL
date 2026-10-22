@@ -1,0 +1,603 @@
+{
+  "metric_schema_version": 2,
+  "code_version": "3.0.11",
+  "protocol": "task_il_shared_local_label_axis",
+  "evidence_status": "unverified",
+  "verification_status": "unverified",
+  "task_il_head_mode": "multi",
+  "task_il_head_disclosure": {
+    "isolation_and_independent": "oracle task-specific predictor",
+    "shared_backbone_baselines": "one separate head per task (standard multi-head task-IL)",
+    "publication_warning": "Standard multi-head protocol; baselines are comparable with the task-IL literature."
+  },
+  "config": {
+    "seed": 42,
+    "diltcl_full_epochs": 50,
+    "diltcl_imp_epochs": 20,
+    "diltcl_expert_finetune_epochs": 20,
+    "pruning_rounds": 5,
+    "diltcl_partitions": 2,
+    "diltcl_sparsity": 0.9,
+    "epochs_ewc": 50,
+    "epochs_lwf": 50,
+    "epochs_replay": 50,
+    "ewc_lambda": 10000.0,
+    "ewc_fisher_labels": "prediction",
+    "lwf_alpha": 1.0,
+    "lwf_temperature": 2.0,
+    "buffer_size": 500,
+    "replay_batch_size": 32,
+    "derpp_alpha": 0.5,
+    "derpp_beta": 0.5,
+    "packnet_retrain_epochs": 10,
+    "packnet_keep_fraction": 0.0,
+    "supsup_sparsity": 0.5,
+    "wsn_sparsity": 0.5,
+    "c100_num_tasks": 20,
+    "c100_classes_per_task": 5,
+    "c100_batch_size": 64,
+    "pm_num_tasks": 10,
+    "pm_batch_size": 256,
+    "tin_num_tasks": 10,
+    "tin_classes_per_task": 20,
+    "tin_batch_size": 64,
+    "tin_image_size": 64,
+    "five_batch_size": 64,
+    "five_image_size": 32,
+    "five_dataset_names": [],
+    "lr": 0.001
+  },
+  "execution": {
+    "options": {
+      "data_backend": "device",
+      "numerics": "fast",
+      "eval_batch_size": null,
+      "num_workers": null,
+      "threads": 3,
+      "tf32": "default"
+    },
+    "effective": {
+      "torch_num_threads": 3,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": true,
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false
+    },
+    "numerics_note": "fast: LwF shared-feature distillation, consolidated EWC penalty, routed multi-head replay (same objective, different float summation order); legacy: v2 arithmetic."
+  },
+  "seeds": [
+    4
+  ],
+  "benchmarks": [
+    "pmnist"
+  ],
+  "methods": [
+    "diltcl"
+  ],
+  "checkpoint_persistence_enabled": true,
+  "environment": {
+    "python_version": "3.12.3",
+    "python_implementation": "CPython",
+    "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+    "numpy_version": "2.4.6",
+    "pytorch_version": "2.12.1+cu130",
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 92000,
+    "python_hash_seed": "4",
+    "command": [
+      "/root/autodl-tmp/DiLT-CL/code/run_task_il.py",
+      "--benchmark",
+      "pmnist",
+      "--seed-list",
+      "4",
+      "--methods",
+      "diltcl",
+      "--out",
+      "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed4__diltcl/result",
+      "--head-mode",
+      "multi",
+      "--data-backend",
+      "device",
+      "--numerics",
+      "fast",
+      "--tf32",
+      "default",
+      "--threads",
+      "3",
+      "--data-root",
+      "/root/autodl-tmp/data",
+      "--no-download",
+      "--checkpoint-dir",
+      "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed4__diltcl/checkpoints"
+    ]
+  },
+  "benchmark_metadata": {
+    "pmnist": {
+      "per_seed": {
+        "4": {
+          "train_samples_per_task": [
+            60000,
+            60000,
+            60000,
+            60000,
+            60000,
+            60000,
+            60000,
+            60000,
+            60000,
+            60000
+          ],
+          "test_samples_per_task": [
+            10000,
+            10000,
+            10000,
+            10000,
+            10000,
+            10000,
+            10000,
+            10000,
+            10000,
+            10000
+          ],
+          "train_sample_count": 600000,
+          "test_sample_count": 100000,
+          "tasks": [
+            {
+              "task": 0,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "14775059724027bfb94d3de86c1db9d740bdf4eefbb8e8180c62ed511d97e72d"
+            },
+            {
+              "task": 1,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "ae659bdbdac0a56f74430e4ae951471e3943523e9025f3855583127f7d07a157"
+            },
+            {
+              "task": 2,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "1d52dc2d861a6632360784395efff6d58dec3fc2d424181249253bc80dc3cb5a"
+            },
+            {
+              "task": 3,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "bce40a081429c959d6aefd91b1378c6eda40a6f70b71cd86f735284aa74ccc0c"
+            },
+            {
+              "task": 4,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "17b2d5eec202e06a51c996252233d4fa642a8a2ad0b1608355984133f48258ff"
+            },
+            {
+              "task": 5,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "7288cb9f1003213b96033bece587ea1cfe24de6d28e2098462a035ad5f8afef5"
+            },
+            {
+              "task": 6,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "ab51827ddad51e42562de6d4670ecb978b4323e8bc76f20b26bff1fd96b5d503"
+            },
+            {
+              "task": 7,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "8c048f71a88885cf4045c941338441f737b38c896111c443f23e321d4317b87d"
+            },
+            {
+              "task": 8,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "0bbf28e82de880cce14940dda3bb52331248ec75d24a39bbf001e0f1067deea0"
+            },
+            {
+              "task": 9,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "6ccf9b8fa33956834ca6e3ec15ca0b07b856e1dbb4889042f8ad07b2545cf361",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 47040000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "9486be7a13040c2562e857681e231a993cc3ff1cd7f038ea6b7b003fd1ad9100"
+            }
+          ],
+          "test_tasks": [
+            {
+              "task": 0,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "14775059724027bfb94d3de86c1db9d740bdf4eefbb8e8180c62ed511d97e72d"
+            },
+            {
+              "task": 1,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "ae659bdbdac0a56f74430e4ae951471e3943523e9025f3855583127f7d07a157"
+            },
+            {
+              "task": 2,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "1d52dc2d861a6632360784395efff6d58dec3fc2d424181249253bc80dc3cb5a"
+            },
+            {
+              "task": 3,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "bce40a081429c959d6aefd91b1378c6eda40a6f70b71cd86f735284aa74ccc0c"
+            },
+            {
+              "task": 4,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "17b2d5eec202e06a51c996252233d4fa642a8a2ad0b1608355984133f48258ff"
+            },
+            {
+              "task": 5,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "7288cb9f1003213b96033bece587ea1cfe24de6d28e2098462a035ad5f8afef5"
+            },
+            {
+              "task": 6,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "ab51827ddad51e42562de6d4670ecb978b4323e8bc76f20b26bff1fd96b5d503"
+            },
+            {
+              "task": 7,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "8c048f71a88885cf4045c941338441f737b38c896111c443f23e321d4317b87d"
+            },
+            {
+              "task": 8,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "0bbf28e82de880cce14940dda3bb52331248ec75d24a39bbf001e0f1067deea0"
+            },
+            {
+              "task": 9,
+              "dataset_wrappers": [],
+              "source_dataset_class": "torchvision.datasets.mnist.MNIST",
+              "transform_repr": "Compose(\n    ToTensor()\n)",
+              "loader_class": "diltcl.data_backend.DeviceLoader",
+              "batch_size": 256,
+              "materialized_pixels_sha256": "9c1a26a0079b707fe336a33a56642820bf199fa68f104720559c81f945ee71e9",
+              "resident_pixel_storage": {
+                "device": "cuda:0",
+                "bytes": 7840000,
+                "shared_across_tasks": true
+              },
+              "pixel_permutation_sha256": "9486be7a13040c2562e857681e231a993cc3ff1cd7f038ea6b7b003fd1ad9100"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "per_seed": {
+    "pmnist": {
+      "diltcl": [
+        {
+          "ACC": 96.88000000000001,
+          "BWT": 0.0,
+          "Forgetting": 0.0,
+          "LA": 96.88000000000001
+        }
+      ]
+    }
+  },
+  "aggregated": {
+    "pmnist": {
+      "diltcl": {
+        "ACC": {
+          "mean": 96.88000000000001,
+          "std": 0.0,
+          "values": [
+            96.88000000000001
+          ]
+        },
+        "BWT": {
+          "mean": 0.0,
+          "std": 0.0,
+          "values": [
+            0.0
+          ]
+        },
+        "Forgetting": {
+          "mean": 0.0,
+          "std": 0.0,
+          "values": [
+            0.0
+          ]
+        },
+        "LA": {
+          "mean": 96.88000000000001,
+          "std": 0.0,
+          "values": [
+            96.88000000000001
+          ]
+        }
+      }
+    }
+  },
+  "per_seed_run_records": {
+    "pmnist": {
+      "diltcl": {
+        "4": {
+          "pipeline_wall_seconds": 1251.9724332727492,
+          "peak_cuda_memory_allocated_bytes": 174689792,
+          "cuda_memory_allocated_before_method_bytes": 66236416,
+          "schedule_accounting": {
+            "kind": "declared-schedule accounting",
+            "current_data_example_visits": 73800000,
+            "optimizer_steps": 359350,
+            "optimizer_steps_note": "exact for the declared fixed-round training loops",
+            "schedule": {
+              "phase1_full_epochs": 50,
+              "partition_imp_rounds": 5,
+              "partition_imp_epochs_per_round": 20,
+              "partitions": 2,
+              "expert_imp_rounds": 5,
+              "expert_imp_epochs_per_round": 20,
+              "expert_finetune_epochs": 20
+            },
+            "replay_accounting_note": null,
+            "flops_measured": false
+          },
+          "method_extras": {
+            "diltcl_requested_target_sparsity": 0.9,
+            "diltcl_pruning_rounds": 5,
+            "diltcl_per_round_pruning_rate": 0.36904265551980675,
+            "diltcl_core_partition_global_density": [
+              0.09999925739449432,
+              0.09999925739449432
+            ],
+            "diltcl_core_density": 0.06599535128953446,
+            "diltcl_expert_density": 0.09340120747655223,
+            "diltcl_expert_global_density_by_task": {
+              "1": 0.09340120747655223,
+              "2": 0.09340120747655223,
+              "3": 0.09340120747655223,
+              "4": 0.09340120747655223,
+              "5": 0.09340120747655223,
+              "6": 0.09340120747655223,
+              "7": 0.09340120747655223,
+              "8": 0.09340120747655223,
+              "9": 0.09340120747655223
+            },
+            "diltcl_expert_eligible_density_by_task": {
+              "1": 0.10000079507688393,
+              "2": 0.10000079507688393,
+              "3": 0.10000079507688393,
+              "4": 0.10000079507688393,
+              "5": 0.10000079507688393,
+              "6": 0.10000079507688393,
+              "7": 0.10000079507688393,
+              "8": 0.10000079507688393,
+              "9": 0.10000079507688393
+            },
+            "core_only_metrics": {
+              "ACC": 18.144,
+              "BWT": 0.0,
+              "Forgetting": 0.0,
+              "LA": 18.144
+            },
+            "checkpoint": {
+              "state_definition": "resume-learning dense PyTorch state",
+              "format": "diltcl-dense-resume-state-v1",
+              "serialized_bytes": 23738039,
+              "sha256": "97f8d7c15b92d8a109307f71daff856ed57252beb20a47ce615d3d2a8d2abdc4",
+              "content_sha256": "c6d8ee42bcf143cfa2034193ec7bce6f7d3d322a18dd9b86293f2f1e703002d8",
+              "deployable_compact_export": false,
+              "persisted": true,
+              "persisted_path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed4__diltcl/checkpoints/pmnist/diltcl/seed4.pt",
+              "persisted_relative_path": "checkpoints/pmnist/diltcl/seed4.pt"
+            }
+          }
+        }
+      }
+    }
+  },
+  "memory": {
+    "pmnist": [
+      {
+        "name": "DiLT-CL (ours)",
+        "float_params": 244169.0,
+        "mask_bits": 2693220,
+        "buffer_floats": 0.0,
+        "megabytes": 1.2524876594543457,
+        "note": "analytic compact estimate: core (d=0.07) + 9 experts (d=0.09)"
+      }
+    ]
+  },
+  "artifact_reportability": {
+    "postrun_validation_completed": false,
+    "current_publication_reportable": false,
+    "unmet_at_write_time": [
+      "independent JSON/NPZ recomputation report",
+      "dataset content hashes and complete source hashes",
+      "standard separate-head Task-IL shared-baseline rerun",
+      "measured FLOPs or hardware-counter compute",
+      "compact exporter/importer logit-equivalence test",
+      "failure/exclusion record from the suite launcher"
+    ]
+  }
+}

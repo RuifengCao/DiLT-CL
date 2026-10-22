@@ -1,0 +1,9 @@
+cifar same pixels as September
+pmnist same pixels as September
+[data_backend] decoding tinyimagenet64_train (100000 samples, 16 workers)...
+[data_backend] tinyimagenet64_train: (100000, 3, 64, 64) uint8 in 3.7s
+[data_backend] cached tinyimagenet64_train -> /root/autodl-tmp/data_cache/tinyimagenet64_train_ee5c4a0d6468d7f89a1480f6.npz
+[data_backend] decoding tinyimagenet64_test (10000 samples, 16 workers)...
+[data_backend] tinyimagenet64_test: (10000, 3, 64, 64) uint8 in 1.0s
+[data_backend] cached tinyimagenet64_test -> /root/autodl-tmp/data_cache/tinyimagenet64_test_26ccdf4d34ac303b24e7694e.npz
+tinyimagenet same pixels as September

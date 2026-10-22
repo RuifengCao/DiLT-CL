@@ -1,0 +1,956 @@
+nohup: ignoring input
+Run directory: /root/autodl-tmp/runs_v3011/p0
+Profile: p0; jobs: 330 (method granularity); seeds: [0, 1, 2, 3, 4]
+Execution: backend=device numerics=fast tf32=default eval_batch=train; max_parallel=8 (auto=min(cpu//threads, free_vram//job_mem, 8)), threads/job=3
+[preflight] OK: dependencies and datasets are in place.
+Fingerprinting dataset root in full mode...
+[dataset fingerprint] 5000/120218 files
+[dataset fingerprint] 10000/120218 files
+[dataset fingerprint] 15000/120218 files
+[dataset fingerprint] 20000/120218 files
+[dataset fingerprint] 25000/120218 files
+[dataset fingerprint] 30000/120218 files
+[dataset fingerprint] 35000/120218 files
+[dataset fingerprint] 40000/120218 files
+[dataset fingerprint] 45000/120218 files
+[dataset fingerprint] 50000/120218 files
+[dataset fingerprint] 55000/120218 files
+[dataset fingerprint] 60000/120218 files
+[dataset fingerprint] 65000/120218 files
+[dataset fingerprint] 70000/120218 files
+[dataset fingerprint] 75000/120218 files
+[dataset fingerprint] 80000/120218 files
+[dataset fingerprint] 85000/120218 files
+[dataset fingerprint] 90000/120218 files
+[dataset fingerprint] 95000/120218 files
+[dataset fingerprint] 100000/120218 files
+[dataset fingerprint] 105000/120218 files
+[dataset fingerprint] 110000/120218 files
+[dataset fingerprint] 115000/120218 files
+[dataset fingerprint] 120000/120218 files
+[start 1/330] p0_class_entropy_cal__tinyimagenet__seed0__diltcl
+[start 2/330] p0_class_entropy_cal__tinyimagenet__seed1__diltcl
+[start 3/330] p0_class_entropy_cal__tinyimagenet__seed2__diltcl
+[start 4/330] p0_class_entropy_cal__tinyimagenet__seed3__diltcl
+[start 5/330] p0_class_entropy_cal__tinyimagenet__seed4__diltcl
+[start 6/330] p0_task_il_multi__tinyimagenet__seed0__diltcl
+[start 7/330] p0_class_entropy__tinyimagenet__seed0__diltcl
+[start 8/330] p0_task_il_multi__tinyimagenet__seed1__diltcl
+[succeeded 1/330] p0_class_entropy_cal__tinyimagenet__seed0__diltcl (25.8 min, 7 running, 25.8 min elapsed)
+[start 9/330] p0_class_entropy__tinyimagenet__seed1__diltcl
+[succeeded 2/330] p0_class_entropy_cal__tinyimagenet__seed1__diltcl (25.8 min, 7 running, 25.8 min elapsed)
+[start 10/330] p0_task_il_multi__tinyimagenet__seed2__diltcl
+[succeeded 3/330] p0_class_entropy_cal__tinyimagenet__seed2__diltcl (25.8 min, 7 running, 25.9 min elapsed)
+[succeeded 4/330] p0_class_entropy_cal__tinyimagenet__seed3__diltcl (25.7 min, 6 running, 25.9 min elapsed)
+[start 11/330] p0_class_entropy__tinyimagenet__seed2__diltcl
+[start 12/330] p0_task_il_multi__tinyimagenet__seed3__diltcl
+[succeeded 5/330] p0_class_entropy_cal__tinyimagenet__seed4__diltcl (25.7 min, 7 running, 25.9 min elapsed)
+[start 13/330] p0_class_entropy__tinyimagenet__seed3__diltcl
+[succeeded 6/330] p0_task_il_multi__tinyimagenet__seed0__diltcl (27.5 min, 7 running, 27.7 min elapsed)
+[start 14/330] p0_task_il_multi__tinyimagenet__seed4__diltcl
+[succeeded 7/330] p0_task_il_multi__tinyimagenet__seed1__diltcl (27.5 min, 7 running, 27.8 min elapsed)
+[start 15/330] p0_class_entropy__tinyimagenet__seed4__diltcl
+[succeeded 8/330] p0_class_entropy__tinyimagenet__seed0__diltcl (28.6 min, 7 running, 28.8 min elapsed)
+[start 16/330] p0_class_entropy_cal__cifar__seed0__diltcl
+[succeeded 9/330] p0_class_entropy_cal__cifar__seed0__diltcl (17.6 min, 7 running, 46.5 min elapsed)
+[start 17/330] p0_class_entropy_cal__cifar__seed1__diltcl
+[succeeded 10/330] p0_task_il_multi__tinyimagenet__seed2__diltcl (26.0 min, 7 running, 51.9 min elapsed)
+[start 18/330] p0_class_entropy_cal__cifar__seed2__diltcl
+[succeeded 11/330] p0_task_il_multi__tinyimagenet__seed3__diltcl (25.9 min, 7 running, 51.9 min elapsed)
+[start 19/330] p0_class_entropy_cal__cifar__seed3__diltcl
+[succeeded 12/330] p0_class_entropy__tinyimagenet__seed1__diltcl (26.2 min, 7 running, 52.0 min elapsed)
+[start 20/330] p0_class_entropy_cal__cifar__seed4__diltcl
+[succeeded 13/330] p0_class_entropy__tinyimagenet__seed2__diltcl (26.1 min, 7 running, 52.0 min elapsed)
+[start 21/330] p0_class_entropy_cal__tinyimagenet__seed0__lwf
+[succeeded 14/330] p0_class_entropy__tinyimagenet__seed3__diltcl (26.0 min, 7 running, 52.0 min elapsed)
+[start 22/330] p0_class_entropy_cal__tinyimagenet__seed1__lwf
+[succeeded 15/330] p0_task_il_multi__tinyimagenet__seed4__diltcl (25.6 min, 7 running, 53.3 min elapsed)
+[start 23/330] p0_class_entropy_cal__tinyimagenet__seed2__lwf
+[succeeded 16/330] p0_class_entropy__tinyimagenet__seed4__diltcl (26.5 min, 7 running, 54.3 min elapsed)
+[start 24/330] p0_class_entropy_cal__tinyimagenet__seed3__lwf
+[succeeded 17/330] p0_class_entropy_cal__tinyimagenet__seed0__lwf (8.9 min, 7 running, 60.9 min elapsed)
+[start 25/330] p0_class_entropy_cal__tinyimagenet__seed4__lwf
+[succeeded 18/330] p0_class_entropy_cal__tinyimagenet__seed1__lwf (8.9 min, 7 running, 60.9 min elapsed)
+[start 26/330] p0_class_entropy_cal__tinyimagenet__seed0__derpp
+[succeeded 19/330] p0_class_entropy_cal__cifar__seed1__diltcl (14.6 min, 7 running, 61.1 min elapsed)
+[start 27/330] p0_class_entropy_cal__tinyimagenet__seed1__derpp
+[succeeded 20/330] p0_class_entropy_cal__tinyimagenet__seed2__lwf (8.6 min, 7 running, 61.9 min elapsed)
+[start 28/330] p0_class_entropy_cal__tinyimagenet__seed2__derpp
+[succeeded 21/330] p0_class_entropy_cal__cifar__seed2__diltcl (10.5 min, 7 running, 62.4 min elapsed)
+[start 29/330] p0_class_entropy_cal__tinyimagenet__seed3__derpp
+[succeeded 22/330] p0_class_entropy_cal__cifar__seed3__diltcl (10.7 min, 7 running, 62.6 min elapsed)
+[start 30/330] p0_class_entropy_cal__tinyimagenet__seed4__derpp
+[succeeded 23/330] p0_class_entropy_cal__cifar__seed4__diltcl (10.9 min, 7 running, 62.9 min elapsed)
+[start 31/330] p0_task_il_multi__cifar__seed0__diltcl
+[succeeded 24/330] p0_class_entropy_cal__tinyimagenet__seed3__lwf (8.7 min, 7 running, 63.0 min elapsed)
+[start 32/330] p0_class_entropy__cifar__seed0__diltcl
+[succeeded 25/330] p0_class_entropy_cal__tinyimagenet__seed4__lwf (7.8 min, 7 running, 68.8 min elapsed)
+[start 33/330] p0_task_il_multi__cifar__seed1__diltcl
+[succeeded 26/330] p0_task_il_multi__cifar__seed0__diltcl (9.0 min, 7 running, 71.9 min elapsed)
+[start 34/330] p0_class_entropy__cifar__seed1__diltcl
+[succeeded 27/330] p0_class_entropy__cifar__seed0__diltcl (9.9 min, 7 running, 72.8 min elapsed)
+[start 35/330] p0_task_il_multi__cifar__seed2__diltcl
+[succeeded 28/330] p0_task_il_multi__cifar__seed1__diltcl (9.0 min, 7 running, 77.8 min elapsed)
+[start 36/330] p0_class_entropy__cifar__seed2__diltcl
+[succeeded 29/330] p0_class_entropy__cifar__seed1__diltcl (9.6 min, 7 running, 81.5 min elapsed)
+[start 37/330] p0_task_il_multi__cifar__seed3__diltcl
+[succeeded 30/330] p0_task_il_multi__cifar__seed2__diltcl (8.9 min, 7 running, 81.8 min elapsed)
+[start 38/330] p0_class_entropy__cifar__seed3__diltcl
+[succeeded 31/330] p0_class_entropy_cal__tinyimagenet__seed0__derpp (21.2 min, 7 running, 82.2 min elapsed)
+[start 39/330] p0_task_il_multi__cifar__seed4__diltcl
+[succeeded 32/330] p0_class_entropy_cal__tinyimagenet__seed1__derpp (21.1 min, 7 running, 82.2 min elapsed)
+[start 40/330] p0_class_entropy__cifar__seed4__diltcl
+[succeeded 33/330] p0_class_entropy_cal__tinyimagenet__seed2__derpp (21.2 min, 7 running, 83.1 min elapsed)
+[start 41/330] p0_task_il_multi__tinyimagenet__seed0__lwf
+[succeeded 34/330] p0_class_entropy_cal__tinyimagenet__seed3__derpp (21.3 min, 7 running, 83.7 min elapsed)
+[start 42/330] p0_class_entropy__tinyimagenet__seed0__lwf
+[succeeded 35/330] p0_class_entropy_cal__tinyimagenet__seed4__derpp (21.3 min, 7 running, 83.9 min elapsed)
+[start 43/330] p0_task_il_multi__tinyimagenet__seed1__lwf
+[succeeded 36/330] p0_class_entropy__cifar__seed2__diltcl (10.3 min, 7 running, 88.1 min elapsed)
+[start 44/330] p0_class_entropy__tinyimagenet__seed1__lwf
+[succeeded 37/330] p0_task_il_multi__cifar__seed3__diltcl (9.6 min, 7 running, 91.2 min elapsed)
+[start 45/330] p0_task_il_multi__tinyimagenet__seed2__lwf
+[succeeded 38/330] p0_task_il_multi__cifar__seed4__diltcl (9.6 min, 7 running, 91.8 min elapsed)
+[start 46/330] p0_class_entropy__tinyimagenet__seed2__lwf
+[succeeded 39/330] p0_class_entropy__cifar__seed3__diltcl (11.1 min, 7 running, 92.9 min elapsed)
+[start 47/330] p0_task_il_multi__tinyimagenet__seed3__lwf
+[succeeded 40/330] p0_class_entropy__tinyimagenet__seed0__lwf (9.7 min, 7 running, 93.4 min elapsed)
+[start 48/330] p0_class_entropy__tinyimagenet__seed3__lwf
+[succeeded 41/330] p0_class_entropy__cifar__seed4__diltcl (12.0 min, 7 running, 94.2 min elapsed)
+[start 49/330] p0_task_il_multi__tinyimagenet__seed4__lwf
+[succeeded 42/330] p0_task_il_multi__tinyimagenet__seed0__lwf (11.4 min, 7 running, 94.5 min elapsed)
+[start 50/330] p0_class_entropy__tinyimagenet__seed4__lwf
+[succeeded 43/330] p0_task_il_multi__tinyimagenet__seed1__lwf (11.6 min, 7 running, 95.5 min elapsed)
+[start 51/330] p0_class_entropy_cal__tinyimagenet__seed0__ewc
+[succeeded 44/330] p0_class_entropy__tinyimagenet__seed1__lwf (12.0 min, 7 running, 100.0 min elapsed)
+[start 52/330] p0_class_entropy_cal__tinyimagenet__seed0__er
+[succeeded 45/330] p0_task_il_multi__tinyimagenet__seed2__lwf (13.0 min, 7 running, 104.2 min elapsed)
+[start 53/330] p0_class_entropy_cal__tinyimagenet__seed1__ewc
+[succeeded 46/330] p0_class_entropy__tinyimagenet__seed2__lwf (12.9 min, 7 running, 104.7 min elapsed)
+[start 54/330] p0_class_entropy_cal__tinyimagenet__seed1__er
+[succeeded 47/330] p0_class_entropy_cal__tinyimagenet__seed0__ewc (10.3 min, 7 running, 105.8 min elapsed)
+[start 55/330] p0_class_entropy_cal__tinyimagenet__seed2__ewc
+[succeeded 48/330] p0_task_il_multi__tinyimagenet__seed3__lwf (13.4 min, 7 running, 106.3 min elapsed)
+[start 56/330] p0_class_entropy_cal__tinyimagenet__seed2__er
+[succeeded 49/330] p0_class_entropy__tinyimagenet__seed3__lwf (13.2 min, 7 running, 106.6 min elapsed)
+[start 57/330] p0_class_entropy_cal__tinyimagenet__seed3__ewc
+[succeeded 50/330] p0_task_il_multi__tinyimagenet__seed4__lwf (13.4 min, 7 running, 107.6 min elapsed)
+[start 58/330] p0_class_entropy_cal__tinyimagenet__seed3__er
+[succeeded 51/330] p0_class_entropy__tinyimagenet__seed4__lwf (13.1 min, 7 running, 107.6 min elapsed)
+[start 59/330] p0_class_entropy_cal__tinyimagenet__seed4__ewc
+[succeeded 52/330] p0_class_entropy_cal__tinyimagenet__seed1__ewc (9.1 min, 7 running, 113.3 min elapsed)
+[start 60/330] p0_class_entropy_cal__tinyimagenet__seed4__er
+[succeeded 53/330] p0_class_entropy_cal__tinyimagenet__seed2__ewc (8.8 min, 7 running, 114.7 min elapsed)
+[start 61/330] p0_task_il_multi__tinyimagenet__seed0__derpp
+[succeeded 54/330] p0_class_entropy_cal__tinyimagenet__seed3__ewc (8.8 min, 7 running, 115.4 min elapsed)
+[start 62/330] p0_class_entropy__tinyimagenet__seed0__derpp
+[succeeded 55/330] p0_class_entropy_cal__tinyimagenet__seed4__ewc (8.6 min, 7 running, 116.3 min elapsed)
+[start 63/330] p0_task_il_multi__tinyimagenet__seed1__derpp
+[succeeded 56/330] p0_class_entropy_cal__tinyimagenet__seed0__er (17.8 min, 7 running, 117.8 min elapsed)
+[start 64/330] p0_class_entropy__tinyimagenet__seed1__derpp
+[succeeded 57/330] p0_class_entropy_cal__tinyimagenet__seed1__er (16.5 min, 7 running, 121.2 min elapsed)
+[start 65/330] p0_task_il_multi__tinyimagenet__seed2__derpp
+[succeeded 58/330] p0_class_entropy_cal__tinyimagenet__seed2__er (15.9 min, 7 running, 122.2 min elapsed)
+[start 66/330] p0_class_entropy__tinyimagenet__seed2__derpp
+[succeeded 59/330] p0_class_entropy_cal__tinyimagenet__seed3__er (15.6 min, 7 running, 123.2 min elapsed)
+[start 67/330] p0_task_il_multi__tinyimagenet__seed3__derpp
+[succeeded 60/330] p0_class_entropy_cal__tinyimagenet__seed4__er (14.5 min, 7 running, 127.8 min elapsed)
+[start 68/330] p0_class_entropy__tinyimagenet__seed3__derpp
+[succeeded 61/330] p0_class_entropy__tinyimagenet__seed0__derpp (25.1 min, 7 running, 140.6 min elapsed)
+[start 69/330] p0_task_il_multi__tinyimagenet__seed4__derpp
+[succeeded 62/330] p0_task_il_multi__tinyimagenet__seed0__derpp (26.8 min, 7 running, 141.5 min elapsed)
+[start 70/330] p0_class_entropy__tinyimagenet__seed4__derpp
+[succeeded 63/330] p0_class_entropy__tinyimagenet__seed2__derpp (19.8 min, 7 running, 142.0 min elapsed)
+[start 71/330] p0_class_entropy_cal__tinyimagenet__seed0__packnet
+[succeeded 64/330] p0_class_entropy__tinyimagenet__seed1__derpp (24.6 min, 7 running, 142.4 min elapsed)
+[start 72/330] p0_class_entropy_cal__tinyimagenet__seed1__packnet
+[succeeded 65/330] p0_task_il_multi__tinyimagenet__seed1__derpp (27.0 min, 7 running, 143.2 min elapsed)
+[start 73/330] p0_class_entropy_cal__tinyimagenet__seed2__packnet
+[succeeded 66/330] p0_task_il_multi__tinyimagenet__seed2__derpp (27.1 min, 7 running, 148.2 min elapsed)
+[start 74/330] p0_class_entropy_cal__tinyimagenet__seed3__packnet
+[succeeded 67/330] p0_task_il_multi__tinyimagenet__seed3__derpp (28.0 min, 7 running, 151.2 min elapsed)
+[start 75/330] p0_class_entropy_cal__tinyimagenet__seed4__packnet
+[succeeded 68/330] p0_class_entropy_cal__tinyimagenet__seed0__packnet (9.4 min, 7 running, 151.5 min elapsed)
+[start 76/330] p0_task_il_multi__tinyimagenet__seed0__ewc
+[succeeded 69/330] p0_class_entropy_cal__tinyimagenet__seed1__packnet (9.2 min, 7 running, 151.6 min elapsed)
+[start 77/330] p0_task_il_multi__tinyimagenet__seed0__er
+[succeeded 70/330] p0_class_entropy_cal__tinyimagenet__seed2__packnet (10.0 min, 7 running, 153.2 min elapsed)
+[start 78/330] p0_class_entropy__tinyimagenet__seed0__ewc
+[succeeded 71/330] p0_class_entropy__tinyimagenet__seed3__derpp (26.9 min, 7 running, 154.7 min elapsed)
+[start 79/330] p0_class_entropy__tinyimagenet__seed0__er
+[succeeded 72/330] p0_class_entropy_cal__tinyimagenet__seed3__packnet (10.0 min, 7 running, 158.2 min elapsed)
+[start 80/330] p0_class_entropy_cal__tinyimagenet__seed0__finetune
+[succeeded 73/330] p0_class_entropy_cal__tinyimagenet__seed4__packnet (10.0 min, 7 running, 161.2 min elapsed)
+[start 81/330] p0_class_entropy_cal__tinyimagenet__seed0__supsup
+[succeeded 74/330] p0_task_il_multi__tinyimagenet__seed0__ewc (10.4 min, 7 running, 161.8 min elapsed)
+[start 82/330] p0_class_entropy_cal__tinyimagenet__seed0__wsn
+[succeeded 75/330] p0_class_entropy__tinyimagenet__seed0__ewc (9.0 min, 7 running, 162.2 min elapsed)
+[start 83/330] p0_task_il_multi__tinyimagenet__seed1__ewc
+[succeeded 76/330] p0_class_entropy_cal__tinyimagenet__seed0__finetune (6.4 min, 7 running, 164.7 min elapsed)
+[start 84/330] p0_task_il_multi__tinyimagenet__seed1__er
+[succeeded 77/330] p0_class_entropy__tinyimagenet__seed4__derpp (27.6 min, 7 running, 169.0 min elapsed)
+[start 85/330] p0_class_entropy__tinyimagenet__seed1__ewc
+[succeeded 78/330] p0_task_il_multi__tinyimagenet__seed0__er (17.9 min, 7 running, 169.5 min elapsed)
+[start 86/330] p0_class_entropy__tinyimagenet__seed1__er
+[succeeded 79/330] p0_task_il_multi__tinyimagenet__seed4__derpp (29.4 min, 7 running, 170.0 min elapsed)
+[start 87/330] p0_class_entropy_cal__tinyimagenet__seed1__finetune
+[succeeded 80/330] p0_class_entropy__tinyimagenet__seed0__er (15.5 min, 7 running, 170.2 min elapsed)
+[start 88/330] p0_class_entropy_cal__tinyimagenet__seed1__supsup
+[succeeded 81/330] p0_task_il_multi__tinyimagenet__seed1__ewc (10.1 min, 7 running, 172.3 min elapsed)
+[start 89/330] p0_class_entropy_cal__tinyimagenet__seed1__wsn
+[succeeded 82/330] p0_class_entropy_cal__tinyimagenet__seed1__finetune (5.9 min, 7 running, 175.9 min elapsed)
+[start 90/330] p0_task_il_multi__tinyimagenet__seed2__ewc
+[succeeded 83/330] p0_class_entropy__tinyimagenet__seed1__ewc (8.4 min, 7 running, 177.4 min elapsed)
+[start 91/330] p0_task_il_multi__tinyimagenet__seed2__er
+[succeeded 84/330] p0_task_il_multi__tinyimagenet__seed1__er (16.8 min, 7 running, 181.5 min elapsed)
+[start 92/330] p0_class_entropy__tinyimagenet__seed2__ewc
+[succeeded 85/330] p0_class_entropy__tinyimagenet__seed1__er (14.2 min, 7 running, 183.7 min elapsed)
+[start 93/330] p0_class_entropy__tinyimagenet__seed2__er
+[succeeded 86/330] p0_task_il_multi__tinyimagenet__seed2__ewc (10.4 min, 7 running, 186.3 min elapsed)
+[start 94/330] p0_class_entropy_cal__tinyimagenet__seed2__finetune
+[succeeded 87/330] p0_class_entropy_cal__tinyimagenet__seed0__supsup (27.0 min, 7 running, 188.2 min elapsed)
+[start 95/330] p0_class_entropy_cal__tinyimagenet__seed2__supsup
+[succeeded 88/330] p0_class_entropy_cal__tinyimagenet__seed0__wsn (26.8 min, 7 running, 188.7 min elapsed)
+[start 96/330] p0_class_entropy_cal__tinyimagenet__seed2__wsn
+[succeeded 89/330] p0_class_entropy__tinyimagenet__seed2__ewc (8.4 min, 7 running, 189.9 min elapsed)
+[start 97/330] p0_task_il_multi__tinyimagenet__seed3__ewc
+[succeeded 90/330] p0_class_entropy_cal__tinyimagenet__seed2__finetune (6.0 min, 7 running, 192.3 min elapsed)
+[start 98/330] p0_task_il_multi__tinyimagenet__seed3__er
+[succeeded 91/330] p0_task_il_multi__tinyimagenet__seed2__er (16.2 min, 7 running, 193.6 min elapsed)
+[start 99/330] p0_class_entropy__tinyimagenet__seed3__ewc
+[succeeded 92/330] p0_class_entropy_cal__tinyimagenet__seed1__supsup (25.3 min, 7 running, 195.5 min elapsed)
+[start 100/330] p0_class_entropy__tinyimagenet__seed3__er
+[succeeded 93/330] p0_class_entropy_cal__tinyimagenet__seed1__wsn (25.1 min, 7 running, 197.5 min elapsed)
+[start 101/330] p0_class_entropy_cal__tinyimagenet__seed3__finetune
+[succeeded 94/330] p0_class_entropy__tinyimagenet__seed2__er (13.8 min, 7 running, 197.5 min elapsed)
+[start 102/330] p0_class_entropy_cal__tinyimagenet__seed3__supsup
+[succeeded 95/330] p0_task_il_multi__tinyimagenet__seed3__ewc (10.2 min, 7 running, 200.1 min elapsed)
+[start 103/330] p0_class_entropy_cal__tinyimagenet__seed3__wsn
+[succeeded 96/330] p0_class_entropy__tinyimagenet__seed3__ewc (8.6 min, 7 running, 202.2 min elapsed)
+[start 104/330] p0_task_il_multi__tinyimagenet__seed4__ewc
+[succeeded 97/330] p0_class_entropy_cal__tinyimagenet__seed3__finetune (6.0 min, 7 running, 203.5 min elapsed)
+[start 105/330] p0_task_il_multi__tinyimagenet__seed4__er
+[succeeded 98/330] p0_task_il_multi__tinyimagenet__seed3__er (16.4 min, 7 running, 208.7 min elapsed)
+[start 106/330] p0_class_entropy__tinyimagenet__seed4__ewc
+[succeeded 99/330] p0_class_entropy__tinyimagenet__seed3__er (14.2 min, 7 running, 209.7 min elapsed)
+[start 107/330] p0_class_entropy__tinyimagenet__seed4__er
+[succeeded 100/330] p0_task_il_multi__tinyimagenet__seed4__ewc (9.5 min, 7 running, 211.7 min elapsed)
+[start 108/330] p0_class_entropy_cal__tinyimagenet__seed4__finetune
+[succeeded 101/330] p0_class_entropy_cal__tinyimagenet__seed2__supsup (25.5 min, 7 running, 213.8 min elapsed)
+[start 109/330] p0_class_entropy_cal__tinyimagenet__seed4__supsup
+[succeeded 102/330] p0_class_entropy_cal__tinyimagenet__seed2__wsn (25.6 min, 7 running, 214.3 min elapsed)
+[start 110/330] p0_class_entropy_cal__tinyimagenet__seed4__wsn
+[succeeded 103/330] p0_class_entropy__tinyimagenet__seed4__ewc (8.4 min, 7 running, 217.1 min elapsed)
+[start 111/330] p0_task_il_multi__tinyimagenet__seed0__packnet
+[succeeded 104/330] p0_class_entropy_cal__tinyimagenet__seed4__finetune (6.1 min, 7 running, 217.8 min elapsed)
+[start 112/330] p0_class_entropy__tinyimagenet__seed0__packnet
+[succeeded 105/330] p0_task_il_multi__tinyimagenet__seed4__er (16.4 min, 7 running, 219.9 min elapsed)
+[start 113/330] p0_task_il_multi__tinyimagenet__seed1__packnet
+[succeeded 106/330] p0_class_entropy__tinyimagenet__seed4__er (14.4 min, 7 running, 224.1 min elapsed)
+[start 114/330] p0_class_entropy__tinyimagenet__seed1__packnet
+[succeeded 107/330] p0_task_il_multi__tinyimagenet__seed0__packnet (8.0 min, 7 running, 225.2 min elapsed)
+[start 115/330] p0_task_il_multi__tinyimagenet__seed2__packnet
+[succeeded 108/330] p0_class_entropy_cal__tinyimagenet__seed3__supsup (27.8 min, 7 running, 225.4 min elapsed)
+[start 116/330] p0_class_entropy__tinyimagenet__seed2__packnet
+[succeeded 109/330] p0_class_entropy__tinyimagenet__seed0__packnet (8.8 min, 7 running, 226.5 min elapsed)
+[start 117/330] p0_task_il_multi__tinyimagenet__seed3__packnet
+[succeeded 110/330] p0_task_il_multi__tinyimagenet__seed1__packnet (8.4 min, 7 running, 228.4 min elapsed)
+[start 118/330] p0_class_entropy__tinyimagenet__seed3__packnet
+[succeeded 111/330] p0_class_entropy_cal__tinyimagenet__seed3__wsn (31.2 min, 7 running, 231.3 min elapsed)
+[start 119/330] p0_task_il_multi__tinyimagenet__seed4__packnet
+[succeeded 112/330] p0_class_entropy__tinyimagenet__seed1__packnet (10.3 min, 7 running, 234.4 min elapsed)
+[start 120/330] p0_class_entropy__tinyimagenet__seed4__packnet
+[succeeded 113/330] p0_task_il_multi__tinyimagenet__seed2__packnet (9.2 min, 7 running, 234.4 min elapsed)
+[start 121/330] p0_task_il_multi__pmnist__seed0__diltcl
+[succeeded 114/330] p0_class_entropy__tinyimagenet__seed2__packnet (9.8 min, 7 running, 235.2 min elapsed)
+[start 122/330] p0_task_il_multi__tinyimagenet__seed0__finetune
+[succeeded 115/330] p0_task_il_multi__tinyimagenet__seed3__packnet (9.2 min, 7 running, 235.8 min elapsed)
+[start 123/330] p0_task_il_multi__tinyimagenet__seed0__supsup
+[succeeded 116/330] p0_class_entropy__tinyimagenet__seed3__packnet (9.6 min, 7 running, 237.9 min elapsed)
+[start 124/330] p0_task_il_multi__tinyimagenet__seed0__wsn
+[succeeded 117/330] p0_task_il_multi__tinyimagenet__seed4__packnet (9.0 min, 7 running, 240.3 min elapsed)
+[start 125/330] p0_task_il_multi__tinyimagenet__seed0__independent
+[succeeded 118/330] p0_task_il_multi__tinyimagenet__seed0__finetune (6.9 min, 7 running, 242.1 min elapsed)
+[start 126/330] p0_class_entropy__tinyimagenet__seed0__finetune
+[succeeded 119/330] p0_class_entropy__tinyimagenet__seed4__packnet (8.6 min, 7 running, 243.0 min elapsed)
+[start 127/330] p0_class_entropy__tinyimagenet__seed0__supsup
+[succeeded 120/330] p0_task_il_multi__tinyimagenet__seed0__independent (6.6 min, 7 running, 246.9 min elapsed)
+[start 128/330] p0_class_entropy__tinyimagenet__seed0__wsn
+[succeeded 121/330] p0_class_entropy_cal__tinyimagenet__seed4__supsup (34.4 min, 7 running, 248.2 min elapsed)
+[start 129/330] p0_task_il_multi__pmnist__seed1__diltcl
+[succeeded 122/330] p0_class_entropy_cal__tinyimagenet__seed4__wsn (34.4 min, 7 running, 248.6 min elapsed)
+[start 130/330] p0_task_il_multi__tinyimagenet__seed1__finetune
+[succeeded 123/330] p0_class_entropy__tinyimagenet__seed0__finetune (6.5 min, 7 running, 248.7 min elapsed)
+[start 131/330] p0_task_il_multi__tinyimagenet__seed1__supsup
+[succeeded 124/330] p0_task_il_multi__tinyimagenet__seed1__finetune (6.8 min, 7 running, 255.4 min elapsed)
+[start 132/330] p0_task_il_multi__tinyimagenet__seed1__wsn
+[succeeded 125/330] p0_task_il_multi__pmnist__seed0__diltcl (22.0 min, 7 running, 256.4 min elapsed)
+[start 133/330] p0_task_il_multi__tinyimagenet__seed1__independent
+[succeeded 126/330] p0_task_il_multi__tinyimagenet__seed0__supsup (22.9 min, 7 running, 258.7 min elapsed)
+[start 134/330] p0_class_entropy__tinyimagenet__seed1__finetune
+[succeeded 127/330] p0_task_il_multi__tinyimagenet__seed0__wsn (22.4 min, 7 running, 260.3 min elapsed)
+[start 135/330] p0_class_entropy__tinyimagenet__seed1__supsup
+[succeeded 128/330] p0_task_il_multi__tinyimagenet__seed1__independent (6.3 min, 7 running, 262.7 min elapsed)
+[start 136/330] p0_class_entropy__tinyimagenet__seed1__wsn
+[succeeded 129/330] p0_class_entropy__tinyimagenet__seed1__finetune (6.2 min, 7 running, 264.9 min elapsed)
+[start 137/330] p0_task_il_multi__pmnist__seed2__diltcl
+[succeeded 130/330] p0_class_entropy__tinyimagenet__seed0__supsup (22.0 min, 7 running, 265.0 min elapsed)
+[start 138/330] p0_task_il_multi__tinyimagenet__seed2__finetune
+[succeeded 131/330] p0_class_entropy__tinyimagenet__seed0__wsn (21.3 min, 7 running, 268.2 min elapsed)
+[start 139/330] p0_task_il_multi__tinyimagenet__seed2__supsup
+[succeeded 132/330] p0_task_il_multi__pmnist__seed1__diltcl (21.0 min, 7 running, 269.2 min elapsed)
+[start 140/330] p0_task_il_multi__tinyimagenet__seed2__wsn
+[succeeded 133/330] p0_task_il_multi__tinyimagenet__seed1__supsup (20.7 min, 7 running, 269.4 min elapsed)
+[start 141/330] p0_task_il_multi__tinyimagenet__seed2__independent
+[succeeded 134/330] p0_task_il_multi__tinyimagenet__seed2__finetune (6.7 min, 7 running, 271.7 min elapsed)
+[start 142/330] p0_class_entropy__tinyimagenet__seed2__finetune
+[succeeded 135/330] p0_task_il_multi__tinyimagenet__seed2__independent (6.5 min, 7 running, 275.9 min elapsed)
+[start 143/330] p0_class_entropy__tinyimagenet__seed2__supsup
+[succeeded 136/330] p0_task_il_multi__tinyimagenet__seed1__wsn (22.3 min, 7 running, 277.7 min elapsed)
+[start 144/330] p0_class_entropy__tinyimagenet__seed2__wsn
+[succeeded 137/330] p0_class_entropy__tinyimagenet__seed2__finetune (6.6 min, 7 running, 278.3 min elapsed)
+[start 145/330] p0_task_il_multi__pmnist__seed3__diltcl
+[succeeded 138/330] p0_class_entropy__tinyimagenet__seed1__supsup (21.8 min, 7 running, 282.1 min elapsed)
+[start 146/330] p0_task_il_multi__tinyimagenet__seed3__finetune
+[succeeded 139/330] p0_class_entropy__tinyimagenet__seed1__wsn (21.4 min, 7 running, 284.1 min elapsed)
+[start 147/330] p0_task_il_multi__tinyimagenet__seed3__supsup
+[succeeded 140/330] p0_task_il_multi__pmnist__seed2__diltcl (20.6 min, 7 running, 285.5 min elapsed)
+[start 148/330] p0_task_il_multi__tinyimagenet__seed3__wsn
+[succeeded 141/330] p0_task_il_multi__tinyimagenet__seed3__finetune (6.7 min, 7 running, 288.9 min elapsed)
+[start 149/330] p0_task_il_multi__tinyimagenet__seed3__independent
+[succeeded 142/330] p0_task_il_multi__tinyimagenet__seed2__supsup (20.7 min, 7 running, 288.9 min elapsed)
+[start 150/330] p0_class_entropy__tinyimagenet__seed3__finetune
+[succeeded 143/330] p0_task_il_multi__tinyimagenet__seed2__wsn (21.1 min, 7 running, 290.4 min elapsed)
+[start 151/330] p0_class_entropy__tinyimagenet__seed3__supsup
+[succeeded 144/330] p0_task_il_multi__tinyimagenet__seed3__independent (6.6 min, 7 running, 295.4 min elapsed)
+[start 152/330] p0_class_entropy__tinyimagenet__seed3__wsn
+[succeeded 145/330] p0_class_entropy__tinyimagenet__seed3__finetune (6.5 min, 7 running, 295.4 min elapsed)
+[start 153/330] p0_task_il_multi__pmnist__seed4__diltcl
+[succeeded 146/330] p0_class_entropy__tinyimagenet__seed2__supsup (21.1 min, 7 running, 296.9 min elapsed)
+[start 154/330] p0_task_il_multi__tinyimagenet__seed4__finetune
+[succeeded 147/330] p0_class_entropy__tinyimagenet__seed2__wsn (21.1 min, 7 running, 298.9 min elapsed)
+[start 155/330] p0_task_il_multi__tinyimagenet__seed4__supsup
+[succeeded 148/330] p0_task_il_multi__pmnist__seed3__diltcl (20.9 min, 7 running, 299.2 min elapsed)
+[start 156/330] p0_task_il_multi__tinyimagenet__seed4__wsn
+[succeeded 149/330] p0_task_il_multi__tinyimagenet__seed4__finetune (6.8 min, 7 running, 303.7 min elapsed)
+[start 157/330] p0_task_il_multi__tinyimagenet__seed4__independent
+[succeeded 150/330] p0_task_il_multi__tinyimagenet__seed3__supsup (21.2 min, 7 running, 305.3 min elapsed)
+[start 158/330] p0_class_entropy__tinyimagenet__seed4__finetune
+[succeeded 151/330] p0_task_il_multi__tinyimagenet__seed3__wsn (21.6 min, 7 running, 307.2 min elapsed)
+[start 159/330] p0_class_entropy__tinyimagenet__seed4__supsup
+[succeeded 152/330] p0_task_il_multi__tinyimagenet__seed4__independent (6.6 min, 7 running, 310.3 min elapsed)
+[start 160/330] p0_class_entropy__tinyimagenet__seed4__wsn
+[succeeded 153/330] p0_class_entropy__tinyimagenet__seed4__finetune (6.7 min, 7 running, 312.0 min elapsed)
+[start 161/330] p0_class_entropy_cal__cifar__seed0__lwf
+[succeeded 154/330] p0_class_entropy__tinyimagenet__seed3__supsup (22.1 min, 7 running, 312.5 min elapsed)
+[start 162/330] p0_class_entropy_cal__cifar__seed1__lwf
+[succeeded 155/330] p0_class_entropy_cal__cifar__seed0__lwf (3.8 min, 7 running, 315.8 min elapsed)
+[start 163/330] p0_class_entropy_cal__cifar__seed2__lwf
+[succeeded 156/330] p0_class_entropy_cal__cifar__seed1__lwf (3.9 min, 7 running, 316.3 min elapsed)
+[start 164/330] p0_class_entropy_cal__cifar__seed3__lwf
+[succeeded 157/330] p0_class_entropy__tinyimagenet__seed3__wsn (20.9 min, 7 running, 316.4 min elapsed)
+[start 165/330] p0_class_entropy_cal__cifar__seed4__lwf
+[succeeded 158/330] p0_task_il_multi__pmnist__seed4__diltcl (20.9 min, 7 running, 316.4 min elapsed)
+[start 166/330] p0_class_entropy_cal__cifar__seed0__derpp
+[succeeded 159/330] p0_task_il_multi__tinyimagenet__seed4__supsup (20.4 min, 7 running, 319.3 min elapsed)
+[start 167/330] p0_class_entropy_cal__cifar__seed1__derpp
+[succeeded 160/330] p0_class_entropy_cal__cifar__seed2__lwf (3.8 min, 7 running, 319.6 min elapsed)
+[start 168/330] p0_class_entropy_cal__cifar__seed2__derpp
+[succeeded 161/330] p0_task_il_multi__tinyimagenet__seed4__wsn (20.5 min, 7 running, 319.7 min elapsed)
+[start 169/330] p0_class_entropy_cal__cifar__seed3__derpp
+[succeeded 162/330] p0_class_entropy_cal__cifar__seed3__lwf (3.7 min, 7 running, 320.0 min elapsed)
+[start 170/330] p0_class_entropy_cal__cifar__seed4__derpp
+[succeeded 163/330] p0_class_entropy_cal__cifar__seed4__lwf (3.9 min, 7 running, 320.2 min elapsed)
+[start 171/330] p0_task_il_multi__cifar__seed0__lwf
+[succeeded 164/330] p0_class_entropy_cal__cifar__seed0__derpp (8.5 min, 7 running, 324.9 min elapsed)
+[start 172/330] p0_class_entropy__cifar__seed0__lwf
+[succeeded 165/330] p0_task_il_multi__cifar__seed0__lwf (5.4 min, 7 running, 325.7 min elapsed)
+[start 173/330] p0_task_il_multi__cifar__seed1__lwf
+[succeeded 166/330] p0_class_entropy__tinyimagenet__seed4__supsup (18.8 min, 7 running, 325.9 min elapsed)
+[start 174/330] p0_class_entropy__cifar__seed1__lwf
+[succeeded 167/330] p0_class_entropy_cal__cifar__seed1__derpp (8.4 min, 7 running, 327.7 min elapsed)
+[start 175/330] p0_task_il_multi__cifar__seed2__lwf
+[succeeded 168/330] p0_class_entropy__tinyimagenet__seed4__wsn (17.8 min, 7 running, 328.1 min elapsed)
+[start 176/330] p0_class_entropy__cifar__seed2__lwf
+[succeeded 169/330] p0_class_entropy_cal__cifar__seed2__derpp (8.5 min, 7 running, 328.1 min elapsed)
+[start 177/330] p0_task_il_multi__cifar__seed3__lwf
+[succeeded 170/330] p0_class_entropy_cal__cifar__seed3__derpp (8.8 min, 7 running, 328.5 min elapsed)
+[start 178/330] p0_class_entropy__cifar__seed3__lwf
+[succeeded 171/330] p0_class_entropy_cal__cifar__seed4__derpp (8.6 min, 7 running, 328.6 min elapsed)
+[start 179/330] p0_task_il_multi__cifar__seed4__lwf
+[succeeded 172/330] p0_class_entropy__cifar__seed0__lwf (4.3 min, 7 running, 329.2 min elapsed)
+[start 180/330] p0_class_entropy__cifar__seed4__lwf
+[succeeded 173/330] p0_class_entropy__cifar__seed1__lwf (4.2 min, 7 running, 330.2 min elapsed)
+[start 181/330] p0_class_entropy_cal__cifar__seed0__ewc
+[succeeded 174/330] p0_task_il_multi__cifar__seed1__lwf (5.7 min, 7 running, 331.4 min elapsed)
+[start 182/330] p0_class_entropy_cal__cifar__seed0__er
+[succeeded 175/330] p0_class_entropy__cifar__seed2__lwf (4.2 min, 7 running, 332.4 min elapsed)
+[start 183/330] p0_class_entropy_cal__cifar__seed1__ewc
+[succeeded 176/330] p0_class_entropy__cifar__seed3__lwf (4.2 min, 7 running, 332.7 min elapsed)
+[start 184/330] p0_class_entropy_cal__cifar__seed1__er
+[succeeded 177/330] p0_task_il_multi__cifar__seed2__lwf (5.7 min, 7 running, 333.5 min elapsed)
+[start 185/330] p0_class_entropy_cal__cifar__seed2__ewc
+[succeeded 178/330] p0_class_entropy__cifar__seed4__lwf (4.3 min, 7 running, 333.5 min elapsed)
+[start 186/330] p0_class_entropy_cal__cifar__seed2__er
+[succeeded 179/330] p0_task_il_multi__cifar__seed3__lwf (5.8 min, 7 running, 334.0 min elapsed)
+[start 187/330] p0_class_entropy_cal__cifar__seed3__ewc
+[succeeded 180/330] p0_class_entropy_cal__cifar__seed0__ewc (4.0 min, 7 running, 334.2 min elapsed)
+[start 188/330] p0_class_entropy_cal__cifar__seed3__er
+[succeeded 181/330] p0_task_il_multi__cifar__seed4__lwf (5.6 min, 7 running, 334.3 min elapsed)
+[start 189/330] p0_class_entropy_cal__cifar__seed4__ewc
+[succeeded 182/330] p0_class_entropy_cal__cifar__seed1__ewc (4.1 min, 7 running, 336.4 min elapsed)
+[start 190/330] p0_class_entropy_cal__cifar__seed4__er
+[succeeded 183/330] p0_class_entropy_cal__cifar__seed0__er (5.6 min, 7 running, 337.1 min elapsed)
+[start 191/330] p0_task_il_multi__cifar__seed0__derpp
+[succeeded 184/330] p0_class_entropy_cal__cifar__seed2__ewc (4.0 min, 7 running, 337.5 min elapsed)
+[start 192/330] p0_class_entropy__cifar__seed0__derpp
+[succeeded 185/330] p0_class_entropy_cal__cifar__seed3__ewc (4.0 min, 7 running, 338.0 min elapsed)
+[start 193/330] p0_task_il_multi__cifar__seed1__derpp
+[succeeded 186/330] p0_class_entropy_cal__cifar__seed4__ewc (3.9 min, 7 running, 338.2 min elapsed)
+[start 194/330] p0_class_entropy__cifar__seed1__derpp
+[succeeded 187/330] p0_class_entropy_cal__cifar__seed1__er (5.8 min, 7 running, 338.5 min elapsed)
+[start 195/330] p0_task_il_multi__cifar__seed2__derpp
+[succeeded 188/330] p0_class_entropy_cal__cifar__seed2__er (5.8 min, 7 running, 339.3 min elapsed)
+[start 196/330] p0_class_entropy__cifar__seed2__derpp
+[succeeded 189/330] p0_class_entropy_cal__cifar__seed3__er (5.7 min, 7 running, 339.9 min elapsed)
+[start 197/330] p0_task_il_multi__cifar__seed3__derpp
+[succeeded 190/330] p0_class_entropy_cal__cifar__seed4__er (5.6 min, 7 running, 342.0 min elapsed)
+[start 198/330] p0_class_entropy__cifar__seed3__derpp
+[succeeded 191/330] p0_class_entropy__cifar__seed0__derpp (9.1 min, 7 running, 346.6 min elapsed)
+[start 199/330] p0_task_il_multi__cifar__seed4__derpp
+[succeeded 192/330] p0_class_entropy__cifar__seed1__derpp (9.0 min, 7 running, 347.2 min elapsed)
+[start 200/330] p0_class_entropy__cifar__seed4__derpp
+[succeeded 193/330] p0_class_entropy__cifar__seed2__derpp (9.1 min, 7 running, 348.4 min elapsed)
+[start 201/330] p0_class_entropy_cal__cifar__seed0__packnet
+[succeeded 194/330] p0_task_il_multi__cifar__seed0__derpp (12.3 min, 7 running, 349.4 min elapsed)
+[start 202/330] p0_class_entropy_cal__cifar__seed1__packnet
+[succeeded 195/330] p0_task_il_multi__cifar__seed1__derpp (12.5 min, 7 running, 350.6 min elapsed)
+[start 203/330] p0_class_entropy_cal__cifar__seed2__packnet
+[succeeded 196/330] p0_class_entropy__cifar__seed3__derpp (9.0 min, 7 running, 351.0 min elapsed)
+[start 204/330] p0_class_entropy_cal__cifar__seed3__packnet
+[succeeded 197/330] p0_task_il_multi__cifar__seed2__derpp (12.8 min, 7 running, 351.3 min elapsed)
+[start 205/330] p0_class_entropy_cal__cifar__seed4__packnet
+[succeeded 198/330] p0_task_il_multi__cifar__seed3__derpp (12.4 min, 7 running, 352.3 min elapsed)
+[start 206/330] p0_task_il_multi__cifar__seed0__ewc
+[succeeded 199/330] p0_class_entropy_cal__cifar__seed0__packnet (4.4 min, 7 running, 352.8 min elapsed)
+[start 207/330] p0_task_il_multi__cifar__seed0__er
+[succeeded 200/330] p0_class_entropy_cal__cifar__seed1__packnet (4.3 min, 7 running, 353.7 min elapsed)
+[start 208/330] p0_class_entropy__cifar__seed0__ewc
+[succeeded 201/330] p0_class_entropy_cal__cifar__seed2__packnet (4.3 min, 7 running, 354.9 min elapsed)
+[start 209/330] p0_class_entropy__cifar__seed0__er
+[succeeded 202/330] p0_class_entropy_cal__cifar__seed3__packnet (4.2 min, 7 running, 355.2 min elapsed)
+[start 210/330] p0_class_entropy_cal__cifar__seed0__finetune
+[succeeded 203/330] p0_class_entropy_cal__cifar__seed4__packnet (4.2 min, 7 running, 355.5 min elapsed)
+[start 211/330] p0_class_entropy_cal__cifar__seed0__supsup
+[succeeded 204/330] p0_class_entropy__cifar__seed4__derpp (9.1 min, 7 running, 356.3 min elapsed)
+[start 212/330] p0_class_entropy_cal__cifar__seed0__wsn
+[succeeded 205/330] p0_class_entropy__cifar__seed0__ewc (4.4 min, 7 running, 358.1 min elapsed)
+[start 213/330] p0_task_il_multi__cifar__seed1__ewc
+[succeeded 206/330] p0_class_entropy_cal__cifar__seed0__finetune (2.9 min, 7 running, 358.2 min elapsed)
+[start 214/330] p0_task_il_multi__cifar__seed1__er
+[succeeded 207/330] p0_task_il_multi__cifar__seed0__ewc (6.4 min, 7 running, 358.7 min elapsed)
+[start 215/330] p0_class_entropy__cifar__seed1__ewc
+[succeeded 208/330] p0_task_il_multi__cifar__seed4__derpp (12.5 min, 7 running, 359.1 min elapsed)
+[start 216/330] p0_class_entropy__cifar__seed1__er
+[succeeded 209/330] p0_class_entropy__cifar__seed0__er (6.2 min, 7 running, 361.1 min elapsed)
+[start 217/330] p0_class_entropy_cal__cifar__seed1__finetune
+[succeeded 210/330] p0_task_il_multi__cifar__seed0__er (8.4 min, 7 running, 361.2 min elapsed)
+[start 218/330] p0_class_entropy_cal__cifar__seed1__supsup
+[succeeded 211/330] p0_class_entropy__cifar__seed1__ewc (4.3 min, 7 running, 363.1 min elapsed)
+[start 219/330] p0_class_entropy_cal__cifar__seed1__wsn
+[succeeded 212/330] p0_class_entropy_cal__cifar__seed0__supsup (7.8 min, 7 running, 363.3 min elapsed)
+[start 220/330] p0_task_il_multi__cifar__seed2__ewc
+[succeeded 213/330] p0_class_entropy_cal__cifar__seed1__finetune (2.9 min, 7 running, 364.0 min elapsed)
+[start 221/330] p0_task_il_multi__cifar__seed2__er
+[succeeded 214/330] p0_task_il_multi__cifar__seed1__ewc (6.3 min, 7 running, 364.4 min elapsed)
+[start 222/330] p0_class_entropy__cifar__seed2__ewc
+[succeeded 215/330] p0_class_entropy_cal__cifar__seed0__wsn (8.1 min, 7 running, 364.4 min elapsed)
+[start 223/330] p0_class_entropy__cifar__seed2__er
+[succeeded 216/330] p0_class_entropy__cifar__seed1__er (6.3 min, 7 running, 365.4 min elapsed)
+[start 224/330] p0_class_entropy_cal__cifar__seed2__finetune
+[succeeded 217/330] p0_task_il_multi__cifar__seed1__er (8.4 min, 7 running, 366.6 min elapsed)
+[start 225/330] p0_class_entropy_cal__cifar__seed2__supsup
+[succeeded 218/330] p0_class_entropy_cal__cifar__seed2__finetune (3.0 min, 7 running, 368.3 min elapsed)
+[start 226/330] p0_class_entropy_cal__cifar__seed2__wsn
+[succeeded 219/330] p0_class_entropy__cifar__seed2__ewc (4.4 min, 7 running, 368.8 min elapsed)
+[start 227/330] p0_task_il_multi__cifar__seed3__ewc
+[succeeded 220/330] p0_class_entropy_cal__cifar__seed1__supsup (7.9 min, 7 running, 369.1 min elapsed)
+[start 228/330] p0_task_il_multi__cifar__seed3__er
+[succeeded 221/330] p0_task_il_multi__cifar__seed2__ewc (6.3 min, 7 running, 369.6 min elapsed)
+[start 229/330] p0_class_entropy__cifar__seed3__ewc
+[succeeded 222/330] p0_class_entropy__cifar__seed2__er (6.4 min, 7 running, 370.9 min elapsed)
+[start 230/330] p0_class_entropy__cifar__seed3__er
+[succeeded 223/330] p0_class_entropy_cal__cifar__seed1__wsn (7.8 min, 7 running, 370.9 min elapsed)
+[start 231/330] p0_class_entropy_cal__cifar__seed3__finetune
+[succeeded 224/330] p0_task_il_multi__cifar__seed2__er (8.0 min, 7 running, 372.0 min elapsed)
+[start 232/330] p0_class_entropy_cal__cifar__seed3__supsup
+[succeeded 225/330] p0_class_entropy_cal__cifar__seed3__finetune (2.9 min, 7 running, 373.8 min elapsed)
+[start 233/330] p0_class_entropy_cal__cifar__seed3__wsn
+[succeeded 226/330] p0_class_entropy__cifar__seed3__ewc (4.5 min, 7 running, 374.2 min elapsed)
+[start 234/330] p0_task_il_multi__cifar__seed4__ewc
+[succeeded 227/330] p0_class_entropy_cal__cifar__seed2__supsup (7.9 min, 7 running, 374.5 min elapsed)
+[start 235/330] p0_task_il_multi__cifar__seed4__er
+[succeeded 228/330] p0_task_il_multi__cifar__seed3__ewc (6.4 min, 7 running, 375.2 min elapsed)
+[start 236/330] p0_class_entropy__cifar__seed4__ewc
+[succeeded 229/330] p0_class_entropy_cal__cifar__seed2__wsn (7.9 min, 7 running, 376.3 min elapsed)
+[start 237/330] p0_class_entropy__cifar__seed4__er
+[succeeded 230/330] p0_class_entropy__cifar__seed3__er (6.1 min, 7 running, 377.0 min elapsed)
+[start 238/330] p0_class_entropy_cal__cifar__seed4__finetune
+[succeeded 231/330] p0_task_il_multi__cifar__seed3__er (8.4 min, 7 running, 377.5 min elapsed)
+[start 239/330] p0_class_entropy_cal__cifar__seed4__supsup
+[succeeded 232/330] p0_class_entropy__cifar__seed4__ewc (4.3 min, 7 running, 379.5 min elapsed)
+[start 240/330] p0_class_entropy_cal__cifar__seed4__wsn
+[succeeded 233/330] p0_class_entropy_cal__cifar__seed4__finetune (2.9 min, 7 running, 379.9 min elapsed)
+[start 241/330] p0_task_il_multi__cifar__seed0__packnet
+[succeeded 234/330] p0_class_entropy_cal__cifar__seed3__supsup (7.9 min, 7 running, 379.9 min elapsed)
+[start 242/330] p0_class_entropy__cifar__seed0__packnet
+[succeeded 235/330] p0_task_il_multi__cifar__seed4__ewc (6.4 min, 7 running, 380.6 min elapsed)
+[start 243/330] p0_task_il_multi__cifar__seed1__packnet
+[succeeded 236/330] p0_class_entropy_cal__cifar__seed3__wsn (8.3 min, 7 running, 382.1 min elapsed)
+[start 244/330] p0_class_entropy__cifar__seed1__packnet
+[succeeded 237/330] p0_class_entropy__cifar__seed4__er (6.2 min, 7 running, 382.4 min elapsed)
+[start 245/330] p0_task_il_multi__cifar__seed2__packnet
+[succeeded 238/330] p0_task_il_multi__cifar__seed4__er (8.1 min, 7 running, 382.6 min elapsed)
+[start 246/330] p0_class_entropy__cifar__seed2__packnet
+[succeeded 239/330] p0_task_il_multi__cifar__seed0__packnet (4.0 min, 7 running, 383.9 min elapsed)
+[start 247/330] p0_task_il_multi__cifar__seed3__packnet
+[succeeded 240/330] p0_class_entropy__cifar__seed0__packnet (4.6 min, 7 running, 384.5 min elapsed)
+[start 248/330] p0_class_entropy__cifar__seed3__packnet
+[succeeded 241/330] p0_task_il_multi__cifar__seed1__packnet (3.9 min, 7 running, 384.6 min elapsed)
+[start 249/330] p0_task_il_multi__cifar__seed4__packnet
+[succeeded 242/330] p0_class_entropy__cifar__seed1__packnet (4.0 min, 7 running, 386.1 min elapsed)
+[start 250/330] p0_class_entropy__cifar__seed4__packnet
+[succeeded 243/330] p0_task_il_multi__cifar__seed2__packnet (3.9 min, 7 running, 386.4 min elapsed)
+[start 251/330] p0_task_il_multi__cifar__seed0__finetune
+[succeeded 244/330] p0_class_entropy_cal__cifar__seed4__supsup (9.3 min, 7 running, 386.7 min elapsed)
+[start 252/330] p0_task_il_multi__cifar__seed0__supsup
+[succeeded 245/330] p0_class_entropy__cifar__seed2__packnet (4.4 min, 7 running, 387.0 min elapsed)
+[start 253/330] p0_task_il_multi__cifar__seed0__wsn
+[succeeded 246/330] p0_task_il_multi__cifar__seed3__packnet (4.0 min, 7 running, 387.9 min elapsed)
+[start 254/330] p0_task_il_multi__cifar__seed0__independent
+[succeeded 247/330] p0_task_il_multi__cifar__seed4__packnet (4.0 min, 7 running, 388.6 min elapsed)
+[start 255/330] p0_class_entropy__cifar__seed0__finetune
+[succeeded 248/330] p0_class_entropy__cifar__seed3__packnet (4.4 min, 7 running, 388.9 min elapsed)
+[start 256/330] p0_class_entropy__cifar__seed0__supsup
+[succeeded 249/330] p0_class_entropy_cal__cifar__seed4__wsn (9.7 min, 7 running, 389.2 min elapsed)
+[start 257/330] p0_class_entropy__cifar__seed0__wsn
+[succeeded 250/330] p0_task_il_multi__cifar__seed0__finetune (3.3 min, 7 running, 389.7 min elapsed)
+[start 258/330] p0_task_il_multi__cifar__seed1__finetune
+[succeeded 251/330] p0_class_entropy__cifar__seed4__packnet (4.3 min, 7 running, 390.4 min elapsed)
+[start 259/330] p0_task_il_multi__cifar__seed1__supsup
+[succeeded 252/330] p0_task_il_multi__cifar__seed0__independent (3.4 min, 7 running, 391.2 min elapsed)
+[start 260/330] p0_task_il_multi__cifar__seed1__wsn
+[succeeded 253/330] p0_class_entropy__cifar__seed0__finetune (3.2 min, 7 running, 391.8 min elapsed)
+[start 261/330] p0_task_il_multi__cifar__seed1__independent
+[succeeded 254/330] p0_task_il_multi__cifar__seed1__finetune (3.2 min, 7 running, 392.9 min elapsed)
+[start 262/330] p0_class_entropy__cifar__seed1__finetune
+[succeeded 255/330] p0_task_il_multi__cifar__seed0__supsup (7.8 min, 7 running, 394.6 min elapsed)
+[start 263/330] p0_class_entropy__cifar__seed1__supsup
+[succeeded 256/330] p0_task_il_multi__cifar__seed1__independent (3.2 min, 7 running, 394.9 min elapsed)
+[start 264/330] p0_class_entropy__cifar__seed1__wsn
+[succeeded 257/330] p0_task_il_multi__cifar__seed0__wsn (7.9 min, 7 running, 394.9 min elapsed)
+[start 265/330] p0_task_il_multi__cifar__seed2__finetune
+[succeeded 258/330] p0_class_entropy__cifar__seed1__finetune (3.2 min, 7 running, 396.1 min elapsed)
+[start 266/330] p0_task_il_multi__cifar__seed2__supsup
+[succeeded 259/330] p0_class_entropy__cifar__seed0__supsup (8.4 min, 7 running, 397.3 min elapsed)
+[start 267/330] p0_task_il_multi__cifar__seed2__wsn
+[succeeded 260/330] p0_class_entropy__cifar__seed0__wsn (8.4 min, 7 running, 397.6 min elapsed)
+[start 268/330] p0_task_il_multi__cifar__seed2__independent
+[succeeded 261/330] p0_task_il_multi__cifar__seed1__supsup (7.6 min, 7 running, 398.0 min elapsed)
+[start 269/330] p0_class_entropy__cifar__seed2__finetune
+[succeeded 262/330] p0_task_il_multi__cifar__seed2__finetune (3.3 min, 7 running, 398.3 min elapsed)
+[start 270/330] p0_class_entropy__cifar__seed2__supsup
+[succeeded 263/330] p0_task_il_multi__cifar__seed1__wsn (7.7 min, 7 running, 398.9 min elapsed)
+[start 271/330] p0_class_entropy__cifar__seed2__wsn
+[succeeded 264/330] p0_task_il_multi__cifar__seed2__independent (3.2 min, 7 running, 400.8 min elapsed)
+[start 272/330] p0_task_il_multi__cifar__seed3__finetune
+[succeeded 265/330] p0_class_entropy__cifar__seed2__finetune (3.2 min, 7 running, 401.2 min elapsed)
+[start 273/330] p0_task_il_multi__cifar__seed3__supsup
+[succeeded 266/330] p0_class_entropy__cifar__seed1__supsup (8.3 min, 7 running, 402.8 min elapsed)
+[start 274/330] p0_task_il_multi__cifar__seed3__wsn
+[succeeded 267/330] p0_class_entropy__cifar__seed1__wsn (8.3 min, 7 running, 403.3 min elapsed)
+[start 275/330] p0_task_il_multi__cifar__seed3__independent
+[succeeded 268/330] p0_task_il_multi__cifar__seed2__supsup (7.5 min, 7 running, 403.6 min elapsed)
+[start 276/330] p0_class_entropy__cifar__seed3__finetune
+[succeeded 269/330] p0_task_il_multi__cifar__seed3__finetune (3.2 min, 7 running, 403.9 min elapsed)
+[start 277/330] p0_class_entropy__cifar__seed3__supsup
+[succeeded 270/330] p0_task_il_multi__cifar__seed2__wsn (7.7 min, 7 running, 405.0 min elapsed)
+[start 278/330] p0_class_entropy__cifar__seed3__wsn
+[succeeded 271/330] p0_task_il_multi__cifar__seed3__independent (3.3 min, 7 running, 406.5 min elapsed)
+[start 279/330] p0_task_il_multi__cifar__seed4__finetune
+[succeeded 272/330] p0_class_entropy__cifar__seed2__supsup (8.3 min, 7 running, 406.6 min elapsed)
+[start 280/330] p0_task_il_multi__cifar__seed4__supsup
+[succeeded 273/330] p0_class_entropy__cifar__seed3__finetune (3.2 min, 7 running, 406.8 min elapsed)
+[start 281/330] p0_task_il_multi__cifar__seed4__wsn
+[succeeded 274/330] p0_class_entropy__cifar__seed2__wsn (8.3 min, 7 running, 407.3 min elapsed)
+[start 282/330] p0_task_il_multi__cifar__seed4__independent
+[succeeded 275/330] p0_task_il_multi__cifar__seed3__supsup (7.5 min, 7 running, 408.7 min elapsed)
+[start 283/330] p0_class_entropy__cifar__seed4__finetune
+[succeeded 276/330] p0_task_il_multi__cifar__seed4__finetune (3.3 min, 7 running, 409.8 min elapsed)
+[start 284/330] p0_class_entropy__cifar__seed4__supsup
+[succeeded 277/330] p0_task_il_multi__cifar__seed4__independent (3.2 min, 7 running, 410.5 min elapsed)
+[start 285/330] p0_class_entropy__cifar__seed4__wsn
+[succeeded 278/330] p0_task_il_multi__cifar__seed3__wsn (7.7 min, 7 running, 410.6 min elapsed)
+[start 286/330] p0_task_il_multi__pmnist__seed0__lwf
+[succeeded 279/330] p0_class_entropy__cifar__seed4__finetune (3.1 min, 7 running, 411.7 min elapsed)
+[start 287/330] p0_task_il_multi__pmnist__seed1__lwf
+[succeeded 280/330] p0_class_entropy__cifar__seed3__supsup (8.3 min, 7 running, 412.2 min elapsed)
+[start 288/330] p0_task_il_multi__pmnist__seed2__lwf
+[succeeded 281/330] p0_class_entropy__cifar__seed3__wsn (8.2 min, 7 running, 413.2 min elapsed)
+[start 289/330] p0_task_il_multi__pmnist__seed3__lwf
+[succeeded 282/330] p0_task_il_multi__cifar__seed4__supsup (7.2 min, 7 running, 413.8 min elapsed)
+[start 290/330] p0_task_il_multi__pmnist__seed4__lwf
+[succeeded 283/330] p0_task_il_multi__cifar__seed4__wsn (7.3 min, 7 running, 414.1 min elapsed)
+[start 291/330] p0_task_il_multi__pmnist__seed0__derpp
+[succeeded 284/330] p0_class_entropy__cifar__seed4__supsup (6.9 min, 7 running, 416.7 min elapsed)
+[start 292/330] p0_task_il_multi__pmnist__seed1__derpp
+[succeeded 285/330] p0_class_entropy__cifar__seed4__wsn (6.9 min, 7 running, 417.4 min elapsed)
+[start 293/330] p0_task_il_multi__pmnist__seed2__derpp
+[succeeded 286/330] p0_task_il_multi__pmnist__seed0__lwf (11.5 min, 7 running, 422.1 min elapsed)
+[start 294/330] p0_task_il_multi__pmnist__seed3__derpp
+[succeeded 287/330] p0_task_il_multi__pmnist__seed1__lwf (11.3 min, 7 running, 423.0 min elapsed)
+[start 295/330] p0_task_il_multi__pmnist__seed4__derpp
+[succeeded 288/330] p0_task_il_multi__pmnist__seed2__lwf (11.6 min, 7 running, 423.8 min elapsed)
+[start 296/330] p0_task_il_multi__pmnist__seed0__ewc
+[succeeded 289/330] p0_task_il_multi__pmnist__seed3__lwf (11.3 min, 7 running, 424.5 min elapsed)
+[start 297/330] p0_task_il_multi__pmnist__seed0__er
+[succeeded 290/330] p0_task_il_multi__pmnist__seed4__lwf (11.6 min, 7 running, 425.4 min elapsed)
+[start 298/330] p0_task_il_multi__pmnist__seed1__ewc
+[succeeded 291/330] p0_task_il_multi__pmnist__seed0__ewc (10.9 min, 7 running, 434.7 min elapsed)
+[start 299/330] p0_task_il_multi__pmnist__seed1__er
+[succeeded 292/330] p0_task_il_multi__pmnist__seed1__ewc (10.9 min, 7 running, 436.3 min elapsed)
+[start 300/330] p0_task_il_multi__pmnist__seed2__ewc
+[succeeded 293/330] p0_task_il_multi__pmnist__seed0__derpp (23.9 min, 7 running, 438.0 min elapsed)
+[start 301/330] p0_task_il_multi__pmnist__seed2__er
+[succeeded 294/330] p0_task_il_multi__pmnist__seed0__er (15.7 min, 7 running, 440.3 min elapsed)
+[start 302/330] p0_task_il_multi__pmnist__seed3__ewc
+[succeeded 295/330] p0_task_il_multi__pmnist__seed1__derpp (23.7 min, 7 running, 440.4 min elapsed)
+[start 303/330] p0_task_il_multi__pmnist__seed3__er
+[succeeded 296/330] p0_task_il_multi__pmnist__seed2__derpp (23.8 min, 7 running, 441.1 min elapsed)
+[start 304/330] p0_task_il_multi__pmnist__seed4__ewc
+[succeeded 297/330] p0_task_il_multi__pmnist__seed3__derpp (23.7 min, 7 running, 445.8 min elapsed)
+[start 305/330] p0_task_il_multi__pmnist__seed4__er
+[succeeded 298/330] p0_task_il_multi__pmnist__seed4__derpp (23.8 min, 7 running, 446.8 min elapsed)
+[start 306/330] p0_task_il_multi__pmnist__seed0__packnet
+[succeeded 299/330] p0_task_il_multi__pmnist__seed2__ewc (11.0 min, 7 running, 447.3 min elapsed)
+[start 307/330] p0_task_il_multi__pmnist__seed1__packnet
+[succeeded 300/330] p0_task_il_multi__pmnist__seed1__er (16.1 min, 7 running, 450.8 min elapsed)
+[start 308/330] p0_task_il_multi__pmnist__seed2__packnet
+[succeeded 301/330] p0_task_il_multi__pmnist__seed3__ewc (11.2 min, 7 running, 451.4 min elapsed)
+[start 309/330] p0_task_il_multi__pmnist__seed3__packnet
+[succeeded 302/330] p0_task_il_multi__pmnist__seed4__ewc (11.0 min, 7 running, 452.1 min elapsed)
+[start 310/330] p0_task_il_multi__pmnist__seed4__packnet
+[succeeded 303/330] p0_task_il_multi__pmnist__seed2__er (15.8 min, 7 running, 453.8 min elapsed)
+[start 311/330] p0_task_il_multi__pmnist__seed0__finetune
+[succeeded 304/330] p0_task_il_multi__pmnist__seed0__packnet (8.0 min, 7 running, 454.8 min elapsed)
+[start 312/330] p0_task_il_multi__pmnist__seed0__supsup
+[succeeded 305/330] p0_task_il_multi__pmnist__seed1__packnet (8.0 min, 7 running, 455.3 min elapsed)
+[start 313/330] p0_task_il_multi__pmnist__seed0__wsn
+[succeeded 306/330] p0_task_il_multi__pmnist__seed3__er (15.7 min, 7 running, 456.1 min elapsed)
+[start 314/330] p0_task_il_multi__pmnist__seed0__independent
+[succeeded 307/330] p0_task_il_multi__pmnist__seed2__packnet (8.0 min, 7 running, 458.8 min elapsed)
+[start 315/330] p0_task_il_multi__pmnist__seed1__finetune
+[succeeded 308/330] p0_task_il_multi__pmnist__seed3__packnet (7.9 min, 7 running, 459.4 min elapsed)
+[start 316/330] p0_task_il_multi__pmnist__seed1__supsup
+[succeeded 309/330] p0_task_il_multi__pmnist__seed4__packnet (8.1 min, 7 running, 460.2 min elapsed)
+[start 317/330] p0_task_il_multi__pmnist__seed1__wsn
+[succeeded 310/330] p0_task_il_multi__pmnist__seed0__finetune (6.5 min, 7 running, 460.3 min elapsed)
+[start 318/330] p0_task_il_multi__pmnist__seed1__independent
+[succeeded 311/330] p0_task_il_multi__pmnist__seed0__independent (6.4 min, 7 running, 462.5 min elapsed)
+[start 319/330] p0_task_il_multi__pmnist__seed2__finetune
+[succeeded 312/330] p0_task_il_multi__pmnist__seed4__er (16.7 min, 7 running, 462.5 min elapsed)
+[start 320/330] p0_task_il_multi__pmnist__seed2__supsup
+[succeeded 313/330] p0_task_il_multi__pmnist__seed1__finetune (6.6 min, 7 running, 465.4 min elapsed)
+[start 321/330] p0_task_il_multi__pmnist__seed2__wsn
+[succeeded 314/330] p0_task_il_multi__pmnist__seed0__supsup (11.9 min, 7 running, 466.7 min elapsed)
+[start 322/330] p0_task_il_multi__pmnist__seed2__independent
+[succeeded 315/330] p0_task_il_multi__pmnist__seed1__independent (6.5 min, 7 running, 466.9 min elapsed)
+[start 323/330] p0_task_il_multi__pmnist__seed3__finetune
+[succeeded 316/330] p0_task_il_multi__pmnist__seed0__wsn (12.2 min, 7 running, 467.5 min elapsed)
+[start 324/330] p0_task_il_multi__pmnist__seed3__supsup
+[succeeded 317/330] p0_task_il_multi__pmnist__seed2__finetune (6.5 min, 7 running, 469.0 min elapsed)
+[start 325/330] p0_task_il_multi__pmnist__seed3__wsn
+[succeeded 318/330] p0_task_il_multi__pmnist__seed1__supsup (11.9 min, 7 running, 471.3 min elapsed)
+[start 326/330] p0_task_il_multi__pmnist__seed3__independent
+[succeeded 319/330] p0_task_il_multi__pmnist__seed1__wsn (12.5 min, 7 running, 472.7 min elapsed)
+[start 327/330] p0_task_il_multi__pmnist__seed4__finetune
+[succeeded 320/330] p0_task_il_multi__pmnist__seed2__independent (6.4 min, 7 running, 473.1 min elapsed)
+[start 328/330] p0_task_il_multi__pmnist__seed4__supsup
+[succeeded 321/330] p0_task_il_multi__pmnist__seed3__finetune (6.4 min, 7 running, 473.3 min elapsed)
+[start 329/330] p0_task_il_multi__pmnist__seed4__wsn
+[succeeded 322/330] p0_task_il_multi__pmnist__seed2__supsup (12.3 min, 7 running, 474.8 min elapsed)
+[start 330/330] p0_task_il_multi__pmnist__seed4__independent
+[succeeded 323/330] p0_task_il_multi__pmnist__seed3__independent (6.3 min, 7 running, 477.6 min elapsed)
+[succeeded 324/330] p0_task_il_multi__pmnist__seed2__wsn (12.7 min, 6 running, 478.2 min elapsed)
+[succeeded 325/330] p0_task_il_multi__pmnist__seed4__finetune (6.7 min, 5 running, 479.4 min elapsed)
+[succeeded 326/330] p0_task_il_multi__pmnist__seed3__supsup (12.1 min, 4 running, 479.6 min elapsed)
+[succeeded 327/330] p0_task_il_multi__pmnist__seed4__independent (6.4 min, 3 running, 481.1 min elapsed)
+[succeeded 328/330] p0_task_il_multi__pmnist__seed3__wsn (12.3 min, 2 running, 481.3 min elapsed)
+[succeeded 329/330] p0_task_il_multi__pmnist__seed4__supsup (11.3 min, 1 running, 484.4 min elapsed)
+[succeeded 330/330] p0_task_il_multi__pmnist__seed4__wsn (11.8 min, 0 running, 485.0 min elapsed)
+{
+  "status": "verified",
+  "jobs_validated": 330,
+  "prediction_files_checked": 80,
+  "errors": [],
+  "report": "/root/autodl-tmp/runs_v3011/p0/verification_report.json"
+}
+
+[verify] /root/miniconda3/bin/python /root/autodl-tmp/DiLT-CL/code/tools/verify_experiment_bundle.py /root/autodl-tmp/runs_v3011/p0
+
+Completed. Return the entire directory: /root/autodl-tmp/runs_v3011/p0
+Merge the per-method artifacts with: python tools/merge_results.py /root/autodl-tmp/runs_v3011/p0   (writes /root/autodl-tmp/runs_v3011/p0/merged)
+Run directory: /root/autodl-tmp/runs_v3011/p1_bias
+Profile: p1; jobs: 40 (method granularity); seeds: [0, 1, 2, 3, 4]
+Execution: backend=device numerics=fast tf32=default eval_batch=train; max_parallel=8 (auto=min(cpu//threads, free_vram//job_mem, 8)), threads/job=3
+[preflight] OK: dependencies and datasets are in place.
+Fingerprinting dataset root in full mode...
+[dataset fingerprint] 5000/120218 files
+[dataset fingerprint] 10000/120218 files
+[dataset fingerprint] 15000/120218 files
+[dataset fingerprint] 20000/120218 files
+[dataset fingerprint] 25000/120218 files
+[dataset fingerprint] 30000/120218 files
+[dataset fingerprint] 35000/120218 files
+[dataset fingerprint] 40000/120218 files
+[dataset fingerprint] 45000/120218 files
+[dataset fingerprint] 50000/120218 files
+[dataset fingerprint] 55000/120218 files
+[dataset fingerprint] 60000/120218 files
+[dataset fingerprint] 65000/120218 files
+[dataset fingerprint] 70000/120218 files
+[dataset fingerprint] 75000/120218 files
+[dataset fingerprint] 80000/120218 files
+[dataset fingerprint] 85000/120218 files
+[dataset fingerprint] 90000/120218 files
+[dataset fingerprint] 95000/120218 files
+[dataset fingerprint] 100000/120218 files
+[dataset fingerprint] 105000/120218 files
+[dataset fingerprint] 110000/120218 files
+[dataset fingerprint] 115000/120218 files
+[dataset fingerprint] 120000/120218 files
+[start 1/40] p1_class_entropy_bias__tinyimagenet__seed0__diltcl
+[start 2/40] p1_class_entropy_bias__tinyimagenet__seed1__diltcl
+[start 3/40] p1_class_entropy_bias__tinyimagenet__seed2__diltcl
+[start 4/40] p1_class_entropy_bias__tinyimagenet__seed3__diltcl
+[start 5/40] p1_class_entropy_bias__tinyimagenet__seed4__diltcl
+[start 6/40] p1_class_entropy_bias__cifar__seed0__diltcl
+[start 7/40] p1_class_entropy_bias__cifar__seed1__diltcl
+[start 8/40] p1_class_entropy_bias__cifar__seed2__diltcl
+[succeeded 1/40] p1_class_entropy_bias__cifar__seed1__diltcl (12.7 min, 7 running, 13.0 min elapsed)
+[start 9/40] p1_class_entropy_bias__cifar__seed3__diltcl
+[succeeded 2/40] p1_class_entropy_bias__cifar__seed0__diltcl (12.8 min, 7 running, 13.0 min elapsed)
+[start 10/40] p1_class_entropy_bias__cifar__seed4__diltcl
+[succeeded 3/40] p1_class_entropy_bias__cifar__seed2__diltcl (12.8 min, 7 running, 13.1 min elapsed)
+[start 11/40] p1_class_entropy_bias__tinyimagenet__seed0__packnet
+[succeeded 4/40] p1_class_entropy_bias__tinyimagenet__seed0__diltcl (21.2 min, 7 running, 21.2 min elapsed)
+[start 12/40] p1_class_entropy_bias__tinyimagenet__seed1__packnet
+[succeeded 5/40] p1_class_entropy_bias__tinyimagenet__seed1__diltcl (21.2 min, 7 running, 21.3 min elapsed)
+[start 13/40] p1_class_entropy_bias__tinyimagenet__seed2__packnet
+[succeeded 6/40] p1_class_entropy_bias__tinyimagenet__seed3__diltcl (21.2 min, 7 running, 21.3 min elapsed)
+[succeeded 7/40] p1_class_entropy_bias__tinyimagenet__seed2__diltcl (21.2 min, 6 running, 21.3 min elapsed)
+[start 14/40] p1_class_entropy_bias__tinyimagenet__seed3__packnet
+[start 15/40] p1_class_entropy_bias__tinyimagenet__seed4__packnet
+[succeeded 8/40] p1_class_entropy_bias__tinyimagenet__seed4__diltcl (21.1 min, 7 running, 21.4 min elapsed)
+[start 16/40] p1_class_entropy_bias__tinyimagenet__seed0__supsup
+[succeeded 9/40] p1_class_entropy_bias__tinyimagenet__seed0__packnet (11.1 min, 7 running, 24.2 min elapsed)
+[start 17/40] p1_class_entropy_bias__tinyimagenet__seed0__wsn
+[succeeded 10/40] p1_class_entropy_bias__cifar__seed3__diltcl (12.1 min, 7 running, 25.1 min elapsed)
+[start 18/40] p1_class_entropy_bias__tinyimagenet__seed1__supsup
+[succeeded 11/40] p1_class_entropy_bias__cifar__seed4__diltcl (12.1 min, 7 running, 25.1 min elapsed)
+[start 19/40] p1_class_entropy_bias__tinyimagenet__seed1__wsn
+[succeeded 12/40] p1_class_entropy_bias__tinyimagenet__seed2__packnet (8.3 min, 7 running, 29.6 min elapsed)
+[start 20/40] p1_class_entropy_bias__tinyimagenet__seed2__supsup
+[succeeded 13/40] p1_class_entropy_bias__tinyimagenet__seed4__packnet (8.2 min, 7 running, 29.6 min elapsed)
+[start 21/40] p1_class_entropy_bias__tinyimagenet__seed2__wsn
+[succeeded 14/40] p1_class_entropy_bias__tinyimagenet__seed3__packnet (8.3 min, 7 running, 29.6 min elapsed)
+[succeeded 15/40] p1_class_entropy_bias__tinyimagenet__seed1__packnet (8.4 min, 6 running, 29.6 min elapsed)
+[start 22/40] p1_class_entropy_bias__tinyimagenet__seed3__supsup
+[start 23/40] p1_class_entropy_bias__tinyimagenet__seed3__wsn
+[succeeded 16/40] p1_class_entropy_bias__tinyimagenet__seed0__supsup (22.7 min, 7 running, 44.1 min elapsed)
+[start 24/40] p1_class_entropy_bias__tinyimagenet__seed4__supsup
+[succeeded 17/40] p1_class_entropy_bias__tinyimagenet__seed0__wsn (21.0 min, 7 running, 45.1 min elapsed)
+[start 25/40] p1_class_entropy_bias__tinyimagenet__seed4__wsn
+[succeeded 18/40] p1_class_entropy_bias__tinyimagenet__seed1__supsup (20.4 min, 7 running, 45.5 min elapsed)
+[start 26/40] p1_class_entropy_bias__cifar__seed0__packnet
+[succeeded 19/40] p1_class_entropy_bias__tinyimagenet__seed1__wsn (20.4 min, 7 running, 45.6 min elapsed)
+[start 27/40] p1_class_entropy_bias__cifar__seed1__packnet
+[succeeded 20/40] p1_class_entropy_bias__tinyimagenet__seed2__supsup (18.0 min, 7 running, 47.6 min elapsed)
+[start 28/40] p1_class_entropy_bias__cifar__seed2__packnet
+[succeeded 21/40] p1_class_entropy_bias__tinyimagenet__seed3__supsup (18.0 min, 7 running, 47.7 min elapsed)
+[start 29/40] p1_class_entropy_bias__cifar__seed3__packnet
+[succeeded 22/40] p1_class_entropy_bias__tinyimagenet__seed2__wsn (18.1 min, 7 running, 47.7 min elapsed)
+[start 30/40] p1_class_entropy_bias__cifar__seed4__packnet
+[succeeded 23/40] p1_class_entropy_bias__tinyimagenet__seed3__wsn (18.0 min, 7 running, 47.7 min elapsed)
+[start 31/40] p1_class_entropy_bias__cifar__seed0__supsup
+[succeeded 24/40] p1_class_entropy_bias__cifar__seed0__packnet (4.6 min, 7 running, 50.1 min elapsed)
+[start 32/40] p1_class_entropy_bias__cifar__seed0__wsn
+[succeeded 25/40] p1_class_entropy_bias__cifar__seed1__packnet (4.6 min, 7 running, 50.1 min elapsed)
+[start 33/40] p1_class_entropy_bias__cifar__seed1__supsup
+[succeeded 26/40] p1_class_entropy_bias__cifar__seed4__packnet (4.4 min, 7 running, 52.2 min elapsed)
+[start 34/40] p1_class_entropy_bias__cifar__seed1__wsn
+[succeeded 27/40] p1_class_entropy_bias__cifar__seed3__packnet (4.5 min, 7 running, 52.2 min elapsed)
+[start 35/40] p1_class_entropy_bias__cifar__seed2__supsup
+[succeeded 28/40] p1_class_entropy_bias__cifar__seed2__packnet (4.6 min, 7 running, 52.2 min elapsed)
+[start 36/40] p1_class_entropy_bias__cifar__seed2__wsn
+[succeeded 29/40] p1_class_entropy_bias__cifar__seed0__supsup (9.4 min, 7 running, 57.2 min elapsed)
+[start 37/40] p1_class_entropy_bias__cifar__seed3__supsup
+[succeeded 30/40] p1_class_entropy_bias__cifar__seed1__supsup (8.9 min, 7 running, 59.1 min elapsed)
+[start 38/40] p1_class_entropy_bias__cifar__seed3__wsn
+[succeeded 31/40] p1_class_entropy_bias__cifar__seed0__wsn (9.0 min, 7 running, 59.1 min elapsed)
+[start 39/40] p1_class_entropy_bias__cifar__seed4__supsup
+[succeeded 32/40] p1_class_entropy_bias__tinyimagenet__seed4__supsup (15.1 min, 7 running, 59.2 min elapsed)
+[start 40/40] p1_class_entropy_bias__cifar__seed4__wsn
+[succeeded 33/40] p1_class_entropy_bias__tinyimagenet__seed4__wsn (15.1 min, 7 running, 60.3 min elapsed)
+[succeeded 34/40] p1_class_entropy_bias__cifar__seed2__supsup (8.3 min, 6 running, 60.5 min elapsed)
+[succeeded 35/40] p1_class_entropy_bias__cifar__seed1__wsn (8.4 min, 5 running, 60.6 min elapsed)
+[succeeded 36/40] p1_class_entropy_bias__cifar__seed2__wsn (8.4 min, 4 running, 60.6 min elapsed)
+[succeeded 37/40] p1_class_entropy_bias__cifar__seed3__supsup (6.2 min, 3 running, 63.4 min elapsed)
+[succeeded 38/40] p1_class_entropy_bias__cifar__seed4__supsup (5.4 min, 2 running, 64.5 min elapsed)
+[succeeded 39/40] p1_class_entropy_bias__cifar__seed4__wsn (5.5 min, 1 running, 64.7 min elapsed)
+[succeeded 40/40] p1_class_entropy_bias__cifar__seed3__wsn (5.7 min, 0 running, 64.8 min elapsed)
+{
+  "status": "verified",
+  "jobs_validated": 40,
+  "prediction_files_checked": 40,
+  "errors": [],
+  "report": "/root/autodl-tmp/runs_v3011/p1_bias/verification_report.json"
+}
+
+[verify] /root/miniconda3/bin/python /root/autodl-tmp/DiLT-CL/code/tools/verify_experiment_bundle.py /root/autodl-tmp/runs_v3011/p1_bias
+
+Completed. Return the entire directory: /root/autodl-tmp/runs_v3011/p1_bias
+Merge the per-method artifacts with: python tools/merge_results.py /root/autodl-tmp/runs_v3011/p1_bias   (writes /root/autodl-tmp/runs_v3011/p1_bias/merged)
+Run directory: /root/autodl-tmp/runs_v3011/p1_biasacc
+Profile: p1; jobs: 40 (method granularity); seeds: [0, 1, 2, 3, 4]
+Execution: backend=device numerics=fast tf32=default eval_batch=train; max_parallel=8 (auto=min(cpu//threads, free_vram//job_mem, 8)), threads/job=3
+[preflight] OK: dependencies and datasets are in place.
+Fingerprinting dataset root in full mode...
+[dataset fingerprint] 5000/120218 files
+[dataset fingerprint] 10000/120218 files
+[dataset fingerprint] 15000/120218 files
+[dataset fingerprint] 20000/120218 files
+[dataset fingerprint] 25000/120218 files
+[dataset fingerprint] 30000/120218 files
+[dataset fingerprint] 35000/120218 files
+[dataset fingerprint] 40000/120218 files
+[dataset fingerprint] 45000/120218 files
+[dataset fingerprint] 50000/120218 files
+[dataset fingerprint] 55000/120218 files
+[dataset fingerprint] 60000/120218 files
+[dataset fingerprint] 65000/120218 files
+[dataset fingerprint] 70000/120218 files
+[dataset fingerprint] 75000/120218 files
+[dataset fingerprint] 80000/120218 files
+[dataset fingerprint] 85000/120218 files
+[dataset fingerprint] 90000/120218 files
+[dataset fingerprint] 95000/120218 files
+[dataset fingerprint] 100000/120218 files
+[dataset fingerprint] 105000/120218 files
+[dataset fingerprint] 110000/120218 files
+[dataset fingerprint] 115000/120218 files
+[dataset fingerprint] 120000/120218 files
+[start 1/40] p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl
+[start 2/40] p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl
+[start 3/40] p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl
+[start 4/40] p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl
+[start 5/40] p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl
+[start 6/40] p1_class_entropy_biasacc__cifar__seed0__diltcl
+[start 7/40] p1_class_entropy_biasacc__cifar__seed1__diltcl
+[start 8/40] p1_class_entropy_biasacc__cifar__seed2__diltcl
+[succeeded 1/40] p1_class_entropy_biasacc__cifar__seed2__diltcl (12.7 min, 7 running, 12.9 min elapsed)
+[start 9/40] p1_class_entropy_biasacc__cifar__seed3__diltcl
+[succeeded 2/40] p1_class_entropy_biasacc__cifar__seed0__diltcl (12.8 min, 7 running, 12.9 min elapsed)
+[start 10/40] p1_class_entropy_biasacc__cifar__seed4__diltcl
+[succeeded 3/40] p1_class_entropy_biasacc__cifar__seed1__diltcl (12.7 min, 7 running, 13.0 min elapsed)
+[start 11/40] p1_class_entropy_biasacc__tinyimagenet__seed0__packnet
+[succeeded 4/40] p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl (21.3 min, 7 running, 21.3 min elapsed)
+[start 12/40] p1_class_entropy_biasacc__tinyimagenet__seed1__packnet
+[succeeded 5/40] p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl (21.2 min, 7 running, 21.3 min elapsed)
+[start 13/40] p1_class_entropy_biasacc__tinyimagenet__seed2__packnet
+[succeeded 6/40] p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl (21.2 min, 7 running, 21.3 min elapsed)
+[start 14/40] p1_class_entropy_biasacc__tinyimagenet__seed3__packnet
+[succeeded 7/40] p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl (21.3 min, 7 running, 21.3 min elapsed)
+[succeeded 8/40] p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl (21.2 min, 6 running, 21.3 min elapsed)
+[start 15/40] p1_class_entropy_biasacc__tinyimagenet__seed4__packnet
+[start 16/40] p1_class_entropy_biasacc__tinyimagenet__seed0__supsup
+[succeeded 9/40] p1_class_entropy_biasacc__tinyimagenet__seed0__packnet (11.1 min, 7 running, 24.1 min elapsed)
+[start 17/40] p1_class_entropy_biasacc__tinyimagenet__seed0__wsn
+[succeeded 10/40] p1_class_entropy_biasacc__cifar__seed3__diltcl (12.1 min, 7 running, 25.0 min elapsed)
+[start 18/40] p1_class_entropy_biasacc__tinyimagenet__seed1__supsup
+[succeeded 11/40] p1_class_entropy_biasacc__cifar__seed4__diltcl (12.1 min, 7 running, 25.0 min elapsed)
+[start 19/40] p1_class_entropy_biasacc__tinyimagenet__seed1__wsn
+[succeeded 12/40] p1_class_entropy_biasacc__tinyimagenet__seed1__packnet (8.4 min, 7 running, 29.6 min elapsed)
+[start 20/40] p1_class_entropy_biasacc__tinyimagenet__seed2__supsup
+[succeeded 13/40] p1_class_entropy_biasacc__tinyimagenet__seed2__packnet (8.4 min, 7 running, 29.7 min elapsed)
+[start 21/40] p1_class_entropy_biasacc__tinyimagenet__seed2__wsn
+[succeeded 14/40] p1_class_entropy_biasacc__tinyimagenet__seed3__packnet (8.4 min, 7 running, 29.7 min elapsed)
+[start 22/40] p1_class_entropy_biasacc__tinyimagenet__seed3__supsup
+[succeeded 15/40] p1_class_entropy_biasacc__tinyimagenet__seed4__packnet (8.4 min, 7 running, 29.8 min elapsed)
+[start 23/40] p1_class_entropy_biasacc__tinyimagenet__seed3__wsn
+[succeeded 16/40] p1_class_entropy_biasacc__tinyimagenet__seed0__supsup (22.5 min, 7 running, 43.9 min elapsed)
+[start 24/40] p1_class_entropy_biasacc__tinyimagenet__seed4__supsup
+[succeeded 17/40] p1_class_entropy_biasacc__tinyimagenet__seed0__wsn (20.9 min, 7 running, 45.0 min elapsed)
+[start 25/40] p1_class_entropy_biasacc__tinyimagenet__seed4__wsn
+[succeeded 18/40] p1_class_entropy_biasacc__tinyimagenet__seed1__supsup (20.4 min, 7 running, 45.4 min elapsed)
+[start 26/40] p1_class_entropy_biasacc__cifar__seed0__packnet
+[succeeded 19/40] p1_class_entropy_biasacc__tinyimagenet__seed1__wsn (20.4 min, 7 running, 45.4 min elapsed)
+[start 27/40] p1_class_entropy_biasacc__cifar__seed1__packnet
+[succeeded 20/40] p1_class_entropy_biasacc__tinyimagenet__seed2__supsup (18.0 min, 7 running, 47.6 min elapsed)
+[start 28/40] p1_class_entropy_biasacc__cifar__seed2__packnet
+[succeeded 21/40] p1_class_entropy_biasacc__tinyimagenet__seed3__supsup (18.0 min, 7 running, 47.7 min elapsed)
+[start 29/40] p1_class_entropy_biasacc__cifar__seed3__packnet
+[succeeded 22/40] p1_class_entropy_biasacc__tinyimagenet__seed2__wsn (18.0 min, 7 running, 47.7 min elapsed)
+[start 30/40] p1_class_entropy_biasacc__cifar__seed4__packnet
+[succeeded 23/40] p1_class_entropy_biasacc__tinyimagenet__seed3__wsn (17.9 min, 7 running, 47.7 min elapsed)
+[start 31/40] p1_class_entropy_biasacc__cifar__seed0__supsup
+[succeeded 24/40] p1_class_entropy_biasacc__cifar__seed0__packnet (4.7 min, 7 running, 50.0 min elapsed)
+[start 32/40] p1_class_entropy_biasacc__cifar__seed0__wsn
+[succeeded 25/40] p1_class_entropy_biasacc__cifar__seed1__packnet (4.7 min, 7 running, 50.1 min elapsed)
+[start 33/40] p1_class_entropy_biasacc__cifar__seed1__supsup
+[succeeded 26/40] p1_class_entropy_biasacc__cifar__seed2__packnet (4.4 min, 7 running, 52.0 min elapsed)
+[start 34/40] p1_class_entropy_biasacc__cifar__seed1__wsn
+[succeeded 27/40] p1_class_entropy_biasacc__cifar__seed3__packnet (4.5 min, 7 running, 52.2 min elapsed)
+[start 35/40] p1_class_entropy_biasacc__cifar__seed2__supsup
+[succeeded 28/40] p1_class_entropy_biasacc__cifar__seed4__packnet (4.6 min, 7 running, 52.3 min elapsed)
+[start 36/40] p1_class_entropy_biasacc__cifar__seed2__wsn
+[succeeded 29/40] p1_class_entropy_biasacc__cifar__seed0__supsup (9.4 min, 7 running, 57.1 min elapsed)
+[start 37/40] p1_class_entropy_biasacc__cifar__seed3__supsup
+[succeeded 30/40] p1_class_entropy_biasacc__cifar__seed0__wsn (8.9 min, 7 running, 59.0 min elapsed)
+[start 38/40] p1_class_entropy_biasacc__cifar__seed3__wsn
+[succeeded 31/40] p1_class_entropy_biasacc__cifar__seed1__supsup (8.9 min, 7 running, 59.0 min elapsed)
+[start 39/40] p1_class_entropy_biasacc__cifar__seed4__supsup
+[succeeded 32/40] p1_class_entropy_biasacc__tinyimagenet__seed4__supsup (15.2 min, 7 running, 59.1 min elapsed)
+[start 40/40] p1_class_entropy_biasacc__cifar__seed4__wsn
+[succeeded 33/40] p1_class_entropy_biasacc__tinyimagenet__seed4__wsn (15.1 min, 7 running, 60.1 min elapsed)
+[succeeded 34/40] p1_class_entropy_biasacc__cifar__seed1__wsn (8.4 min, 6 running, 60.5 min elapsed)
+[succeeded 35/40] p1_class_entropy_biasacc__cifar__seed2__supsup (8.4 min, 5 running, 60.6 min elapsed)
+[succeeded 36/40] p1_class_entropy_biasacc__cifar__seed2__wsn (8.3 min, 4 running, 60.6 min elapsed)
+[succeeded 37/40] p1_class_entropy_biasacc__cifar__seed3__supsup (6.2 min, 3 running, 63.3 min elapsed)
+[succeeded 38/40] p1_class_entropy_biasacc__cifar__seed4__supsup (5.4 min, 2 running, 64.5 min elapsed)
+[succeeded 39/40] p1_class_entropy_biasacc__cifar__seed4__wsn (5.6 min, 1 running, 64.7 min elapsed)
+[succeeded 40/40] p1_class_entropy_biasacc__cifar__seed3__wsn (5.8 min, 0 running, 64.8 min elapsed)
+{
+  "status": "verified",
+  "jobs_validated": 40,
+  "prediction_files_checked": 40,
+  "errors": [],
+  "report": "/root/autodl-tmp/runs_v3011/p1_biasacc/verification_report.json"
+}
+
+[verify] /root/miniconda3/bin/python /root/autodl-tmp/DiLT-CL/code/tools/verify_experiment_bundle.py /root/autodl-tmp/runs_v3011/p1_biasacc
+
+Completed. Return the entire directory: /root/autodl-tmp/runs_v3011/p1_biasacc
+Merge the per-method artifacts with: python tools/merge_results.py /root/autodl-tmp/runs_v3011/p1_biasacc   (writes /root/autodl-tmp/runs_v3011/p1_biasacc/merged)
+/root/miniconda3/lib/python3.12/site-packages/scipy/stats/_axis_nan_policy.py:431: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+  return hypotest_fun_in(*args, **kwds)
+[merged] p0_class_entropy: 90 jobs -> /root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy.json (verified)
+[merged] p0_class_entropy_cal: 90 jobs -> /root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy_cal.json (verified)
+[merged] p0_task_il_multi: 150 jobs -> /root/autodl-tmp/runs_v3011/p0/merged/p0_task_il_multi.json (verified)
+/root/miniconda3/lib/python3.12/site-packages/scipy/stats/_axis_nan_policy.py:431: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+  return hypotest_fun_in(*args, **kwds)
+[merged] p1_class_entropy_bias: 40 jobs -> /root/autodl-tmp/runs_v3011/p1_bias/merged/p1_class_entropy_bias.json (verified)
+/root/miniconda3/lib/python3.12/site-packages/scipy/stats/_axis_nan_policy.py:431: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+  return hypotest_fun_in(*args, **kwds)
+[merged] p1_class_entropy_biasacc: 40 jobs -> /root/autodl-tmp/runs_v3011/p1_biasacc/merged/p1_class_entropy_biasacc.json (verified)
+REGEN_DONE

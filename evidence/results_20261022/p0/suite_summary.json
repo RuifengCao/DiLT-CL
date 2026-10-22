@@ -1,0 +1,2004 @@
+{
+  "failed_jobs": [],
+  "job_count": 330,
+  "job_granularity": "method",
+  "outcomes": [
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1549.1888135820627
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1548.1350851282477
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1546.9590531215072
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1544.764253878966
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1543.5768738109618
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1652.179119406268
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1651.1935212649405
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1718.3263516314328
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1056.7699394449592
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1560.4748086761683
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1556.7003375329077
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1569.5519719310105
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1566.619906861335
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1562.981325758621
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1533.9939168542624
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1592.3968497551978
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 534.523052893579
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 533.0065655466169
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 875.408941058442
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 518.662626594305
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 629.6771595515311
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 641.2492742519826
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 653.9951090179384
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 519.0002730470151
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 469.8261859677732
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 542.9629638716578
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 592.4751663133502
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 542.5253665447235
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 573.7244755905122
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 535.6843242552131
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1271.8258556034416
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1266.2906187176704
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1271.0473493598402
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1280.3757928162813
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1280.0900625977665
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 616.8400816153735
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 578.7761600017548
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 575.2978316769004
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 664.5792220775038
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 583.7987210322171
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 717.733572434634
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 683.6371094025671
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 693.9504236876965
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 717.1619105599821
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 782.0592258926481
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 776.6927341949195
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 619.795261669904
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 806.4894258826971
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 790.9521196428686
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 805.8208844829351
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 785.7682134304196
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 545.4963149279356
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 530.1906507611275
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 527.5976490527391
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 518.4200449846685
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1065.6078225467354
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 987.7411878593266
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 955.802416106686
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 938.7725681569427
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 872.5614698957652
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1508.2895602993667
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1607.5661958884448
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1188.7587181981653
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1477.1713325455785
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1617.578910721466
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1623.213072244078
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1677.6122673582286
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 565.2018492594361
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 551.8682725280523
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 598.7381811477244
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1613.4631068520248
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 600.2395552322268
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 602.5143308024853
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 623.1288132853806
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 538.0428036823869
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 385.57541064731777
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1654.1836471930146
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1073.4998396430165
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1765.2481827568263
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 929.1238491237164
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 608.2220306396484
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 354.23163675516844
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 501.71909286640584
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1009.9805775079876
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 853.0076692979783
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 626.0127605702728
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1617.4734830576926
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1610.7273507136852
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 504.68579714000225
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 357.88294371031225
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 971.9246630109847
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1515.3608858175576
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1507.8423093408346
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 826.8651176802814
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 613.2507127299905
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 515.7878673132509
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 360.9296822734177
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 984.6273429840803
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 851.3337397743016
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 568.8335671573877
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1532.9750672783703
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1534.4175746869296
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 506.6708939615637
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 365.5075625665486
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 986.7928944900632
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 865.2756927236915
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 480.1636916529387
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1669.7338285390288
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 525.7462226878852
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 506.4948832988739
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1872.1353195793927
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 616.6635000929236
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 553.480694686994
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 588.6094773560762
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 554.6048312764615
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 574.3655492328107
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 537.7228186558932
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 416.42089162021875
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 516.8151948712766
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 397.03442379646003
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 2066.793484468013
+    },
+    {
+      "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 2061.966810947284
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 392.8865068908781
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 405.86756474897265
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1318.167734304443
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1371.9929338134825
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1341.610748950392
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 379.04850791208446
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 374.7797386087477
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1318.8498233314604
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1276.3872458599508
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1261.0002076104283
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1241.2282133828849
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 404.40209711156785
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 388.8002554997802
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1339.1772281453013
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 394.50460778176785
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1309.905090585351
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1285.3387255631387
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1236.7697295155376
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 403.42356548830867
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1241.9080594852567
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1268.8117770068347
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 393.23623442463577
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 391.40158545970917
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1264.6035111248493
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1267.5359414350241
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1253.444156555459
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 405.29877016693354
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1272.5527036003768
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1298.6644689626992
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 397.8331269416958
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 403.24303684942424
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1325.2999558839947
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 227.77916281670332
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 231.03937591426075
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1256.3422279916704
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__diltcl",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1255.2728184349835
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1226.5555277243257
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 227.01900406368077
+    },
+    {
+      "job_id": "p0_task_il_multi__tinyimagenet__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1231.257483670488
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 223.5424620974809
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 232.88404314406216
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 510.30058024823666
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 326.4120249710977
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1126.8896980695426
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 506.44630432501435
+    },
+    {
+      "job_id": "p0_class_entropy__tinyimagenet__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1068.621651995927
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 510.26697125658393
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 526.6716058645397
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 515.0069986768067
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 258.6145011372864
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 254.63036679662764
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 344.7165205478668
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 253.59925828315318
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 254.41902488470078
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 342.2988206278533
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 255.2453374285251
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 349.05839533545077
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 241.68358905613422
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 338.2605987843126
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 244.5378367230296
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 338.70999816060066
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 240.32704123668373
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 242.55748896300793
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 236.76341380737722
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 347.46007345058024
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 346.5977292191237
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 340.9174920581281
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 333.65321438759565
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 547.1195681672543
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 538.0227060485631
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 545.6391627304256
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 739.1314861476421
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 752.7387986723334
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 542.3940326478332
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 770.2310360725969
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 744.0806964598596
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 264.545517379418
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 259.3238864094019
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 258.1967112198472
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 250.70036575198174
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 250.91144670546055
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 548.3591332677752
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 262.0725029390305
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 176.50407050549984
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 386.4560788311064
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 748.7302622124553
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 370.8682037368417
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 506.12762876972556
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 258.5011445134878
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 466.90996668860316
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 176.9092503041029
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 378.4566682651639
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 484.1786595694721
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 378.06911733560264
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 506.3082137182355
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 177.85194515809417
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 264.8504569809884
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 472.46896056830883
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 379.0569536406547
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 385.5890317745507
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 468.42074546404183
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 480.7846948634833
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 175.0865207631141
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 272.2045164126903
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 475.49790488369763
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 381.91169471107423
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 476.1222811974585
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 365.89277504757047
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 502.53046616725624
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 260.2569702472538
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 174.3486572690308
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 473.4942969363183
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 386.57851058244705
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 499.03238525800407
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 370.4670367985964
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 486.14124508202076
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 241.0612913686782
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 275.32477601245046
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 236.33615171723068
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 237.3284971062094
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 234.25635611452162
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 555.5331302024424
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 262.6817409899086
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 238.8406222090125
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 242.017902366817
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 263.23804402165115
+    },
+    {
+      "job_id": "p0_class_entropy_cal__cifar__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 579.53652183339
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 198.55760909616947
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 257.9037821535021
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 201.1991472709924
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 189.90484752319753
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 193.65706984885037
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 469.4870817717165
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 189.19909112900496
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 475.34070497378707
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 194.86456996574998
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 504.28296965919435
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 501.85050592944026
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 453.87156210653484
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 198.7094467524439
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 460.6955360043794
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 192.40313751995564
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 191.95334668643773
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 496.65401642397046
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 499.8990580048412
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 449.2960336189717
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 189.82090222463012
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 460.4743372295052
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 195.08520587347448
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 500.54152306728065
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 189.35540931113064
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 499.9836926087737
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 450.1396554224193
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 196.63981667347252
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 192.95270459540188
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 462.3992654234171
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 184.4250378254801
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 495.3243348840624
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 490.31581448204815
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 433.7726786136627
+    },
+    {
+      "job_id": "p0_task_il_multi__cifar__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 438.7674980368465
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 412.43430073186755
+    },
+    {
+      "job_id": "p0_class_entropy__cifar__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 413.0524592921138
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 691.3534804601222
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 675.6638450156897
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 696.129485366866
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 680.7639897279441
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__lwf",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 693.6463509853929
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 652.8899083416909
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 653.0416104383767
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1433.815587328747
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 944.8366676159203
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1422.1144965961576
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1425.9808451328427
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1422.6906710006297
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__derpp",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1426.1195403654128
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 657.8172931522131
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 966.5143263805658
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 670.2995084803551
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__ewc",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 659.3544753529131
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 945.9157382883132
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 479.89966813102365
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 480.1212635226548
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 942.0783811490983
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 480.6896839980036
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 476.82998347468674
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__packnet",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 485.51122419163585
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 392.6150841638446
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 382.8517645150423
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__er",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 1001.5377159994096
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 398.4573525842279
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 715.174625530839
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 391.6938482262194
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed0__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 731.6135855447501
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 391.50257347896695
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 716.7692892085761
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed1__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 750.4909729212523
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 382.318972395733
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 384.48136138916016
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 735.8442685008049
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 376.7011667340994
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed2__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 764.8261162787676
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__finetune",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 403.219676008448
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 725.773157576099
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__independent",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 381.24499879591167
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed3__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 740.4393001273274
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__supsup",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 677.5322563685477
+    },
+    {
+      "job_id": "p0_task_il_multi__pmnist__seed4__wsn",
+      "returncode": 0,
+      "state": "succeeded",
+      "wall_seconds": 706.6806565746665
+    }
+  ],
+  "postrun_verifier_returncode": 0,
+  "profile": "p0",
+  "rerun_policy": "Successful jobs with matching SHA-256 are skipped. Failed or corrupt jobs are rerun under the same explicit seed/config; no seed is silently excluded.",
+  "scheduling": {
+    "by_cpu": 69,
+    "by_memory": 15,
+    "cpu_count": 208,
+    "gpu_memory_source": "nvidia-smi",
+    "gpu_memory_total_mib": 32607,
+    "gpu_memory_used_mib": 2,
+    "job_memory_mib": 2048,
+    "max_parallel": 8,
+    "rule": "auto=min(cpu//threads, free_vram//job_mem, 8)",
+    "threads_per_job": 3
+  },
+  "state": "completed",
+  "updated_at": "2026-10-22T00:37:47.142701+00:00"
+}

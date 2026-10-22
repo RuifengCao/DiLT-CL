@@ -1,0 +1,505 @@
+{
+  "acknowledged_source_changes": [],
+  "dataset_fingerprint": {
+    "file_count": 120218,
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "total_bytes": 1080093749,
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "determinism": [],
+  "errors": [],
+  "jobs_expected": 40,
+  "jobs_under_acknowledged_source": [],
+  "jobs_validated": 40,
+  "prediction_files_checked": 40,
+  "publication_reportable": true,
+  "results": [
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.json",
+      "json_sha256": "3923dfeefe7857f7fdf9766fa374f202c45175043ac952fdbedda9ce3a43783a",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.npz",
+      "npz_sha256": "64af4f6bd72ee766b6333224d32a233b02324bada41c0ae99ea20bec3dfcfdb1",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__supsup/result.json",
+      "json_sha256": "13cffc30d34444208bbac27b1f8a047204a451bcd05144945120556f96cdc062",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__supsup/result.npz",
+      "npz_sha256": "a73fcce2c7a23a8eb6eeba491dd10a8b76dc44fb33813c3d2d3c452535571fad",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/supsup/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__wsn/result.json",
+      "json_sha256": "9af96b162126acf3eab9f6cc853339ce2f5099a4a1b6ac859fe1b03e0dcfc797",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__wsn/result.npz",
+      "npz_sha256": "2bcdf969720b3e081937b11dbcfbe6aa7f57106376f37538c69e55bb2bf03102",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/wsn/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed0__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__diltcl/result.json",
+      "json_sha256": "5e5687aa4e9b3cf148834b49be29bf86ffcad4d513603db1edb8827c80f3528a",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__diltcl/result.npz",
+      "npz_sha256": "41f4d875f21d738b2a6abffbcd4d919f8bccc1f73e1a2aaf0bd91562f8744679",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/diltcl/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__packnet/result.json",
+      "json_sha256": "a3860755b23f60ec3c91971c46ccfac1ccf4f46ee6abcebaea0aa00c46ab49aa",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__packnet/result.npz",
+      "npz_sha256": "29437c33a639ac216dd35e61e3e64c8f1b406ef0b396c36cb425c7554d195d71",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/packnet/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__supsup/result.json",
+      "json_sha256": "d96091a0346485e98fb8b61f8dc2eff3ccae3b95f2573559050773838c02240d",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__supsup/result.npz",
+      "npz_sha256": "f28cfe7cb56149954ab65e09008c3bc4e1c8ce18c1f6a3ad253d96030ddbd261",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/supsup/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__wsn/result.json",
+      "json_sha256": "5c426336edafb99f7dc2a75641169cc8f8f551612d03152f3c09a6ace5dcfd8e",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__wsn/result.npz",
+      "npz_sha256": "327533a7bcd30852adb53294dedc3e30d04ca128e77a80ca2788f8f850eaa6ef",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/wsn/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl/result.json",
+      "json_sha256": "19a3c71e113fcb27669d7418a1b331306fca1ea2fae54990c84e8340741ad133",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed0__diltcl/result.npz",
+      "npz_sha256": "9116837ee5f6e0ede760c3b5a27ca0dbdb9bf98fd79e8ec95c06e05b8ca9056d",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/diltcl/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__packnet/result.json",
+      "json_sha256": "596b42399227faf724347047f0013ea7d5e69564c2625a2f7a66fb35ae757cd0",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__packnet/result.npz",
+      "npz_sha256": "96920deeba123b9482c14c2508ef51f214b8c3b2be73612f186ba028590b7e56",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.json",
+      "json_sha256": "c44c5dcec2c978dec6dfea8f74a410e5257840ae253489a9db827334fdaa4c44",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__supsup/result.npz",
+      "npz_sha256": "82239caa6c16499b2ab3e01f223ba917c60b3ad79dd86bfb55b19eb6531f9cd9",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/supsup/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__wsn/result.json",
+      "json_sha256": "12d831ea4413462fbdde12a624ac741669dc077034c81d004ac9937eb28efaea",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__wsn/result.npz",
+      "npz_sha256": "77b2d9e372678ebcc9fa00952d2f800f4415f97e246dc0a6603488a33633b991",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/wsn/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed1__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__diltcl/result.json",
+      "json_sha256": "961dd90238ff09b61fb3ab7a9e5ea69b6222d7d2445cbb4d9384da126ca5a3fb",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed1__diltcl/result.npz",
+      "npz_sha256": "f5e95257b28c4e118c13c2f7918a735a214fb437e268fb11acae05ff130b9614",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/diltcl/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__packnet/result.json",
+      "json_sha256": "b34c894e92a3aa83cc37a0be1e8000904fcf1e003f2a5cd9d9c55f500d25c538",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__packnet/result.npz",
+      "npz_sha256": "b56395e50d07fc5f35bccdeb7af7201a94ae15a2c03eef636f3816d4178119c3",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/packnet/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__supsup/result.json",
+      "json_sha256": "a08e0b471a5e0a7e0175ccd886b635ca30ea7c73bb4c0877a225d130abef2046",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__supsup/result.npz",
+      "npz_sha256": "424f821ecf90f9c55a767a518feddb923607ff35ef767c8d7212c877202e283c",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/supsup/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__wsn/result.json",
+      "json_sha256": "256a2e9bac2c65824986a1d727e35b6ed83c4aea6bbaea33771a56f096d60392",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__wsn/result.npz",
+      "npz_sha256": "a3eb92d08f3b871478135df60b3a8e8bd6f2658693adb971aa8816bc8771451c",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/wsn/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl/result.json",
+      "json_sha256": "7c1ec4b62a55828ac8b8679f19686866e2bd8f00a01caf3f9cc8e0230e37ee99",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed1__diltcl/result.npz",
+      "npz_sha256": "ba3eeb2cbfa733ee83d3dbe229b3bf17bb946a1f0a5cdb93fc0a8c058a9f47a9",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/diltcl/seed1"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__packnet/result.json",
+      "json_sha256": "6dfccacf0d876a218c526ab22e967374dc725b2093a04984c98c7ac191ea0755",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__packnet/result.npz",
+      "npz_sha256": "15e1f1ebf8a111587e273ca2541d3fa139ff15ef3256e6500e3644e6e4d2c87a",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__supsup/result.json",
+      "json_sha256": "c4181af1e6cf5ca80628a147825fb9640ce30555c9f90209d3a2a2015bf4cc1b",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__supsup/result.npz",
+      "npz_sha256": "f51940a0e6112232d2fd9a2c77dff9c5035ef9ae04f53511253d9320e040a5a7",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/supsup/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__wsn/result.json",
+      "json_sha256": "736c31882f39a82434f02e52506bf8c938950a95dabf8f2d0cec1de31e58dfac",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__wsn/result.npz",
+      "npz_sha256": "2f2103795b78218c7ab045ecf46e11ffa4b095f077c8e54b770b26e41869d622",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/wsn/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed2__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__diltcl/result.json",
+      "json_sha256": "7f5c3d065374ab5d2774b81ca959fe3c5fc703497e9383ac53d5d0fd3213e501",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed2__diltcl/result.npz",
+      "npz_sha256": "ab5774a4c58c2f7c13a2386edcd311802b619443c239a9bc53c4f9a6694e6df6",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/diltcl/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__packnet/result.json",
+      "json_sha256": "a75dc4fb2440a4cdb49532905ebd70dd1ed9869e3acdeaad506dfce7c0527d9c",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__packnet/result.npz",
+      "npz_sha256": "4e84ae4d5f0732c220a1e098ac0b1fd5ae1d4a1a04c5fd4815330fc9461936e6",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/packnet/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.json",
+      "json_sha256": "43b76764073b130c4367e542adeffda3c5f094d5a71f943f9ed71cf8372d7237",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__supsup/result.npz",
+      "npz_sha256": "3af20aa61f994ce98537ed2580b408ec584ed8d8c0b93102128e1bd2c17fe049",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/supsup/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__wsn/result.json",
+      "json_sha256": "6bde1b95f37e345c6a89e92447b26e309549411914f39258f7443a0821bbeb10",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__wsn/result.npz",
+      "npz_sha256": "b4c2ba5943fbbe88cfd55568612e57ba73864d3851d0d0ca5f238ce845bc9228",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/wsn/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl/result.json",
+      "json_sha256": "0504c9902ec8698ebcd941a52ce47d5024e73a71066fa00a4d36bdca74ae32aa",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed2__diltcl/result.npz",
+      "npz_sha256": "29e00091746de14468b193ce01d5387826cef03d2c3a12e9eabbe13993809c67",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/diltcl/seed2"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__packnet/result.json",
+      "json_sha256": "73469dd08cf495c9d2df2d171409750271b753e046ee91627ba4db9006f948a2",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__packnet/result.npz",
+      "npz_sha256": "f1cfc03cbfa92ea1823f5007d73a63d2d6435de2444cddfc11dcfa34d233ee75",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__supsup/result.json",
+      "json_sha256": "e675ef11ccfacdbe29d1d611c7bc9b6f08e34158d221ad090d216a86b9382f71",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__supsup/result.npz",
+      "npz_sha256": "d538b11e8b21d880268ca96b3a9cb677d18bd4f514a65c04cde61559a0c8ddfa",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/supsup/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__wsn/result.json",
+      "json_sha256": "e67e3120cae4d3d4682ef50733cae846c9c33a7567642a2b7313e83454569ce7",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__wsn/result.npz",
+      "npz_sha256": "14e80caf4b91231daffa4427fdfe242b95a00aa8a2313de20f0b7c3179dd7593",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/wsn/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed3__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__diltcl/result.json",
+      "json_sha256": "97e796b47f9f16a2026813210b08a827befc09316f315671720df2d09e281b3a",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed3__diltcl/result.npz",
+      "npz_sha256": "e0dbb31b2cd699a531456dffab4365ba25e9e769ac0be8aa00e6b828e4911572",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/diltcl/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__packnet/result.json",
+      "json_sha256": "e8efc6f48166ba8f35856e8a9155b37b1c5b6126131d0ecc3eb468ae9cddf929",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__packnet/result.npz",
+      "npz_sha256": "a24c8962cce171d02199a2af8f8b3854535882f329aa29d9663444195e57b06e",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/packnet/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__supsup/result.json",
+      "json_sha256": "9375d48fdd893d66966ce1d255ca42fff6bfd1bcd61e3f8a2be95ec36cbdc27c",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__supsup/result.npz",
+      "npz_sha256": "27068ab6662fc4ec48118864207d4ea21dd963759514d82b46927fefc4a63d4e",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/supsup/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__wsn/result.json",
+      "json_sha256": "8c7521e51fee4066a7635f20216b9bcd3937046721bf85863aada38f2cad1335",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__wsn/result.npz",
+      "npz_sha256": "7e4e51c3f84cb8abbbe56557701eb6b616299fa72d517591408a2d8df7de388e",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/wsn/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl/result.json",
+      "json_sha256": "dfa5411ecac40edf1afb9bd5eed448a5473b65579c8215927026b4e957ffe8ad",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed3__diltcl/result.npz",
+      "npz_sha256": "dd110931dfe1b53c716a841e29f1a91bf4f3a8effd56d8b6ac7b544956bad422",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/diltcl/seed3"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__packnet/result.json",
+      "json_sha256": "58fe6bb81f86bb214eda22095e65e97da3012e9eddf61445b72fe0c4b2cee530",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__packnet/result.npz",
+      "npz_sha256": "1f44abbc55acaf622eb83264d7188c2e9bca3d9c58a9551e84676aa2b77e3d9b",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__supsup/result.json",
+      "json_sha256": "4281f2e1ee144ca0afd6d8c8d94110feed1a2725fccd10df70e3554d280e03f7",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__supsup/result.npz",
+      "npz_sha256": "0b2ba94eb24b3155f3696e5e23406090e48ff54c9600701713b1e4ffeafed171",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/supsup/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__wsn/result.json",
+      "json_sha256": "df719550384f7bb8169e33736ca30400bc15a1215f3635f1809ddba63f200c61",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__wsn/result.npz",
+      "npz_sha256": "dcb3dfcb220f55238b841bf6c4bc42a6bdf267d82af538bcd243e36b1c5f986c",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/wsn/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__cifar__seed4__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__diltcl/result.json",
+      "json_sha256": "6e6de5ebffb17a54c8c7005fbb3d8d61c00b133321779a5f1d7d3f05962f0056",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed4__diltcl/result.npz",
+      "npz_sha256": "47919ba5126295a913501cead0c2fd10daedc021d2de6895631175a5b3252400",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/diltcl/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__packnet",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__packnet/result.json",
+      "json_sha256": "de215d401808502379924b2c326f323a6b64c6f8290d1850443744a94d1fa903",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__packnet/result.npz",
+      "npz_sha256": "105b57f7254a55f8abc79ee41421a7d5f9925e6c21bc5dd85c6b033f1dc2faaf",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/packnet/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__supsup",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__supsup/result.json",
+      "json_sha256": "65917f891fba6f8ba46463f42644f32adffa01969a66b4a00753bc82a2a269c7",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__supsup/result.npz",
+      "npz_sha256": "2a0d09e960aa224edbe2ab73426e4016504d897cf6488bc7ec366b4300d1abeb",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/supsup/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__wsn",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__wsn/result.json",
+      "json_sha256": "3d3096273c832d8cd802cc0e9dc58697cda326f46bce1f9d028d344602a15aea",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__wsn/result.npz",
+      "npz_sha256": "67e7ab5aa575758b6b9473e1edd8a6b60e79b659a9a4442dba8111cbdf7ecb98",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/wsn/seed4"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl",
+      "json": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl/result.json",
+      "json_sha256": "ee1af78c33080a7c0ca32aac60ef11bb473c771743699792bc4a82f714847571",
+      "npz": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__tinyimagenet__seed4__diltcl/result.npz",
+      "npz_sha256": "7e35c8eadc25dee6b7c6af5a4b0c9380a9bf2f7f02d21e2c498d336f417fd5b9",
+      "passed": true,
+      "predictions_checked": [
+        "tinyimagenet/diltcl/seed4"
+      ]
+    }
+  ],
+  "run_dir": "/root/autodl-tmp/runs_v3011/p1_biasacc",
+  "scope_note": "This verifier establishes artifact arithmetic, structure, hashes, suite completeness, and the declared same-seed repeat. It does not turn the reused-C-head Task-IL shared baselines into standard separate-head baselines and does not certify a compact exporter.",
+  "status": "verified",
+  "verification_schema_version": 1,
+  "verified_at": "2026-10-22T02:48:18.242045+00:00",
+  "warnings": []
+}

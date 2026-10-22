@@ -1,0 +1,124 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "0",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "0",
+    "--methods",
+    "packnet",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-bias-acc",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-22T02:33:29.106205+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-bias-acc",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p1_class_entropy_biasacc__cifar__seed0__packnet",
+    "methods": "packnet",
+    "priority": "P1",
+    "purpose": "90%-train matched raw entropy versus score-bias-acc router",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 0
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p1_biasacc/logs/p1_class_entropy_biasacc__cifar__seed0__packnet.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 184732,
+      "path": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.json",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.json",
+      "sha256": "3923dfeefe7857f7fdf9766fa374f202c45175043ac952fdbedda9ce3a43783a"
+    },
+    {
+      "bytes": 28008,
+      "path": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/result.npz",
+      "sha256": "64af4f6bd72ee766b6333224d32a233b02324bada41c0ae99ea20bec3dfcfdb1"
+    },
+    {
+      "bytes": 52059355,
+      "path": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/checkpoints/cifar/packnet/seed0.pt",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/checkpoints/cifar/packnet/seed0.pt",
+      "sha256": "81b88a6cfa62d3638a275601759cf52440a3db8893b4ddb50ab48a3f76172d54"
+    },
+    {
+      "bytes": 1946829,
+      "path": "/root/autodl-tmp/runs_v3011/p1_biasacc/artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/predictions/cifar/packnet/seed0.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_biasacc__cifar__seed0__packnet/predictions/cifar/packnet/seed0.npz",
+      "sha256": "1250101905dd00e69b5fc6fe1ceaf51da112d1e8d53816efbd6301eb7b0029ae"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-22T02:28:49.630767+00:00",
+  "state": "succeeded",
+  "wall_seconds": 279.36092998087406
+}

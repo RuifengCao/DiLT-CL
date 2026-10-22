@@ -1,0 +1,128 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "2",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "2",
+    "--methods",
+    "packnet",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-logreg",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-c",
+    "1.0",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-21T22:27:37.786046+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-logreg",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-c",
+      "1.0",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy_cal__cifar__seed2__packnet",
+    "methods": "packnet",
+    "priority": "P0",
+    "purpose": "90%-train matched raw entropy versus score-logreg",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 2
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p0/logs/p0_class_entropy_cal__cifar__seed2__packnet.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 236285,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed2__packnet/result.json",
+      "sha256": "35acbc5d353b187aab05a2e67f5df6b946cfad5101556667ef7770f3628e7e60"
+    },
+    {
+      "bytes": 28008,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed2__packnet/result.npz",
+      "sha256": "fa352f290246abd04ec03696d410c2b8201ae0642f139216d974f3e11ae16eb1"
+    },
+    {
+      "bytes": 52059355,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/checkpoints/cifar/packnet/seed2.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed2__packnet/checkpoints/cifar/packnet/seed2.pt",
+      "sha256": "0c8479c72cb5384b0df5c6d5f71861861b22fe602417e6be779f73a1c4ddd97d"
+    },
+    {
+      "bytes": 1955459,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/predictions/cifar/packnet/seed2.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__cifar__seed2__packnet/predictions/cifar/packnet/seed2.npz",
+      "sha256": "ffa5e3111993d48b87542d53acf256230dc7ca830e9cd4e870a183d6eed690fa"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-21T22:23:19.472540+00:00",
+  "state": "succeeded",
+  "wall_seconds": 258.1967112198472
+}

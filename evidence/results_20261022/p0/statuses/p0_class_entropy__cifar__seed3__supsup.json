@@ -1,0 +1,112 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "3",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "3",
+    "--methods",
+    "supsup",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/result",
+    "--inference-criterion",
+    "entropy",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-21T23:24:55.882937+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy__cifar__seed3__supsup",
+    "methods": "supsup",
+    "priority": "P0",
+    "purpose": "full-data raw entropy class-IL main rerun",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 3
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p0/logs/p0_class_entropy__cifar__seed3__supsup.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 57046,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__supsup/result.json",
+      "sha256": "96605db8065c94094d102793c564c363b4cb3b6bf9edaf14469d7ee189a50449"
+    },
+    {
+      "bytes": 13984,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__supsup/result.npz",
+      "sha256": "1d4f8ebbd74ed670572adfaee468a0ffc87d7b5747d60534fce88d12492c8a27"
+    },
+    {
+      "bytes": 51996323,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/checkpoints/cifar/supsup/seed3.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__supsup/checkpoints/cifar/supsup/seed3.pt",
+      "sha256": "39964f6f4760ad583c32f80eec1a1999fed0706a2a09f56d8fbdd6329d44a243"
+    },
+    {
+      "bytes": 782895,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/predictions/cifar/supsup/seed3.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__cifar__seed3__supsup/predictions/cifar/supsup/seed3.npz",
+      "sha256": "9258234434f99b362d2ddd79bba06556e0fc62ef906a526bfe2d2f79222a7f13"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-21T23:16:40.443080+00:00",
+  "state": "succeeded",
+  "wall_seconds": 495.3243348840624
+}

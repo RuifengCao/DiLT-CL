@@ -33,11 +33,15 @@ code/                        the diltcl package, runners, tools and tests
   README.md                  code overview, installation, guarantees
   PROTOCOL.md                protocols and metric definitions
   REPRODUCE.md               verification and reproduction, three levels
-evidence/results_20260906/   merged, verified artifacts of the three runs behind the paper
-  MANIFEST.json              SHA-256 of every file in the folder
-  p0_v3/                     330 jobs: task-IL (multi-head) and class-IL (raw and calibrated routing)
+evidence/results_20261022/   the v3.0.11 regeneration of all 410 jobs: the runs behind the paper's numbers
+  MANIFEST.json              SHA-256 of every file the results packager wrote
+  NOTES.md                   files added after packaging, and one redaction
+  p0/                        330 jobs: task-IL (multi-head) and class-IL (raw and calibrated routing)
   p1_bias/                   40 jobs: class-IL with the tied-slope score-bias router
   p1_biasacc/                40 jobs: class-IL with the accuracy-fitted score-bias router
+evidence/results_20260906/   the original runs (v3.0.0 to v3.0.3), which the regeneration reproduces
+  MANIFEST.json              SHA-256 of every file in the folder
+  p0_v3/, p1_bias/, p1_biasacc/   the same groups and jobs
 ```
 
 Each run folder holds the merged artifacts (`merged/*.json|npz`: per-seed
@@ -45,8 +49,14 @@ metrics and matrices, aggregates, paired tests), the independent
 verification report (`verification_report.json`), what ran and how long
 (`plan.json`, `statuses/`, `suite_summary.json`), and the provenance of code,
 environment and data (`source_manifest*.json`, `environment*.json`,
-`pip_freeze.txt`, `dataset_fingerprint*.json`, per-file lists removed).
-The fingerprint used by the 170 P0 jobs launched on 2026-09-04
+`pip_freeze.txt`, `dataset_fingerprint*.json`, per-file lists removed). The
+run folders of the regeneration also hold the per-job results
+(`artifacts/<job>/result.json|npz`, the inputs of the merged artifacts) and
+the audit reports: `p0/audit/` holds the regeneration audit and the
+routing-precision audit of all three runs against the original runs, and
+each run's `audit/` holds its per-example recomputation (`predictions.json`)
+and checkpoint re-evaluation (`eval*.json`).
+In the original runs, the fingerprint used by the 170 P0 jobs launched on 2026-09-04
 (`p0_v3/dataset_fingerprints/6f307858*.json`) predates per-entry hashes;
 they were added on 2026-10-20, computed from its archived per-file list
 (`entries_derived_from_files`), so those jobs' data can be compared
@@ -54,6 +64,27 @@ benchmark by benchmark.
 `p0_v3/paper/wall_minutes.txt` was written before SupSup and WSN were rerun
 under v3.0.2, so its rows for those two methods time the invalidated runs;
 `code/tools/wall_times.py` recomputes the summary from `statuses/`.
+
+## Regeneration
+
+All 410 jobs were retrained from their seeds with v3.0.11 on another RTX 5090
+(2026-10-21/22). All 410 trained states are bit-identical to those of the
+original runs (tensor-content hash and file SHA-256), and every per-seed
+metric, aggregate and paired test is identical. The only difference in any
+result array or metric is one of the 9,600,000 test decisions of the
+calibrated jobs (Bias-CE router, DiLT-CL, CIFAR-100, seed 2, sixth prefix),
+moved because version 3.0.10 applies a fitted router in float64 instead of
+the original float32; it changes one cell of three matrices of that job and
+no reported number. The 160 class-IL isolation checkpoints re-evaluate
+exactly, and the per-example records reproduce every routing and oracle
+result. Records that are not results differ as expected: wall times and
+memory peaks; the bookkeeping fields corrected since the original runs (EWC
+schedule accounting, analytic memory, the solver labels of the first-prefix
+Bias-Acc routers); and the MNIST data folder, which was downloaded again
+with a different set of auxiliary files (the audit's `50 with different
+data` are the 50 Permuted-MNIST jobs; their decoded training pixels and
+every result are identical). `evidence/results_20261022/audit_new.log`
+summarises the audits.
 
 ## Quick check (CPU, a few minutes)
 
@@ -65,44 +96,48 @@ python -m pytest tests -q                 # 349 tests, 348 run (about 2 min); th
 # every evidence file against its recorded hash
 python - <<'EOF'
 import hashlib, json, pathlib
-root = pathlib.Path("../evidence/results_20260906")
-m = json.loads((root / "MANIFEST.json").read_text())
-bad = [f["path"] for f in m["files"]
-       if hashlib.sha256((root / f["path"]).read_bytes()).hexdigest() != f["sha256"]]
-print(len(m["files"]), "files,", len(bad), "mismatches")
+for name in ("results_20261022", "results_20260906"):
+    root = pathlib.Path("../evidence") / name
+    m = json.loads((root / "MANIFEST.json").read_text())
+    bad = [f["path"] for f in m["files"]
+           if hashlib.sha256((root / f["path"]).read_bytes()).hexdigest() != f["sha256"]]
+    print(name, len(m["files"]), "files,", len(bad), "mismatches")
 EOF
 
 # the paper's paired statistics (CIs, paired t with Holm, exact sign-flip, MDD)
-E=../evidence/results_20260906
-python tools/paired_stats.py --task-il $E/p0_v3/merged/p0_task_il_multi.json \
-    --class-il $E/p0_v3/merged/p0_class_entropy.json \
-    --calibrated $E/p0_v3/merged/p0_class_entropy_cal.json \
+E=../evidence/results_20261022
+python tools/paired_stats.py --task-il $E/p0/merged/p0_task_il_multi.json \
+    --class-il $E/p0/merged/p0_class_entropy.json \
+    --calibrated $E/p0/merged/p0_class_entropy_cal.json \
     --calibrated $E/p1_bias/merged/p1_class_entropy_bias.json \
     --calibrated $E/p1_biasacc/merged/p1_class_entropy_biasacc.json \
     --out-csv paired.csv --out-tex paired_full.tex --out-compact-tex paired_main.tex \
     --out-calibration-tex paired_calibration.tex
 ```
 
-Full verification from the per-job results, re-evaluation of the trained
-experts from their checkpoints, and retraining from the seeds are described
-in [`code/REPRODUCE.md`](code/REPRODUCE.md).
+The same command on `../evidence/results_20260906` (with `p0_v3/` for
+`p0/`) gives byte-identical outputs. Full verification from the per-job
+results, re-evaluation of the trained experts from their checkpoints, and
+retraining from the seeds are described in
+[`code/REPRODUCE.md`](code/REPRODUCE.md).
 
 ## What is not in this repository
 
 * **Datasets.** CIFAR-100 and MNIST are downloaded by torchvision;
   TinyImageNet is staged by hand (`code/README.md`).
-* **Checkpoints and per-job results.** The complete run directories (about
-  10 GiB, mostly the 410 persisted expert states) are packaged as release
-  archives with `code/tools/build_release.py`, whose manifest records the
-  SHA-256 of every archive and of every file inside. They will be linked here
-  when they are published.
+* **Checkpoints and per-example predictions.** The complete run directories
+  of the regeneration (about 10 GiB, mostly the 410 persisted expert states)
+  are packaged as release archives with `code/tools/build_release.py`, whose
+  manifest records the SHA-256 of every archive and of every file inside.
+  They will be linked here when they are published.
 
 ## Status
 
-Code version 3.0.11 (`code/diltcl/__init__.py`). The artifacts in `evidence/`
-were produced by versions 3.0.0 to 3.0.3 on one NVIDIA RTX 5090; the exact
-software stack is pinned in `code/requirements-lock.txt` and recorded in each
-run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
+Code version 3.0.11 (`code/diltcl/__init__.py`). The original runs in
+`evidence/results_20260906/` were produced by versions 3.0.0 to 3.0.3 on one
+NVIDIA RTX 5090, and the regeneration in `evidence/results_20261022/` by
+version 3.0.11 on another card of the same model; the exact software stack is
+pinned in `code/requirements-lock.txt` and recorded in each run folder. Versions 3.0.4 and 3.0.5 corrected bookkeeping (compute
 accounting, parameter counts, a SciPy fallback that the recorded runs did not
 use) and added per-example prediction recording, checkpoint re-evaluation, a
 regeneration audit and a release builder. Versions 3.0.6 to 3.0.9 changed no
@@ -130,10 +165,9 @@ routing precision; tests that could fail on a GPU server without a fault in
 the code no longer do; and the suite's environment probes have a time
 limit. The test suite and a
 synthetic end-to-end run pass on Python 3.13 and on the recorded software
-stack (Python 3.12.3, PyTorch 2.12.1) on a CPU. Whether 3.0.11 regenerates the
-recorded experts bit for bit on the recorded stack is what the Level 3
-regeneration audit in `code/REPRODUCE.md` checks; that audit has not been run
-yet.
+stack (Python 3.12.3, PyTorch 2.12.1) on a CPU. On the recorded GPU stack,
+3.0.11 regenerated the recorded experts bit for bit (see Regeneration
+above).
 
 ## License
 

@@ -1,0 +1,16 @@
+{
+  "combined_from": [
+    "/root/autodl-tmp/runs_v3011/p1_bias/audit/eval_0.json",
+    "/root/autodl-tmp/runs_v3011/p1_bias/audit/eval_1.json",
+    "/root/autodl-tmp/runs_v3011/p1_bias/audit/eval_2.json",
+    "/root/autodl-tmp/runs_v3011/p1_bias/audit/eval_3.json"
+  ],
+  "coverage_problems": [],
+  "checkpoints_evaluated": 40,
+  "with_errors": 0,
+  "exact": true,
+  "status": "identical",
+  "per_run": {
+    "/root/autodl-tmp/runs_v3011/p1_bias": 40
+  }
+}

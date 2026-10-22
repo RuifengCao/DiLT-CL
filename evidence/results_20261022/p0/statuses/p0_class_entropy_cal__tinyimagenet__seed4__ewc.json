@@ -1,0 +1,122 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "4",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "4",
+    "--methods",
+    "ewc",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-logreg",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-c",
+    "1.0",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "tinyimagenet",
+    "entries": {
+      "tiny-imagenet-200": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-21T18:29:00.912065+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-logreg",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-c",
+      "1.0",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy_cal__tinyimagenet__seed4__ewc",
+    "methods": "ewc",
+    "priority": "P0",
+    "purpose": "90%-train matched raw entropy versus score-logreg",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 4
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p0/logs/p0_class_entropy_cal__tinyimagenet__seed4__ewc.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 49035,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/result.json",
+      "sha256": "f543a9ba97f23e4448119cdcc7996e2f107815d9de010a5f96271dccf8eb2e9e"
+    },
+    {
+      "bytes": 1098,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/result.npz",
+      "sha256": "eecc13ef78fc0074641fb5aa6e1c60f35977a17b9de89fe606aec70cf2a05b6a"
+    },
+    {
+      "bytes": 2680197,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/checkpoints/tinyimagenet/ewc/seed4.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy_cal__tinyimagenet__seed4__ewc/checkpoints/tinyimagenet/ewc/seed4.pt",
+      "sha256": "52641a0900eb5e3bdff3d4861d5d384bab70e1d96284d6acf67ce7cc14679ea4"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-21T18:20:22.482113+00:00",
+  "state": "succeeded",
+  "wall_seconds": 518.4200449846685
+}

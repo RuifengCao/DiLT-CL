@@ -1,0 +1,1629 @@
+{
+  "metric_schema_version": 3,
+  "code_version": "3.0.11",
+  "evidence_status": "unverified",
+  "verification_status": "unverified",
+  "artifact_reportability": {
+    "metric_schema_emitted": true,
+    "postrun_validation_completed": false,
+    "verification_independent_of_metric_schema": true,
+    "reportable_if": "verification_status == verified",
+    "current_publication_reportable": false,
+    "unmet_at_write_time": [
+      "independent JSON/NPZ recomputation report",
+      "code commit or complete source hashes",
+      "dataset identity/order/transforms and hashes",
+      "achieved density for every isolation baseline, hardware-counter FLOPs, and exact replay-example accounting",
+      "failure/exclusion record"
+    ]
+  },
+  "protocol": "class_il",
+  "matrix_semantics": "prefix_candidate_tasks_macro_task_average",
+  "prefix_rule": {
+    "row_i": "after training task i",
+    "evaluated_true_tasks": "0..i",
+    "isolation_candidate_routes": "0..i",
+    "shared_head": "fixed full head; metrics include only seen true tasks 0..i",
+    "upper_triangle": "undefined and serialized as zero",
+    "metric_domain": "valid lower-triangular entries only"
+  },
+  "head_conventions": {
+    "shared_backbone": "fixed-full-head",
+    "isolation": "task-local-head+router",
+    "task_identity_at_test": false,
+    "per_benchmark_output_counts": {
+      "cifar": {
+        "shared": 100,
+        "isolation_local": 5
+      }
+    }
+  },
+  "tie_policy": {
+    "definition": "exact equality at the router decision optimum",
+    "selection": "lowest task id",
+    "reported_metrics": [
+      "RouteTieRate",
+      "MicroRouteTieRate"
+    ]
+  },
+  "conditional_accuracy_definition": "pooled P(class prediction correct | inferred route correct); ZeroCorrectRouteTasks is diagnostic and no task-level selective macro average is used",
+  "npz_auxiliary_suffixes": {
+    "task_inference": "prefix task-routing accuracy matrix",
+    "conditional_class": "prefix class accuracy conditioned on a correct route",
+    "routing_tie": "prefix exact router-tie-rate matrix",
+    "raw_result": "matched-checkpoint uncalibrated class-IL matrix",
+    "raw_task_inference": "matched-checkpoint uncalibrated routing matrix",
+    "raw_conditional_class": "matched-checkpoint uncalibrated conditional-class matrix",
+    "raw_routing_tie": "matched-checkpoint uncalibrated router-tie-rate matrix"
+  },
+  "inference_criterion": "entropy",
+  "inference_calibration": "none",
+  "calibration_fraction": 0.0,
+  "calibration_c": 1.0,
+  "calibration_split_seed": 1729,
+  "config": {
+    "seed": 42,
+    "diltcl_full_epochs": 50,
+    "diltcl_imp_epochs": 20,
+    "diltcl_expert_finetune_epochs": 20,
+    "pruning_rounds": 5,
+    "diltcl_partitions": 2,
+    "diltcl_sparsity": 0.9,
+    "epochs_ewc": 50,
+    "epochs_lwf": 50,
+    "epochs_replay": 50,
+    "ewc_lambda": 10000.0,
+    "ewc_fisher_labels": "prediction",
+    "lwf_alpha": 1.0,
+    "lwf_temperature": 2.0,
+    "buffer_size": 500,
+    "replay_batch_size": 32,
+    "derpp_alpha": 0.5,
+    "derpp_beta": 0.5,
+    "packnet_retrain_epochs": 10,
+    "packnet_keep_fraction": 0.0,
+    "supsup_sparsity": 0.5,
+    "wsn_sparsity": 0.5,
+    "c100_num_tasks": 20,
+    "c100_classes_per_task": 5,
+    "c100_batch_size": 64,
+    "pm_num_tasks": 10,
+    "pm_batch_size": 256,
+    "tin_num_tasks": 10,
+    "tin_classes_per_task": 20,
+    "tin_batch_size": 64,
+    "tin_image_size": 64,
+    "five_batch_size": 64,
+    "five_image_size": 32,
+    "five_dataset_names": [],
+    "lr": 0.001
+  },
+  "execution": {
+    "options": {
+      "data_backend": "device",
+      "numerics": "fast",
+      "eval_batch_size": null,
+      "num_workers": null,
+      "threads": 3,
+      "tf32": "default"
+    },
+    "effective": {
+      "torch_num_threads": 3,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": true,
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false
+    },
+    "numerics_note": "fast: LwF shared-feature distillation, consolidated EWC penalty, routed multi-head replay (same objective, different float summation order); legacy: v2 arithmetic."
+  },
+  "seeds": [
+    4
+  ],
+  "benchmarks": [
+    "cifar"
+  ],
+  "methods": [
+    "supsup"
+  ],
+  "checkpoint_persistence_enabled": true,
+  "benchmark_metadata": {
+    "cifar": {
+      "dataset": "Split-CIFAR-100",
+      "task_names": null,
+      "task_count": 20,
+      "classes_per_task": 5,
+      "global_class_count": 100,
+      "label_relation": "disjoint-class",
+      "shared_head_output_count": 100,
+      "isolation_local_head_output_count": 5,
+      "per_seed_counts": {
+        "4": {
+          "isolation": {
+            "train_samples_per_task_before_calibration_holdout": [
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500
+            ],
+            "test_samples_per_task": [
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500,
+              500
+            ],
+            "train_sample_count_before_calibration_holdout": 50000,
+            "test_sample_count": 10000,
+            "dataset_views": [
+              {
+                "task": 0,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "label_mapping": {
+                  "0": 0,
+                  "1": 1,
+                  "2": 2,
+                  "3": 3,
+                  "4": 4
+                }
+              },
+              {
+                "task": 1,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  5,
+                  6,
+                  7,
+                  8,
+                  9
+                ],
+                "label_mapping": {
+                  "5": 0,
+                  "6": 1,
+                  "7": 2,
+                  "8": 3,
+                  "9": 4
+                }
+              },
+              {
+                "task": 2,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  10,
+                  11,
+                  12,
+                  13,
+                  14
+                ],
+                "label_mapping": {
+                  "10": 0,
+                  "11": 1,
+                  "12": 2,
+                  "13": 3,
+                  "14": 4
+                }
+              },
+              {
+                "task": 3,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  15,
+                  16,
+                  17,
+                  18,
+                  19
+                ],
+                "label_mapping": {
+                  "15": 0,
+                  "16": 1,
+                  "17": 2,
+                  "18": 3,
+                  "19": 4
+                }
+              },
+              {
+                "task": 4,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  20,
+                  21,
+                  22,
+                  23,
+                  24
+                ],
+                "label_mapping": {
+                  "20": 0,
+                  "21": 1,
+                  "22": 2,
+                  "23": 3,
+                  "24": 4
+                }
+              },
+              {
+                "task": 5,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  25,
+                  26,
+                  27,
+                  28,
+                  29
+                ],
+                "label_mapping": {
+                  "25": 0,
+                  "26": 1,
+                  "27": 2,
+                  "28": 3,
+                  "29": 4
+                }
+              },
+              {
+                "task": 6,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "label_mapping": {
+                  "30": 0,
+                  "31": 1,
+                  "32": 2,
+                  "33": 3,
+                  "34": 4
+                }
+              },
+              {
+                "task": 7,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  35,
+                  36,
+                  37,
+                  38,
+                  39
+                ],
+                "label_mapping": {
+                  "35": 0,
+                  "36": 1,
+                  "37": 2,
+                  "38": 3,
+                  "39": 4
+                }
+              },
+              {
+                "task": 8,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  40,
+                  41,
+                  42,
+                  43,
+                  44
+                ],
+                "label_mapping": {
+                  "40": 0,
+                  "41": 1,
+                  "42": 2,
+                  "43": 3,
+                  "44": 4
+                }
+              },
+              {
+                "task": 9,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  45,
+                  46,
+                  47,
+                  48,
+                  49
+                ],
+                "label_mapping": {
+                  "45": 0,
+                  "46": 1,
+                  "47": 2,
+                  "48": 3,
+                  "49": 4
+                }
+              },
+              {
+                "task": 10,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  50,
+                  51,
+                  52,
+                  53,
+                  54
+                ],
+                "label_mapping": {
+                  "50": 0,
+                  "51": 1,
+                  "52": 2,
+                  "53": 3,
+                  "54": 4
+                }
+              },
+              {
+                "task": 11,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  55,
+                  56,
+                  57,
+                  58,
+                  59
+                ],
+                "label_mapping": {
+                  "55": 0,
+                  "56": 1,
+                  "57": 2,
+                  "58": 3,
+                  "59": 4
+                }
+              },
+              {
+                "task": 12,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  60,
+                  61,
+                  62,
+                  63,
+                  64
+                ],
+                "label_mapping": {
+                  "60": 0,
+                  "61": 1,
+                  "62": 2,
+                  "63": 3,
+                  "64": 4
+                }
+              },
+              {
+                "task": 13,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  65,
+                  66,
+                  67,
+                  68,
+                  69
+                ],
+                "label_mapping": {
+                  "65": 0,
+                  "66": 1,
+                  "67": 2,
+                  "68": 3,
+                  "69": 4
+                }
+              },
+              {
+                "task": 14,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  70,
+                  71,
+                  72,
+                  73,
+                  74
+                ],
+                "label_mapping": {
+                  "70": 0,
+                  "71": 1,
+                  "72": 2,
+                  "73": 3,
+                  "74": 4
+                }
+              },
+              {
+                "task": 15,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  75,
+                  76,
+                  77,
+                  78,
+                  79
+                ],
+                "label_mapping": {
+                  "75": 0,
+                  "76": 1,
+                  "77": 2,
+                  "78": 3,
+                  "79": 4
+                }
+              },
+              {
+                "task": 16,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  80,
+                  81,
+                  82,
+                  83,
+                  84
+                ],
+                "label_mapping": {
+                  "80": 0,
+                  "81": 1,
+                  "82": 2,
+                  "83": 3,
+                  "84": 4
+                }
+              },
+              {
+                "task": 17,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  85,
+                  86,
+                  87,
+                  88,
+                  89
+                ],
+                "label_mapping": {
+                  "85": 0,
+                  "86": 1,
+                  "87": 2,
+                  "88": 3,
+                  "89": 4
+                }
+              },
+              {
+                "task": 18,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  90,
+                  91,
+                  92,
+                  93,
+                  94
+                ],
+                "label_mapping": {
+                  "90": 0,
+                  "91": 1,
+                  "92": 2,
+                  "93": 3,
+                  "94": 4
+                }
+              },
+              {
+                "task": 19,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "ebdd0aca3927984403ddab6758a50fdc469ed951295588c1c64e54212e072a4a",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 153600000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  95,
+                  96,
+                  97,
+                  98,
+                  99
+                ],
+                "label_mapping": {
+                  "95": 0,
+                  "96": 1,
+                  "97": 2,
+                  "98": 3,
+                  "99": 4
+                }
+              }
+            ],
+            "test_dataset_views": [
+              {
+                "task": 0,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "label_mapping": {
+                  "0": 0,
+                  "1": 1,
+                  "2": 2,
+                  "3": 3,
+                  "4": 4
+                }
+              },
+              {
+                "task": 1,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  5,
+                  6,
+                  7,
+                  8,
+                  9
+                ],
+                "label_mapping": {
+                  "5": 0,
+                  "6": 1,
+                  "7": 2,
+                  "8": 3,
+                  "9": 4
+                }
+              },
+              {
+                "task": 2,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  10,
+                  11,
+                  12,
+                  13,
+                  14
+                ],
+                "label_mapping": {
+                  "10": 0,
+                  "11": 1,
+                  "12": 2,
+                  "13": 3,
+                  "14": 4
+                }
+              },
+              {
+                "task": 3,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  15,
+                  16,
+                  17,
+                  18,
+                  19
+                ],
+                "label_mapping": {
+                  "15": 0,
+                  "16": 1,
+                  "17": 2,
+                  "18": 3,
+                  "19": 4
+                }
+              },
+              {
+                "task": 4,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  20,
+                  21,
+                  22,
+                  23,
+                  24
+                ],
+                "label_mapping": {
+                  "20": 0,
+                  "21": 1,
+                  "22": 2,
+                  "23": 3,
+                  "24": 4
+                }
+              },
+              {
+                "task": 5,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  25,
+                  26,
+                  27,
+                  28,
+                  29
+                ],
+                "label_mapping": {
+                  "25": 0,
+                  "26": 1,
+                  "27": 2,
+                  "28": 3,
+                  "29": 4
+                }
+              },
+              {
+                "task": 6,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "label_mapping": {
+                  "30": 0,
+                  "31": 1,
+                  "32": 2,
+                  "33": 3,
+                  "34": 4
+                }
+              },
+              {
+                "task": 7,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  35,
+                  36,
+                  37,
+                  38,
+                  39
+                ],
+                "label_mapping": {
+                  "35": 0,
+                  "36": 1,
+                  "37": 2,
+                  "38": 3,
+                  "39": 4
+                }
+              },
+              {
+                "task": 8,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  40,
+                  41,
+                  42,
+                  43,
+                  44
+                ],
+                "label_mapping": {
+                  "40": 0,
+                  "41": 1,
+                  "42": 2,
+                  "43": 3,
+                  "44": 4
+                }
+              },
+              {
+                "task": 9,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  45,
+                  46,
+                  47,
+                  48,
+                  49
+                ],
+                "label_mapping": {
+                  "45": 0,
+                  "46": 1,
+                  "47": 2,
+                  "48": 3,
+                  "49": 4
+                }
+              },
+              {
+                "task": 10,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  50,
+                  51,
+                  52,
+                  53,
+                  54
+                ],
+                "label_mapping": {
+                  "50": 0,
+                  "51": 1,
+                  "52": 2,
+                  "53": 3,
+                  "54": 4
+                }
+              },
+              {
+                "task": 11,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  55,
+                  56,
+                  57,
+                  58,
+                  59
+                ],
+                "label_mapping": {
+                  "55": 0,
+                  "56": 1,
+                  "57": 2,
+                  "58": 3,
+                  "59": 4
+                }
+              },
+              {
+                "task": 12,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  60,
+                  61,
+                  62,
+                  63,
+                  64
+                ],
+                "label_mapping": {
+                  "60": 0,
+                  "61": 1,
+                  "62": 2,
+                  "63": 3,
+                  "64": 4
+                }
+              },
+              {
+                "task": 13,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  65,
+                  66,
+                  67,
+                  68,
+                  69
+                ],
+                "label_mapping": {
+                  "65": 0,
+                  "66": 1,
+                  "67": 2,
+                  "68": 3,
+                  "69": 4
+                }
+              },
+              {
+                "task": 14,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  70,
+                  71,
+                  72,
+                  73,
+                  74
+                ],
+                "label_mapping": {
+                  "70": 0,
+                  "71": 1,
+                  "72": 2,
+                  "73": 3,
+                  "74": 4
+                }
+              },
+              {
+                "task": 15,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  75,
+                  76,
+                  77,
+                  78,
+                  79
+                ],
+                "label_mapping": {
+                  "75": 0,
+                  "76": 1,
+                  "77": 2,
+                  "78": 3,
+                  "79": 4
+                }
+              },
+              {
+                "task": 16,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  80,
+                  81,
+                  82,
+                  83,
+                  84
+                ],
+                "label_mapping": {
+                  "80": 0,
+                  "81": 1,
+                  "82": 2,
+                  "83": 3,
+                  "84": 4
+                }
+              },
+              {
+                "task": 17,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  85,
+                  86,
+                  87,
+                  88,
+                  89
+                ],
+                "label_mapping": {
+                  "85": 0,
+                  "86": 1,
+                  "87": 2,
+                  "88": 3,
+                  "89": 4
+                }
+              },
+              {
+                "task": 18,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  90,
+                  91,
+                  92,
+                  93,
+                  94
+                ],
+                "label_mapping": {
+                  "90": 0,
+                  "91": 1,
+                  "92": 2,
+                  "93": 3,
+                  "94": 4
+                }
+              },
+              {
+                "task": 19,
+                "dataset_wrappers": [],
+                "source_dataset_class": "torchvision.datasets.cifar.CIFAR100",
+                "transform_repr": "Compose(\n    ToTensor()\n    Normalize(mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761))\n)",
+                "loader_class": "diltcl.data_backend.DeviceLoader",
+                "batch_size": 64,
+                "materialized_pixels_sha256": "f56c0b9c42097f522f7d09afaa0122569b19f04350ce5db9e0ecf526a62bbf62",
+                "resident_pixel_storage": {
+                  "device": "cuda:0",
+                  "bytes": 30720000,
+                  "shared_across_tasks": true
+                },
+                "source_classes": [
+                  95,
+                  96,
+                  97,
+                  98,
+                  99
+                ],
+                "label_mapping": {
+                  "95": 0,
+                  "96": 1,
+                  "97": 2,
+                  "98": 3,
+                  "99": 4
+                }
+              }
+            ],
+            "model_train_samples_per_task": [
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500
+            ],
+            "calibration_samples_per_task": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "python_implementation": "CPython",
+    "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+    "numpy_version": "2.4.6",
+    "pytorch_version": "2.12.1+cu130",
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "cudnn_version": 92000,
+    "python_hash_seed": "4",
+    "command": [
+      "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+      "--benchmark",
+      "cifar",
+      "--seed-list",
+      "4",
+      "--methods",
+      "supsup",
+      "--out",
+      "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/result",
+      "--inference-criterion",
+      "entropy",
+      "--data-backend",
+      "device",
+      "--numerics",
+      "fast",
+      "--tf32",
+      "default",
+      "--threads",
+      "3",
+      "--data-root",
+      "/root/autodl-tmp/data",
+      "--no-download",
+      "--checkpoint-dir",
+      "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/checkpoints",
+      "--predictions-dir",
+      "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/predictions"
+    ]
+  },
+  "per_seed_run_records": {
+    "cifar": {
+      "supsup": {
+        "4": {
+          "pipeline_wall_seconds": 407.86865963228047,
+          "peak_cuda_memory_allocated_bytes": 400828928,
+          "cuda_memory_allocated_before_method_bytes": 186101760,
+          "includes_training_and_all_router_evaluations": true,
+          "includes_prediction_recording": true,
+          "trained_state": {
+            "state_definition": "router-evaluation dense PyTorch state",
+            "format": "supsup-router-state-v1",
+            "serialized_bytes": 51996323,
+            "sha256": "89ed63721ecb64109e93441f4df12c89d23417cb0e44797b8129190639eb7b95",
+            "content_sha256": "1cff8224ed5411dc2f38bd4ba7306cb55df87f167283b942978b710d6f6b23c5",
+            "deployable_compact_export": false,
+            "method_state_metadata": {},
+            "persisted": true,
+            "persisted_path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/checkpoints/cifar/supsup/seed4.pt",
+            "persisted_relative_path": "checkpoints/cifar/supsup/seed4.pt"
+          },
+          "schedule_accounting": {
+            "kind": "declared-schedule accounting",
+            "model_train_sample_counts_per_task": [
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500,
+              2500
+            ],
+            "current_data_example_visits": 2500000,
+            "optimizer_steps": 40000,
+            "optimizer_steps_note": "exact for declared current-data training loops",
+            "schedule": {
+              "epochs_per_task": 50,
+              "post_prune_retrain_epochs_per_task": 0
+            },
+            "replay_examples_included": false,
+            "flops_measured": false
+          }
+        }
+      }
+    }
+  },
+  "shared_backbone_methods": [],
+  "isolation_methods": [
+    "supsup"
+  ],
+  "per_seed": {
+    "cifar": {
+      "supsup": [
+        {
+          "ACC": 18.84,
+          "BWT": -16.221052631578946,
+          "Forgetting": 16.221052631578942,
+          "LA": 34.249999999999986,
+          "OracleACC": 78.16,
+          "TA": 19.380000000000003,
+          "MicroACC": 18.84,
+          "MicroOracleACC": 78.16,
+          "MicroTA": 19.38,
+          "ConditionalACC": 97.21362229102168,
+          "MicroConditionalACC": 97.21362229102168,
+          "RouteTieRate": 0.0,
+          "MicroRouteTieRate": 0.0,
+          "ZeroCorrectRouteTasks": 0
+        }
+      ]
+    }
+  },
+  "aggregated": {
+    "cifar": {
+      "supsup": {
+        "ACC": {
+          "mean": 18.84,
+          "std": 0.0,
+          "values": [
+            18.84
+          ]
+        },
+        "BWT": {
+          "mean": -16.221052631578946,
+          "std": 0.0,
+          "values": [
+            -16.221052631578946
+          ]
+        },
+        "Forgetting": {
+          "mean": 16.221052631578942,
+          "std": 0.0,
+          "values": [
+            16.221052631578942
+          ]
+        },
+        "LA": {
+          "mean": 34.249999999999986,
+          "std": 0.0,
+          "values": [
+            34.249999999999986
+          ]
+        },
+        "OracleACC": {
+          "mean": 78.16,
+          "std": 0.0,
+          "values": [
+            78.16
+          ]
+        },
+        "TA": {
+          "mean": 19.380000000000003,
+          "std": 0.0,
+          "values": [
+            19.380000000000003
+          ]
+        },
+        "MicroACC": {
+          "mean": 18.84,
+          "std": 0.0,
+          "values": [
+            18.84
+          ]
+        },
+        "MicroOracleACC": {
+          "mean": 78.16,
+          "std": 0.0,
+          "values": [
+            78.16
+          ]
+        },
+        "MicroTA": {
+          "mean": 19.38,
+          "std": 0.0,
+          "values": [
+            19.38
+          ]
+        },
+        "ConditionalACC": {
+          "mean": 97.21362229102168,
+          "std": 0.0,
+          "values": [
+            97.21362229102168
+          ]
+        },
+        "MicroConditionalACC": {
+          "mean": 97.21362229102168,
+          "std": 0.0,
+          "values": [
+            97.21362229102168
+          ]
+        },
+        "RouteTieRate": {
+          "mean": 0.0,
+          "std": 0.0,
+          "values": [
+            0.0
+          ]
+        },
+        "MicroRouteTieRate": {
+          "mean": 0.0,
+          "std": 0.0,
+          "values": [
+            0.0
+          ]
+        },
+        "ZeroCorrectRouteTasks": {
+          "mean": 0.0,
+          "std": 0.0,
+          "values": [
+            0
+          ]
+        }
+      }
+    }
+  },
+  "calibration": {
+    "cifar": {
+      "supsup": {
+        "4": {
+          "kind": "none",
+          "trained_state": {
+            "state_definition": "router-evaluation dense PyTorch state",
+            "format": "supsup-router-state-v1",
+            "serialized_bytes": 51996323,
+            "sha256": "89ed63721ecb64109e93441f4df12c89d23417cb0e44797b8129190639eb7b95",
+            "content_sha256": "1cff8224ed5411dc2f38bd4ba7306cb55df87f167283b942978b710d6f6b23c5",
+            "deployable_compact_export": false,
+            "method_state_metadata": {},
+            "persisted": true,
+            "persisted_path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/checkpoints/cifar/supsup/seed4.pt",
+            "persisted_relative_path": "checkpoints/cifar/supsup/seed4.pt"
+          },
+          "predictions": {
+            "format": "diltcl-class-il-predictions-v1",
+            "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/predictions/cifar/supsup/seed4.npz",
+            "bytes": 781171,
+            "sha256": "308bfd5b92c01bfa36333d9b3ebf3b420e4aa52340ebc38eaae3c59655d15980",
+            "arrays": [
+              "label_local",
+              "oracle_pred_local",
+              "route_by_stage",
+              "routed_pred_local_by_stage",
+              "scores",
+              "tie_by_stage",
+              "true_task"
+            ],
+            "examples": 10000,
+            "relative_path": "predictions/cifar/supsup/seed4.npz"
+          }
+        }
+      }
+    }
+  }
+}

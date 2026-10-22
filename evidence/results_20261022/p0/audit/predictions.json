@@ -1,0 +1,2567 @@
+{
+  "files_checked": 80,
+  "files_with_errors": 0,
+  "status": "passed",
+  "entries": [
+    {
+      "job": "p0_class_entropy__cifar__seed0__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed0__diltcl/predictions/cifar/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 19.42,
+        "task_inference": 19.85,
+        "oracle_accuracy": 77.96,
+        "conditional_accuracy": 97.8337531486146,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.040000000000006,
+        "recoverable_routing_loss": 58.53999999999999,
+        "recoverable_fraction_percent": 72.6482998262596
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed0__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed0__packnet/predictions/cifar/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.81,
+        "task_inference": 13.42,
+        "oracle_accuracy": 69.97,
+        "conditional_accuracy": 95.45454545454545,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.03,
+        "recoverable_routing_loss": 57.16,
+        "recoverable_fraction_percent": 65.55797683220553
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed0__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed0__supsup/predictions/cifar/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.67,
+        "task_inference": 19.21,
+        "oracle_accuracy": 78.08,
+        "conditional_accuracy": 97.1889640812077,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.92,
+        "recoverable_routing_loss": 59.41,
+        "recoverable_fraction_percent": 73.04807574080905
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed0__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed0__wsn/predictions/cifar/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.34,
+        "task_inference": 18.84,
+        "oracle_accuracy": 79.92,
+        "conditional_accuracy": 97.34607218683652,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.08,
+        "recoverable_routing_loss": 61.58,
+        "recoverable_fraction_percent": 75.41023757041391
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed1__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed1__diltcl/predictions/cifar/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 19.2,
+        "task_inference": 19.75,
+        "oracle_accuracy": 77.76,
+        "conditional_accuracy": 97.21518987341773,
+        "identity_residual_A_minus_UV": -3.552713678800501e-15,
+        "oracle_error": 22.239999999999995,
+        "recoverable_routing_loss": 58.56,
+        "recoverable_fraction_percent": 72.47524752475248
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed1__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed1__packnet/predictions/cifar/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.94,
+        "task_inference": 13.63,
+        "oracle_accuracy": 69.5,
+        "conditional_accuracy": 94.93763756419662,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.5,
+        "recoverable_routing_loss": 56.56,
+        "recoverable_fraction_percent": 64.9666896393292
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed1__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed1__supsup/predictions/cifar/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.4,
+        "task_inference": 18.9,
+        "oracle_accuracy": 78.28,
+        "conditional_accuracy": 97.35449735449735,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.72,
+        "recoverable_routing_loss": 59.88,
+        "recoverable_fraction_percent": 73.38235294117648
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed1__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed1__wsn/predictions/cifar/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 19.35,
+        "task_inference": 19.77,
+        "oracle_accuracy": 79.66,
+        "conditional_accuracy": 97.87556904400607,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.340000000000003,
+        "recoverable_routing_loss": 60.309999999999995,
+        "recoverable_fraction_percent": 74.77991320520768
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed2__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed2__diltcl/predictions/cifar/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 19.19,
+        "task_inference": 19.61,
+        "oracle_accuracy": 78.66,
+        "conditional_accuracy": 97.85823559408465,
+        "identity_residual_A_minus_UV": 3.552713678800501e-15,
+        "oracle_error": 21.340000000000003,
+        "recoverable_routing_loss": 59.47,
+        "recoverable_fraction_percent": 73.59237718104195
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed2__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed2__packnet/predictions/cifar/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.07,
+        "task_inference": 13.65,
+        "oracle_accuracy": 69.55,
+        "conditional_accuracy": 95.75091575091575,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.450000000000003,
+        "recoverable_routing_loss": 56.48,
+        "recoverable_fraction_percent": 64.97181640400322
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed2__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed2__supsup/predictions/cifar/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.39,
+        "task_inference": 18.92,
+        "oracle_accuracy": 78.47,
+        "conditional_accuracy": 97.19873150105708,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.53,
+        "recoverable_routing_loss": 60.08,
+        "recoverable_fraction_percent": 73.61842911407916
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed2__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed2__wsn/predictions/cifar/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.32,
+        "task_inference": 18.7,
+        "oracle_accuracy": 79.19,
+        "conditional_accuracy": 97.96791443850267,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.810000000000002,
+        "recoverable_routing_loss": 60.87,
+        "recoverable_fraction_percent": 74.52252693437805
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed3__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__diltcl/predictions/cifar/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.88,
+        "task_inference": 19.32,
+        "oracle_accuracy": 78.39,
+        "conditional_accuracy": 97.72256728778468,
+        "identity_residual_A_minus_UV": -3.552713678800501e-15,
+        "oracle_error": 21.61,
+        "recoverable_routing_loss": 59.510000000000005,
+        "recoverable_fraction_percent": 73.3604536489152
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed3__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__packnet/predictions/cifar/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.01,
+        "task_inference": 13.7,
+        "oracle_accuracy": 68.02,
+        "conditional_accuracy": 94.96350364963503,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 31.980000000000004,
+        "recoverable_routing_loss": 55.01,
+        "recoverable_fraction_percent": 63.23715369582711
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed3__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__supsup/predictions/cifar/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 17.79,
+        "task_inference": 18.16,
+        "oracle_accuracy": 78.52,
+        "conditional_accuracy": 97.96255506607929,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.480000000000004,
+        "recoverable_routing_loss": 60.73,
+        "recoverable_fraction_percent": 73.87179175282812
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed3__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed3__wsn/predictions/cifar/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 17.77,
+        "task_inference": 18.19,
+        "oracle_accuracy": 80.16,
+        "conditional_accuracy": 97.6910390324354,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 19.840000000000003,
+        "recoverable_routing_loss": 62.39,
+        "recoverable_fraction_percent": 75.87255259637601
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed4__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__diltcl/predictions/cifar/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 19.8,
+        "task_inference": 20.14,
+        "oracle_accuracy": 78.54,
+        "conditional_accuracy": 98.31181727904668,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.459999999999994,
+        "recoverable_routing_loss": 58.74000000000001,
+        "recoverable_fraction_percent": 73.2418952618454
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed4__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__packnet/predictions/cifar/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.84,
+        "task_inference": 13.39,
+        "oracle_accuracy": 69.63,
+        "conditional_accuracy": 95.8924570575056,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.370000000000005,
+        "recoverable_routing_loss": 56.78999999999999,
+        "recoverable_fraction_percent": 65.15603487838457
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed4__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__supsup/predictions/cifar/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.84,
+        "task_inference": 19.38,
+        "oracle_accuracy": 78.16,
+        "conditional_accuracy": 97.21362229102168,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.840000000000003,
+        "recoverable_routing_loss": 59.31999999999999,
+        "recoverable_fraction_percent": 73.09019221291275
+      }
+    },
+    {
+      "job": "p0_class_entropy__cifar__seed4__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__cifar__seed4__wsn/predictions/cifar/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 18.4,
+        "task_inference": 18.82,
+        "oracle_accuracy": 80.28,
+        "conditional_accuracy": 97.7683315621679,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 19.72,
+        "recoverable_routing_loss": 61.88,
+        "recoverable_fraction_percent": 75.83333333333334
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed0__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/predictions/tinyimagenet/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.99,
+        "task_inference": 16.93,
+        "oracle_accuracy": 38.69,
+        "conditional_accuracy": 70.82102776137035,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.31,
+        "recoverable_routing_loss": 26.699999999999996,
+        "recoverable_fraction_percent": 30.337461652084983
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed0__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__packnet/predictions/tinyimagenet/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 6.53,
+        "task_inference": 12.36,
+        "oracle_accuracy": 22.81,
+        "conditional_accuracy": 52.83171521035599,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.19,
+        "recoverable_routing_loss": 16.279999999999998,
+        "recoverable_fraction_percent": 17.417353161442172
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed0__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__supsup/predictions/tinyimagenet/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 15.48,
+        "task_inference": 21.53,
+        "oracle_accuracy": 42.63,
+        "conditional_accuracy": 71.89967487227125,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.37,
+        "recoverable_routing_loss": 27.150000000000002,
+        "recoverable_fraction_percent": 32.12257453857075
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed0__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__wsn/predictions/tinyimagenet/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.91,
+        "task_inference": 17.69,
+        "oracle_accuracy": 42.48,
+        "conditional_accuracy": 72.97908422837762,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 57.52,
+        "recoverable_routing_loss": 29.569999999999997,
+        "recoverable_fraction_percent": 33.95338155930646
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed1__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed1__diltcl/predictions/tinyimagenet/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.27,
+        "task_inference": 17.42,
+        "oracle_accuracy": 38.24,
+        "conditional_accuracy": 70.43628013777267,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.76,
+        "recoverable_routing_loss": 25.970000000000002,
+        "recoverable_fraction_percent": 29.602188532998976
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed1__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed1__packnet/predictions/tinyimagenet/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 6.61,
+        "task_inference": 12.8,
+        "oracle_accuracy": 23.0,
+        "conditional_accuracy": 51.640625,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.0,
+        "recoverable_routing_loss": 16.39,
+        "recoverable_fraction_percent": 17.550058892815077
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed1__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed1__supsup/predictions/tinyimagenet/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.9,
+        "task_inference": 21.03,
+        "oracle_accuracy": 42.44,
+        "conditional_accuracy": 70.85116500237756,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.56,
+        "recoverable_routing_loss": 27.54,
+        "recoverable_fraction_percent": 32.36192714453584
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed1__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed1__wsn/predictions/tinyimagenet/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.35,
+        "task_inference": 17.52,
+        "oracle_accuracy": 43.24,
+        "conditional_accuracy": 70.49086757990868,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 56.76,
+        "recoverable_routing_loss": 30.89,
+        "recoverable_fraction_percent": 35.24244152880775
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed2__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed2__diltcl/predictions/tinyimagenet/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.63,
+        "task_inference": 17.67,
+        "oracle_accuracy": 38.57,
+        "conditional_accuracy": 71.47707979626486,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 61.43,
+        "recoverable_routing_loss": 25.939999999999998,
+        "recoverable_fraction_percent": 29.689824882682842
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed2__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed2__packnet/predictions/tinyimagenet/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 6.26,
+        "task_inference": 12.12,
+        "oracle_accuracy": 20.79,
+        "conditional_accuracy": 51.65016501650165,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 79.21000000000001,
+        "recoverable_routing_loss": 14.53,
+        "recoverable_fraction_percent": 15.500320034136976
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed2__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed2__supsup/predictions/tinyimagenet/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 15.11,
+        "task_inference": 21.54,
+        "oracle_accuracy": 43.13,
+        "conditional_accuracy": 70.14856081708449,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 56.87,
+        "recoverable_routing_loss": 28.020000000000003,
+        "recoverable_fraction_percent": 33.00742136883026
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed2__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed2__wsn/predictions/tinyimagenet/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.09,
+        "task_inference": 16.96,
+        "oracle_accuracy": 43.07,
+        "conditional_accuracy": 71.28537735849056,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 56.93,
+        "recoverable_routing_loss": 30.98,
+        "recoverable_fraction_percent": 35.240586963940395
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed3__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed3__diltcl/predictions/tinyimagenet/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.66,
+        "task_inference": 17.59,
+        "oracle_accuracy": 38.78,
+        "conditional_accuracy": 71.97271176805003,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.22,
+        "recoverable_routing_loss": 26.12,
+        "recoverable_fraction_percent": 29.906114037096405
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed3__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed3__packnet/predictions/tinyimagenet/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 6.46,
+        "task_inference": 12.39,
+        "oracle_accuracy": 22.47,
+        "conditional_accuracy": 52.13882163034705,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.53,
+        "recoverable_routing_loss": 16.009999999999998,
+        "recoverable_fraction_percent": 17.11567243959803
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed3__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed3__supsup/predictions/tinyimagenet/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.61,
+        "task_inference": 20.8,
+        "oracle_accuracy": 42.82,
+        "conditional_accuracy": 70.24038461538461,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.18,
+        "recoverable_routing_loss": 28.21,
+        "recoverable_fraction_percent": 33.036655346059256
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed3__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed3__wsn/predictions/tinyimagenet/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.46,
+        "task_inference": 17.67,
+        "oracle_accuracy": 42.41,
+        "conditional_accuracy": 70.51499717034521,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.59,
+        "recoverable_routing_loss": 29.949999999999996,
+        "recoverable_fraction_percent": 34.212931231437054
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed4__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed4__diltcl/predictions/tinyimagenet/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.57,
+        "task_inference": 17.73,
+        "oracle_accuracy": 38.67,
+        "conditional_accuracy": 70.89678510998309,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 61.33,
+        "recoverable_routing_loss": 26.1,
+        "recoverable_fraction_percent": 29.852453391284453
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed4__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed4__packnet/predictions/tinyimagenet/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 6.6,
+        "task_inference": 12.64,
+        "oracle_accuracy": 24.18,
+        "conditional_accuracy": 52.21518987341772,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 75.82,
+        "recoverable_routing_loss": 17.58,
+        "recoverable_fraction_percent": 18.82226980728051
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed4__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed4__supsup/predictions/tinyimagenet/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.37,
+        "task_inference": 20.24,
+        "oracle_accuracy": 42.46,
+        "conditional_accuracy": 70.99802371541502,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 57.54,
+        "recoverable_routing_loss": 28.090000000000003,
+        "recoverable_fraction_percent": 32.80392385846083
+      }
+    },
+    {
+      "job": "p0_class_entropy__tinyimagenet__seed4__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed4__wsn/predictions/tinyimagenet/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.01,
+        "task_inference": 17.14,
+        "oracle_accuracy": 43.17,
+        "conditional_accuracy": 70.07001166861143,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 56.83,
+        "recoverable_routing_loss": 31.160000000000004,
+        "recoverable_fraction_percent": 35.41311512671895
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed0__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed0__diltcl/predictions/cifar/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.3,
+        "task_inference": 13.25,
+        "oracle_accuracy": 78.5,
+        "conditional_accuracy": 92.83018867924528,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.5,
+        "recoverable_routing_loss": 66.2,
+        "recoverable_fraction_percent": 75.48460661345496
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed0__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed0__packnet/predictions/cifar/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.13,
+        "task_inference": 11.31,
+        "oracle_accuracy": 70.18,
+        "conditional_accuracy": 89.56675508399647,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 29.819999999999993,
+        "recoverable_routing_loss": 60.050000000000004,
+        "recoverable_fraction_percent": 66.81873817736731
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed0__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed0__supsup/predictions/cifar/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.75,
+        "task_inference": 13.81,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 92.32440260680666,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 65.73,
+        "recoverable_fraction_percent": 75.3352435530086
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed0__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed0__wsn/predictions/cifar/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.97,
+        "task_inference": 10.98,
+        "oracle_accuracy": 79.25,
+        "conditional_accuracy": 90.80145719489981,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.75,
+        "recoverable_routing_loss": 69.28,
+        "recoverable_fraction_percent": 76.95212706875486
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed1__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed1__diltcl/predictions/cifar/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.89,
+        "task_inference": 12.78,
+        "oracle_accuracy": 76.96,
+        "conditional_accuracy": 93.0359937402191,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 23.040000000000006,
+        "recoverable_routing_loss": 65.07,
+        "recoverable_fraction_percent": 73.85086823289069
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed1__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed1__packnet/predictions/cifar/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.76,
+        "task_inference": 11.29,
+        "oracle_accuracy": 69.37,
+        "conditional_accuracy": 86.44818423383525,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 30.629999999999995,
+        "recoverable_routing_loss": 59.61000000000001,
+        "recoverable_fraction_percent": 66.05718085106385
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed1__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed1__supsup/predictions/cifar/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.56,
+        "task_inference": 13.42,
+        "oracle_accuracy": 78.89,
+        "conditional_accuracy": 93.59165424739196,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.11,
+        "recoverable_routing_loss": 66.33,
+        "recoverable_fraction_percent": 75.85773101555353
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed1__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed1__wsn/predictions/cifar/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.53,
+        "task_inference": 11.36,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 92.69366197183099,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 67.95,
+        "recoverable_fraction_percent": 75.94724488655416
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed2__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__diltcl/predictions/cifar/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.04,
+        "task_inference": 12.82,
+        "oracle_accuracy": 77.55,
+        "conditional_accuracy": 93.91575663026521,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.450000000000003,
+        "recoverable_routing_loss": 65.50999999999999,
+        "recoverable_fraction_percent": 74.47703501591631
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed2__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__packnet/predictions/cifar/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.0,
+        "task_inference": 11.37,
+        "oracle_accuracy": 70.38,
+        "conditional_accuracy": 87.95074758135443,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 29.620000000000005,
+        "recoverable_routing_loss": 60.379999999999995,
+        "recoverable_fraction_percent": 67.08888888888889
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed2__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__supsup/predictions/cifar/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.77,
+        "task_inference": 14.65,
+        "oracle_accuracy": 78.35,
+        "conditional_accuracy": 93.99317406143345,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.650000000000006,
+        "recoverable_routing_loss": 64.58,
+        "recoverable_fraction_percent": 74.89272874869535
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed2__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed2__wsn/predictions/cifar/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.86,
+        "task_inference": 11.75,
+        "oracle_accuracy": 78.82,
+        "conditional_accuracy": 92.42553191489361,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.180000000000007,
+        "recoverable_routing_loss": 67.96,
+        "recoverable_fraction_percent": 76.23962306484181
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed3__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed3__diltcl/predictions/cifar/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.95,
+        "task_inference": 12.73,
+        "oracle_accuracy": 77.12,
+        "conditional_accuracy": 93.87274155538098,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.879999999999995,
+        "recoverable_routing_loss": 65.17,
+        "recoverable_fraction_percent": 74.01476433844407
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed3__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed3__packnet/predictions/cifar/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.02,
+        "task_inference": 11.41,
+        "oracle_accuracy": 69.98,
+        "conditional_accuracy": 87.81770376862401,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.019999999999996,
+        "recoverable_routing_loss": 59.96000000000001,
+        "recoverable_fraction_percent": 66.63703045121139
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed3__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed3__supsup/predictions/cifar/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.81,
+        "task_inference": 14.86,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 92.93405114401077,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 64.67,
+        "recoverable_fraction_percent": 75.0319062536257
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed3__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed3__wsn/predictions/cifar/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.91,
+        "task_inference": 10.87,
+        "oracle_accuracy": 79.34,
+        "conditional_accuracy": 91.16835326586937,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.659999999999997,
+        "recoverable_routing_loss": 69.43,
+        "recoverable_fraction_percent": 77.06737706737708
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed4__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed4__diltcl/predictions/cifar/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.01,
+        "task_inference": 13.76,
+        "oracle_accuracy": 77.95,
+        "conditional_accuracy": 94.54941860465117,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.049999999999997,
+        "recoverable_routing_loss": 64.94,
+        "recoverable_fraction_percent": 74.65225888033108
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed4__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed4__packnet/predictions/cifar/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.83,
+        "task_inference": 11.93,
+        "oracle_accuracy": 70.37,
+        "conditional_accuracy": 90.77954735959766,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 29.629999999999995,
+        "recoverable_routing_loss": 59.540000000000006,
+        "recoverable_fraction_percent": 66.77133565100371
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed4__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed4__supsup/predictions/cifar/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.8,
+        "task_inference": 14.82,
+        "oracle_accuracy": 78.14,
+        "conditional_accuracy": 93.11740890688259,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.86,
+        "recoverable_routing_loss": 64.34,
+        "recoverable_fraction_percent": 74.64037122969837
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__cifar__seed4__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__cifar__seed4__wsn/predictions/cifar/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.2,
+        "task_inference": 11.17,
+        "oracle_accuracy": 78.87,
+        "conditional_accuracy": 91.31602506714414,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.129999999999995,
+        "recoverable_routing_loss": 68.67,
+        "recoverable_fraction_percent": 76.46993318485524
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed0__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed0__diltcl/predictions/tinyimagenet/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.68,
+        "task_inference": 17.24,
+        "oracle_accuracy": 38.93,
+        "conditional_accuracy": 61.94895591647332,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 61.07,
+        "recoverable_routing_loss": 28.25,
+        "recoverable_fraction_percent": 31.627854903716976
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed0__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed0__packnet/predictions/tinyimagenet/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.6,
+        "task_inference": 14.05,
+        "oracle_accuracy": 22.45,
+        "conditional_accuracy": 39.8576512455516,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.55,
+        "recoverable_routing_loss": 16.85,
+        "recoverable_fraction_percent": 17.849576271186443
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed0__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed0__supsup/predictions/tinyimagenet/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 15.32,
+        "task_inference": 23.06,
+        "oracle_accuracy": 42.35,
+        "conditional_accuracy": 66.43538594969644,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 57.65,
+        "recoverable_routing_loss": 27.03,
+        "recoverable_fraction_percent": 31.92017005196032
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed0__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed0__wsn/predictions/tinyimagenet/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.27,
+        "task_inference": 16.53,
+        "oracle_accuracy": 42.23,
+        "conditional_accuracy": 62.129461584996974,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.77,
+        "recoverable_routing_loss": 31.959999999999997,
+        "recoverable_fraction_percent": 35.617965006129495
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed1__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed1__diltcl/predictions/tinyimagenet/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 8.48,
+        "task_inference": 15.84,
+        "oracle_accuracy": 37.81,
+        "conditional_accuracy": 53.535353535353536,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 62.19,
+        "recoverable_routing_loss": 29.330000000000002,
+        "recoverable_fraction_percent": 32.04763986013986
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed1__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed1__packnet/predictions/tinyimagenet/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.11,
+        "task_inference": 14.03,
+        "oracle_accuracy": 22.48,
+        "conditional_accuracy": 36.421952957947255,
+        "identity_residual_A_minus_UV": 8.881784197001252e-16,
+        "oracle_error": 77.52,
+        "recoverable_routing_loss": 17.37,
+        "recoverable_fraction_percent": 18.30540625987986
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed1__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed1__supsup/predictions/tinyimagenet/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.76,
+        "task_inference": 22.44,
+        "oracle_accuracy": 41.75,
+        "conditional_accuracy": 65.77540106951872,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 58.25,
+        "recoverable_routing_loss": 26.990000000000002,
+        "recoverable_fraction_percent": 31.663538244955422
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed1__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed1__wsn/predictions/tinyimagenet/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.22,
+        "task_inference": 16.39,
+        "oracle_accuracy": 42.32,
+        "conditional_accuracy": 62.35509456985967,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.68,
+        "recoverable_routing_loss": 32.1,
+        "recoverable_fraction_percent": 35.75406549342838
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed2__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed2__diltcl/predictions/tinyimagenet/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.07,
+        "task_inference": 17.21,
+        "oracle_accuracy": 37.4,
+        "conditional_accuracy": 52.701917489831494,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 62.6,
+        "recoverable_routing_loss": 28.33,
+        "recoverable_fraction_percent": 31.155834158143623
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed2__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed2__packnet/predictions/tinyimagenet/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.68,
+        "task_inference": 14.28,
+        "oracle_accuracy": 22.82,
+        "conditional_accuracy": 39.77591036414566,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.18,
+        "recoverable_routing_loss": 17.14,
+        "recoverable_fraction_percent": 18.17217981340119
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed2__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed2__supsup/predictions/tinyimagenet/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.0,
+        "task_inference": 21.81,
+        "oracle_accuracy": 41.22,
+        "conditional_accuracy": 64.19073819348922,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 58.78,
+        "recoverable_routing_loss": 27.22,
+        "recoverable_fraction_percent": 31.651162790697676
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed2__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed2__wsn/predictions/tinyimagenet/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.2,
+        "task_inference": 16.31,
+        "oracle_accuracy": 42.29,
+        "conditional_accuracy": 62.538320049049666,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.71,
+        "recoverable_routing_loss": 32.09,
+        "recoverable_fraction_percent": 35.734966592427625
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed3__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__diltcl/predictions/tinyimagenet/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.17,
+        "task_inference": 16.62,
+        "oracle_accuracy": 38.5,
+        "conditional_accuracy": 61.191335740072205,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 61.5,
+        "recoverable_routing_loss": 28.33,
+        "recoverable_fraction_percent": 31.53734832461316
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed3__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__packnet/predictions/tinyimagenet/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.16,
+        "task_inference": 14.15,
+        "oracle_accuracy": 22.94,
+        "conditional_accuracy": 36.466431095406364,
+        "identity_residual_A_minus_UV": -8.881784197001252e-16,
+        "oracle_error": 77.06,
+        "recoverable_routing_loss": 17.78,
+        "recoverable_fraction_percent": 18.74736398144243
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed3__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__supsup/predictions/tinyimagenet/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 15.79,
+        "task_inference": 23.65,
+        "oracle_accuracy": 42.61,
+        "conditional_accuracy": 66.76532769556026,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.39,
+        "recoverable_routing_loss": 26.82,
+        "recoverable_fraction_percent": 31.848949055931598
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed3__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed3__wsn/predictions/tinyimagenet/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.87,
+        "task_inference": 16.79,
+        "oracle_accuracy": 41.78,
+        "conditional_accuracy": 64.74091721262657,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 58.22,
+        "recoverable_routing_loss": 30.910000000000004,
+        "recoverable_fraction_percent": 34.67968136429935
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed4__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__diltcl/predictions/tinyimagenet/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.68,
+        "task_inference": 15.86,
+        "oracle_accuracy": 38.09,
+        "conditional_accuracy": 61.03404791929382,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.91,
+        "recoverable_routing_loss": 28.410000000000004,
+        "recoverable_fraction_percent": 31.454827280779458
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed4__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__packnet/predictions/tinyimagenet/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.06,
+        "task_inference": 13.67,
+        "oracle_accuracy": 21.88,
+        "conditional_accuracy": 37.01536210680322,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 78.12,
+        "recoverable_routing_loss": 16.82,
+        "recoverable_fraction_percent": 17.71645249631346
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed4__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__supsup/predictions/tinyimagenet/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 15.06,
+        "task_inference": 23.46,
+        "oracle_accuracy": 42.32,
+        "conditional_accuracy": 64.19437340153452,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.68,
+        "recoverable_routing_loss": 27.259999999999998,
+        "recoverable_fraction_percent": 32.09324228867436
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    },
+    {
+      "job": "p0_class_entropy_cal__tinyimagenet__seed4__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy_cal__tinyimagenet__seed4__wsn/predictions/tinyimagenet/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.02,
+        "task_inference": 16.36,
+        "oracle_accuracy": 42.16,
+        "conditional_accuracy": 61.24694376528117,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.84,
+        "recoverable_routing_loss": 32.14,
+        "recoverable_fraction_percent": 35.71904867748388
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "sklearn-lbfgs"
+      }
+    }
+  ]
+}

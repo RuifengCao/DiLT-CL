@@ -1,0 +1,11 @@
+cifar         diltcl   seed0 [score-bias-acc]: oracle= 78.50 routed= 18.85 IDENTICAL
+cifar         diltcl   seed1 [score-bias-acc]: oracle= 76.96 routed= 17.84 IDENTICAL
+cifar         diltcl   seed2 [score-bias-acc]: oracle= 77.55 routed= 19.02 IDENTICAL
+cifar         diltcl   seed3 [score-bias-acc]: oracle= 77.12 routed= 17.81 IDENTICAL
+cifar         diltcl   seed4 [score-bias-acc]: oracle= 77.95 routed= 19.44 IDENTICAL
+tinyimagenet  diltcl   seed0 [score-bias-acc]: oracle= 38.93 routed= 12.34 IDENTICAL
+tinyimagenet  diltcl   seed1 [score-bias-acc]: oracle= 37.81 routed= 11.32 IDENTICAL
+tinyimagenet  diltcl   seed2 [score-bias-acc]: oracle= 37.40 routed= 10.62 IDENTICAL
+tinyimagenet  diltcl   seed3 [score-bias-acc]: oracle= 38.50 routed= 12.01 IDENTICAL
+tinyimagenet  diltcl   seed4 [score-bias-acc]: oracle= 38.09 routed= 11.79 IDENTICAL
+10 checkpoint(s) re-evaluated, 0 with errors -> identical

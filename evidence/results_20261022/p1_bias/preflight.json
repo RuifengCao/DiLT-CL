@@ -1,0 +1,13 @@
+{
+  "benchmarks": [
+    "cifar",
+    "tinyimagenet"
+  ],
+  "blocking": [],
+  "calibration_requested": true,
+  "checked_at": "2026-10-22T00:38:05.891213+00:00",
+  "data_root": "/root/autodl-tmp/data",
+  "ok": true,
+  "pin_sklearn": true,
+  "warnings": []
+}

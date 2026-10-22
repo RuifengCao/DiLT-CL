@@ -5,7 +5,7 @@ complete retraining. Every command runs from this directory (`code/`).
 
 | Level | What it establishes | Needs | Time |
 |---|---|---|---|
-| 1. Verify the released artifacts | Every reported number follows from the retained matrices; every checkpoint and per-example prediction file is the one recorded by its job; for runs that recorded per-example predictions (v3.0.5 and later, such as a Level 3 regeneration; not the original v3.0.0 to v3.0.3 runs), every routing and oracle statistic follows from the per-example decisions | CPU, Python, the release | minutes |
+| 1. Verify the released artifacts | Every reported number follows from the retained matrices; every checkpoint and per-example prediction file is the one recorded by its job; every routing and oracle statistic follows from the per-example decisions, which the released runs (the v3.0.11 regeneration) recorded and the original v3.0.0 to v3.0.3 runs did not | CPU, Python, the release | minutes |
 | 2. Re-evaluate the released checkpoints | The released experts regenerate every routed, task-inference, conditional and oracle result | the datasets; a GPU of the recorded type for exact equality | ~1 h on one GPU |
 | 3. Retrain from the seeds | The pipeline regenerates the experts themselves (bit for bit on the recorded stack); against the original runs, the calibrated routers' float32-to-float64 change is measured decision by decision | the datasets and an NVIDIA GPU | ~10 GPU-hours per five seeds of all groups |
 
@@ -65,9 +65,13 @@ for r in p0 p1_bias p1_biasacc; do
 done
 ```
 
-The release is to be built after the regeneration audit of Level 3, which
-has not been run yet; each run directory's `audit/` folder will then hold
-that audit's reports.
+The release holds the v3.0.11 regeneration of all 410 jobs (2026-10-21/22),
+whose merged artifacts, per-job results and audit reports are also in
+`../evidence/results_20261022/`. The `audit/` folders hold the reports of
+that regeneration: `p0/audit/` the regeneration audit and the
+routing-precision audit of all three runs against the original runs, and
+each run's `audit/` its per-example recomputation and checkpoint
+re-evaluation.
 
 ## Level 1: verify the released artifacts (CPU)
 
@@ -83,11 +87,10 @@ python tools/compare_runs.py --reference RUNS/p0 RUNS/p1_bias RUNS/p1_biasacc \
 ```
 
 (`--out` keeps the released `verification_report.json` of each run
-unchanged.) The original runs were produced by v3.0.0 to v3.0.3, before
-per-example predictions were recorded, so for them
-`recompute_from_predictions.py` prints `not-recorded` and checks nothing;
-its checks apply to runs produced by v3.0.5 or later, such as the
-regeneration of Level 3.
+unchanged.) The released runs recorded per-example predictions for every
+class-IL isolation job (80, 40 and 40 files). The original runs, produced by
+v3.0.0 to v3.0.3, recorded none, so on their run directories
+`recompute_from_predictions.py` prints `not-recorded` and checks nothing.
 
 * `verify_experiment_bundle.py` checks that every planned job succeeded and
   produced exactly its planned methods, recomputes every summary metric from
@@ -289,7 +292,12 @@ that close. How many decisions move depends on how often that happens. The
 120 original calibrated runs recorded no exact float32 tie in any test cell
 (routing tie rate 0.000%), so few moves are expected there; on experts whose
 outputs saturate it can be a large share of the decisions (593 of 1,260 on a
-CPU in the saturated case of `tests/test_predictions_audit.py`).
+CPU in the saturated case of `tests/test_predictions_audit.py`). The
+regeneration of 2026-10-21/22 (`../evidence/results_20261022/`, on another
+RTX 5090) found 410/410 identical trained states and state files, 409/410
+identical runs, and 1 of the 9,600,000 test decisions of the calibrated
+jobs moved (in one score-bias run); the float32 rebuild matched the original
+runs in all 120 calibrated jobs (`-> explained`).
 `compare_runs.py` reports `differences` for the runs concerned and
 names the change of routing precision when only the calibrated router's
 arrays and metrics differ and the stored routers are the original ones

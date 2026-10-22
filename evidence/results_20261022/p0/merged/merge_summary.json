@@ -1,0 +1,95 @@
+{
+  "merged_at": "2026-10-22T02:48:19.635755+00:00",
+  "run_dir": "/root/autodl-tmp/runs_v3011/p0",
+  "groups": {
+    "p0_class_entropy": {
+      "json": "/root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy.json",
+      "npz": "/root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy.npz",
+      "inputs": 90,
+      "missing_jobs": 0,
+      "verification_status": "verified",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "methods": [
+        "finetune",
+        "ewc",
+        "lwf",
+        "er",
+        "derpp",
+        "packnet",
+        "supsup",
+        "wsn",
+        "diltcl"
+      ],
+      "benchmarks": [
+        "cifar",
+        "tinyimagenet"
+      ]
+    },
+    "p0_class_entropy_cal": {
+      "json": "/root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy_cal.json",
+      "npz": "/root/autodl-tmp/runs_v3011/p0/merged/p0_class_entropy_cal.npz",
+      "inputs": 90,
+      "missing_jobs": 0,
+      "verification_status": "verified",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "methods": [
+        "finetune",
+        "ewc",
+        "lwf",
+        "er",
+        "derpp",
+        "packnet",
+        "supsup",
+        "wsn",
+        "diltcl"
+      ],
+      "benchmarks": [
+        "cifar",
+        "tinyimagenet"
+      ]
+    },
+    "p0_task_il_multi": {
+      "json": "/root/autodl-tmp/runs_v3011/p0/merged/p0_task_il_multi.json",
+      "npz": "/root/autodl-tmp/runs_v3011/p0/merged/p0_task_il_multi.npz",
+      "inputs": 150,
+      "missing_jobs": 0,
+      "verification_status": "verified",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "methods": [
+        "finetune",
+        "ewc",
+        "lwf",
+        "er",
+        "derpp",
+        "packnet",
+        "supsup",
+        "wsn",
+        "diltcl",
+        "independent"
+      ],
+      "benchmarks": [
+        "cifar",
+        "pmnist",
+        "tinyimagenet"
+      ]
+    }
+  }
+}

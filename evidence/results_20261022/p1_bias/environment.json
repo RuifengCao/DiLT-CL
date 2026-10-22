@@ -1,0 +1,69 @@
+{
+  "captured_at": "2026-10-22T00:38:05.466655+00:00",
+  "cpu_count": 208,
+  "environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "MKL_NUM_THREADS": "25",
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "25",
+    "PYTHONHASHSEED": null,
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "executable": "/root/miniconda3/bin/python",
+  "machine": "x86_64",
+  "nvidia_smi": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "0, NVIDIA GeForce RTX 5090, GPU-69713ae7-e463-ca11-8adb-a8995d7bbc27, 595.71.05, 32607 MiB"
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.1",
+    "torch": "2.12.1+cu130",
+    "torchvision": "0.27.1+cu130"
+  },
+  "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+  "processor": "x86_64",
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "torch_probe": {
+    "cuda_available": true,
+    "cuda_count": 1,
+    "cuda_version": "13.0",
+    "cudnn": 92000,
+    "devices": [
+      "NVIDIA GeForce RTX 5090"
+    ],
+    "float64_routing": {
+      "decision_mismatches": 0,
+      "decisions_checked": 9216,
+      "device": "cuda",
+      "float32_decision_mismatches": 0,
+      "float32_decisions_checked": 9216,
+      "float32_ok": true,
+      "float32_route_mismatches": 0,
+      "float32_tie_mismatches": 0,
+      "ok": true,
+      "route_mismatches": 0,
+      "subnormal_scores": 351,
+      "tie_mismatches": 0,
+      "widening_mismatches": 0
+    },
+    "ok": true,
+    "torch": "2.12.1+cu130"
+  },
+  "usable_cpu_count": 208
+}

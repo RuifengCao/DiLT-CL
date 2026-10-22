@@ -8,8 +8,10 @@ single source of truth for the version; every result artifact records it as
 The code is **correctness-gated**: no output counts as evidence until the
 corrected pipeline has been run end to end on the declared hardware and the
 independent verifier has passed (see `PROTOCOL.md` and `REPRODUCE.md`). The
-merged results behind the accompanying paper, with their verification
-records, are in `../evidence/results_20260906/`.
+results behind the accompanying paper are those of the v3.0.11 regeneration
+in `../evidence/results_20261022/` (merged artifacts, per-job results,
+verification and audit reports); `../evidence/results_20260906/` holds the
+original v3.0.0 to v3.0.3 runs, which it reproduces.
 
 ## What is in the package
 

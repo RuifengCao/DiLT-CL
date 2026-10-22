@@ -1,0 +1,28 @@
+nohup: ignoring input
+== 5a
+p0 verified 330 80 0
+p1_bias verified 40 40 0
+p1_biasacc verified 40 40 0
+== 5b
+p0_class_entropy             compared=  90 identical=  90 same-state=  90 same-file=  90 new=   0 missing=   0
+p0_class_entropy_cal         compared=  90 identical=  90 same-state=  90 same-file=  90 new=   0 missing=   0
+p0_task_il_multi             compared= 150 identical= 150 same-state= 150 same-file= 150 new=   0 missing=   0
+p1_class_entropy_bias        compared=  40 identical=  39 same-state=  40 same-file=  40 new=   0 missing=   0  ROUTERS float32->float64: 1 run(s) with the same experts route differently (check with tools/routing_precision_audit.py)
+p1_class_entropy_biasacc     compared=  40 identical=  40 same-state=  40 same-file=  40 new=   0 missing=   0
+data and launch controls: 410 job(s) compared, 50 with different data (170 from archived per-file lists), 0 with different launch controls
+decoded splits: 1100 task view(s) compared, 0 with different pixels
+409/410 runs identical (state files 410/410 identical); missing: 0 run(s), 0 group(s) -> differences
+== 5c
+80 predictions file(s) checked, 0 with errors -> passed
+40 predictions file(s) checked, 0 with errors -> passed
+40 predictions file(s) checked, 0 with errors -> passed
+== 5d
+80 checkpoint(s) re-evaluated in 4 report(s), 0 with errors -> identical
+40 checkpoint(s) re-evaluated in 4 report(s), 0 with errors -> identical
+40 checkpoint(s) re-evaluated in 4 report(s), 0 with errors -> identical
+== 5e
+p0_class_entropy_cal          40 job(s): 0 of 3200000 test decision(s) moved by float64 routing; float32 rebuild matches the reference in 40/40
+p1_class_entropy_bias         40 job(s): 1 of 3200000 test decision(s) moved by float64 routing; float32 rebuild matches the reference in 40/40
+p1_class_entropy_biasacc      40 job(s): 0 of 3200000 test decision(s) moved by float64 routing; float32 rebuild matches the reference in 40/40
+1 of 9600000 calibrated test decision(s) moved in 1 of 120 job(s); reference: 120 identical, 0 within float32 near-ties, 0 different -> explained
+AUDIT_NEW_DONE

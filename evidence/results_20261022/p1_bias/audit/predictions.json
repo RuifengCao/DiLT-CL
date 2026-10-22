@@ -1,0 +1,1847 @@
+{
+  "files_checked": 40,
+  "files_with_errors": 0,
+  "status": "passed",
+  "entries": [
+    {
+      "job": "p1_class_entropy_bias__cifar__seed0__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__diltcl/predictions/cifar/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.65,
+        "task_inference": 13.4,
+        "oracle_accuracy": 78.5,
+        "conditional_accuracy": 94.40298507462687,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.5,
+        "recoverable_routing_loss": 65.85,
+        "recoverable_fraction_percent": 75.3863766456783
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed0__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__packnet/predictions/cifar/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.5,
+        "task_inference": 10.62,
+        "oracle_accuracy": 70.18,
+        "conditional_accuracy": 89.45386064030131,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 29.819999999999993,
+        "recoverable_routing_loss": 60.68000000000001,
+        "recoverable_fraction_percent": 67.04972375690609
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed0__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__supsup/predictions/cifar/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.8,
+        "task_inference": 13.49,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 94.88510007412899,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 65.68,
+        "recoverable_fraction_percent": 75.3211009174312
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed0__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed0__wsn/predictions/cifar/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.8,
+        "task_inference": 10.5,
+        "oracle_accuracy": 79.25,
+        "conditional_accuracy": 93.33333333333333,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 20.75,
+        "recoverable_routing_loss": 69.45,
+        "recoverable_fraction_percent": 76.99556541019956
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed1__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/predictions/cifar/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.22,
+        "task_inference": 12.53,
+        "oracle_accuracy": 76.96,
+        "conditional_accuracy": 89.54509177972865,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 23.040000000000006,
+        "recoverable_routing_loss": 65.74,
+        "recoverable_fraction_percent": 74.0482090560937
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed1__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__packnet/predictions/cifar/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 8.63,
+        "task_inference": 9.84,
+        "oracle_accuracy": 69.37,
+        "conditional_accuracy": 87.70325203252033,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.629999999999995,
+        "recoverable_routing_loss": 60.74,
+        "recoverable_fraction_percent": 66.47696180365547
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed1__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__supsup/predictions/cifar/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.13,
+        "task_inference": 13.76,
+        "oracle_accuracy": 78.89,
+        "conditional_accuracy": 95.42151162790698,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.11,
+        "recoverable_routing_loss": 65.76,
+        "recoverable_fraction_percent": 75.69932082422011
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed1__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__wsn/predictions/cifar/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.34,
+        "task_inference": 11.1,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 93.15315315315316,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 68.14,
+        "recoverable_fraction_percent": 75.99821548070489
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed2__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__diltcl/predictions/cifar/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.08,
+        "task_inference": 12.84,
+        "oracle_accuracy": 77.55,
+        "conditional_accuracy": 94.0809968847352,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.450000000000003,
+        "recoverable_routing_loss": 65.47,
+        "recoverable_fraction_percent": 74.46542311191993
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed2__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__packnet/predictions/cifar/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 8.67,
+        "task_inference": 9.81,
+        "oracle_accuracy": 70.38,
+        "conditional_accuracy": 88.37920489296636,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 29.620000000000005,
+        "recoverable_routing_loss": 61.709999999999994,
+        "recoverable_fraction_percent": 67.5681594218767
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed2__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__supsup/predictions/cifar/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.59,
+        "task_inference": 14.18,
+        "oracle_accuracy": 78.35,
+        "conditional_accuracy": 95.8392101551481,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.650000000000006,
+        "recoverable_routing_loss": 64.75999999999999,
+        "recoverable_fraction_percent": 74.94502951047332
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed2__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed2__wsn/predictions/cifar/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.54,
+        "task_inference": 10.25,
+        "oracle_accuracy": 78.82,
+        "conditional_accuracy": 93.07317073170732,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.180000000000007,
+        "recoverable_routing_loss": 69.28,
+        "recoverable_fraction_percent": 76.58633650232146
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed3__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__diltcl/predictions/cifar/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.12,
+        "task_inference": 13.16,
+        "oracle_accuracy": 77.12,
+        "conditional_accuracy": 92.09726443768997,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.879999999999995,
+        "recoverable_routing_loss": 65.0,
+        "recoverable_fraction_percent": 73.96449704142012
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed3__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__packnet/predictions/cifar/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.37,
+        "task_inference": 10.52,
+        "oracle_accuracy": 69.98,
+        "conditional_accuracy": 89.06844106463879,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 30.019999999999996,
+        "recoverable_routing_loss": 60.61000000000001,
+        "recoverable_fraction_percent": 66.8763102725367
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed3__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__supsup/predictions/cifar/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.28,
+        "task_inference": 13.78,
+        "oracle_accuracy": 78.48,
+        "conditional_accuracy": 96.37155297532657,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.519999999999996,
+        "recoverable_routing_loss": 65.2,
+        "recoverable_fraction_percent": 75.18450184501845
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed3__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed3__wsn/predictions/cifar/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.22,
+        "task_inference": 10.95,
+        "oracle_accuracy": 79.34,
+        "conditional_accuracy": 93.33333333333333,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 20.659999999999997,
+        "recoverable_routing_loss": 69.12,
+        "recoverable_fraction_percent": 76.98819336155046
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed4__diltcl",
+      "benchmark": "cifar",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__diltcl/predictions/cifar/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 12.39,
+        "task_inference": 13.27,
+        "oracle_accuracy": 77.95,
+        "conditional_accuracy": 93.36850037678975,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 22.049999999999997,
+        "recoverable_routing_loss": 65.56,
+        "recoverable_fraction_percent": 74.83164022371875
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed4__packnet",
+      "benchmark": "cifar",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__packnet/predictions/cifar/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 8.64,
+        "task_inference": 9.9,
+        "oracle_accuracy": 70.37,
+        "conditional_accuracy": 87.27272727272727,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 29.629999999999995,
+        "recoverable_routing_loss": 61.730000000000004,
+        "recoverable_fraction_percent": 67.56786339754817
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed4__supsup",
+      "benchmark": "cifar",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__supsup/predictions/cifar/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.13,
+        "task_inference": 13.89,
+        "oracle_accuracy": 78.14,
+        "conditional_accuracy": 94.528437724982,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.86,
+        "recoverable_routing_loss": 65.01,
+        "recoverable_fraction_percent": 74.83596178197307
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__cifar__seed4__wsn",
+      "benchmark": "cifar",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed4__wsn/predictions/cifar/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.45,
+        "task_inference": 11.22,
+        "oracle_accuracy": 78.87,
+        "conditional_accuracy": 93.13725490196079,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 21.129999999999995,
+        "recoverable_routing_loss": 68.42,
+        "recoverable_fraction_percent": 76.40424343941932
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 20,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 105000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed0__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__diltcl/predictions/tinyimagenet/diltcl/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.9,
+        "task_inference": 16.4,
+        "oracle_accuracy": 38.93,
+        "conditional_accuracy": 66.46341463414635,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.07,
+        "recoverable_routing_loss": 28.03,
+        "recoverable_fraction_percent": 31.45903479236813
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed0__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__packnet/predictions/tinyimagenet/packnet/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.9,
+        "task_inference": 12.72,
+        "oracle_accuracy": 22.45,
+        "conditional_accuracy": 46.38364779874214,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.55,
+        "recoverable_routing_loss": 16.549999999999997,
+        "recoverable_fraction_percent": 17.587672688629116
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed0__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__supsup/predictions/tinyimagenet/supsup/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.93,
+        "task_inference": 21.46,
+        "oracle_accuracy": 42.35,
+        "conditional_accuracy": 69.5712954333644,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.65,
+        "recoverable_routing_loss": 27.42,
+        "recoverable_fraction_percent": 32.232279299400496
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed0__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 0,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed0__wsn/predictions/tinyimagenet/wsn/seed0.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.82,
+        "task_inference": 17.12,
+        "oracle_accuracy": 42.23,
+        "conditional_accuracy": 69.04205607476635,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.77,
+        "recoverable_routing_loss": 30.409999999999997,
+        "recoverable_fraction_percent": 34.48627806758901
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed1__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__diltcl/predictions/tinyimagenet/diltcl/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.3,
+        "task_inference": 14.26,
+        "oracle_accuracy": 37.81,
+        "conditional_accuracy": 65.21739130434783,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 62.19,
+        "recoverable_routing_loss": 28.51,
+        "recoverable_fraction_percent": 31.43329658213892
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed1__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__packnet/predictions/tinyimagenet/packnet/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.28,
+        "task_inference": 12.16,
+        "oracle_accuracy": 22.48,
+        "conditional_accuracy": 43.421052631578945,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.52,
+        "recoverable_routing_loss": 17.2,
+        "recoverable_fraction_percent": 18.158783783783782
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed1__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__supsup/predictions/tinyimagenet/supsup/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.65,
+        "task_inference": 21.67,
+        "oracle_accuracy": 41.75,
+        "conditional_accuracy": 67.60498384863867,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 58.25,
+        "recoverable_routing_loss": 27.1,
+        "recoverable_fraction_percent": 31.751611013473934
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed1__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 1,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed1__wsn/predictions/tinyimagenet/wsn/seed1.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.73,
+        "task_inference": 17.02,
+        "oracle_accuracy": 42.32,
+        "conditional_accuracy": 68.91891891891892,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.68,
+        "recoverable_routing_loss": 30.59,
+        "recoverable_fraction_percent": 34.655035685963526
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed2__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__diltcl/predictions/tinyimagenet/diltcl/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.24,
+        "task_inference": 14.33,
+        "oracle_accuracy": 37.4,
+        "conditional_accuracy": 64.480111653873,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 62.6,
+        "recoverable_routing_loss": 28.159999999999997,
+        "recoverable_fraction_percent": 31.02688408990744
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed2__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__packnet/predictions/tinyimagenet/packnet/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.75,
+        "task_inference": 12.46,
+        "oracle_accuracy": 22.82,
+        "conditional_accuracy": 46.14767255216693,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.18,
+        "recoverable_routing_loss": 17.07,
+        "recoverable_fraction_percent": 18.111405835543767
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed2__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__supsup/predictions/tinyimagenet/supsup/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 13.71,
+        "task_inference": 20.14,
+        "oracle_accuracy": 41.22,
+        "conditional_accuracy": 68.07348560079444,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 58.78,
+        "recoverable_routing_loss": 27.509999999999998,
+        "recoverable_fraction_percent": 31.88086684436204
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed2__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 2,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed2__wsn/predictions/tinyimagenet/wsn/seed2.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.66,
+        "task_inference": 16.82,
+        "oracle_accuracy": 42.29,
+        "conditional_accuracy": 69.32223543400714,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 57.71,
+        "recoverable_routing_loss": 30.63,
+        "recoverable_fraction_percent": 34.67285487887707
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed3__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__diltcl/predictions/tinyimagenet/diltcl/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 9.92,
+        "task_inference": 15.06,
+        "oracle_accuracy": 38.5,
+        "conditional_accuracy": 65.86985391766268,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.5,
+        "recoverable_routing_loss": 28.58,
+        "recoverable_fraction_percent": 31.72735346358792
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed3__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__packnet/predictions/tinyimagenet/packnet/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.46,
+        "task_inference": 12.5,
+        "oracle_accuracy": 22.94,
+        "conditional_accuracy": 43.68,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 77.06,
+        "recoverable_routing_loss": 17.48,
+        "recoverable_fraction_percent": 18.48952824201396
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed3__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__supsup/predictions/tinyimagenet/supsup/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.82,
+        "task_inference": 21.31,
+        "oracle_accuracy": 42.61,
+        "conditional_accuracy": 69.5448146410136,
+        "identity_residual_A_minus_UV": 1.7763568394002505e-15,
+        "oracle_error": 57.39,
+        "recoverable_routing_loss": 27.79,
+        "recoverable_fraction_percent": 32.62502934961258
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed3__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 3,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed3__wsn/predictions/tinyimagenet/wsn/seed3.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.9,
+        "task_inference": 17.29,
+        "oracle_accuracy": 41.78,
+        "conditional_accuracy": 68.82591093117409,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 58.22,
+        "recoverable_routing_loss": 29.880000000000003,
+        "recoverable_fraction_percent": 33.91600454029513
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed4__diltcl",
+      "benchmark": "tinyimagenet",
+      "method": "diltcl",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__diltcl/predictions/tinyimagenet/diltcl/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 10.04,
+        "task_inference": 15.31,
+        "oracle_accuracy": 38.09,
+        "conditional_accuracy": 65.57805355976485,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 61.91,
+        "recoverable_routing_loss": 28.050000000000004,
+        "recoverable_fraction_percent": 31.180524677634505
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed4__packnet",
+      "benchmark": "tinyimagenet",
+      "method": "packnet",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__packnet/predictions/tinyimagenet/packnet/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 5.99,
+        "task_inference": 12.92,
+        "oracle_accuracy": 21.88,
+        "conditional_accuracy": 46.362229102167184,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 78.12,
+        "recoverable_routing_loss": 15.889999999999999,
+        "recoverable_fraction_percent": 16.902457185405805
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed4__supsup",
+      "benchmark": "tinyimagenet",
+      "method": "supsup",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__supsup/predictions/tinyimagenet/supsup/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 14.59,
+        "task_inference": 20.96,
+        "oracle_accuracy": 42.32,
+        "conditional_accuracy": 69.6087786259542,
+        "identity_residual_A_minus_UV": -1.7763568394002505e-15,
+        "oracle_error": 57.68,
+        "recoverable_routing_loss": 27.73,
+        "recoverable_fraction_percent": 32.466924247746164
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    },
+    {
+      "job": "p1_class_entropy_bias__tinyimagenet__seed4__wsn",
+      "benchmark": "tinyimagenet",
+      "method": "wsn",
+      "seed": 4,
+      "file": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__tinyimagenet__seed4__wsn/predictions/tinyimagenet/wsn/seed4.npz",
+      "errors": [],
+      "decomposition": {
+        "routed_accuracy": 11.86,
+        "task_inference": 17.13,
+        "oracle_accuracy": 42.16,
+        "conditional_accuracy": 69.23525977816696,
+        "identity_residual_A_minus_UV": 0.0,
+        "oracle_error": 57.84,
+        "recoverable_routing_loss": 30.299999999999997,
+        "recoverable_fraction_percent": 34.37712729748127
+      },
+      "stored_router": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "disagreements": 0,
+        "near_tie_disagreements": 0,
+        "tie_flag_errors": 0,
+        "routing_precision": "float64",
+        "tf32": false,
+        "errors": []
+      },
+      "fit_accuracy_check": {
+        "stages_checked": 10,
+        "near_tie_examples": 0,
+        "errors": []
+      },
+      "refit": {
+        "route_agreement": 1.0,
+        "decisions_compared": 55000,
+        "max_abs_parameter_difference": {
+          "feature_mean": 0.0,
+          "feature_scale": 0.0,
+          "coef": 0.0,
+          "intercept": 0.0
+        },
+        "parameters_identical": true,
+        "max_abs_coef_difference": 0.0,
+        "solver_backend": "scipy-lbfgs"
+      }
+    }
+  ]
+}

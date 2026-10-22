@@ -1,0 +1,128 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "1",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "cifar",
+    "--seed-list",
+    "1",
+    "--methods",
+    "diltcl",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result",
+    "--inference-criterion",
+    "entropy",
+    "--inference-calibration",
+    "score-bias",
+    "--calibration-fraction",
+    "0.10",
+    "--calibration-c",
+    "1.0",
+    "--calibration-split-seed",
+    "1729",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "cifar",
+    "entries": {
+      "cifar-100-python": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-22T00:51:14.972887+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "cifar",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy",
+      "--inference-calibration",
+      "score-bias",
+      "--calibration-fraction",
+      "0.10",
+      "--calibration-c",
+      "1.0",
+      "--calibration-split-seed",
+      "1729"
+    ],
+    "fast": false,
+    "job_id": "p1_class_entropy_bias__cifar__seed1__diltcl",
+    "methods": "diltcl",
+    "priority": "P1",
+    "purpose": "90%-train matched raw entropy versus score-bias router",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 1
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p1_bias/logs/p1_class_entropy_bias__cifar__seed1__diltcl.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 199801,
+      "path": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.json",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.json",
+      "sha256": "2be6e23888b9e720f41b48ce5794e236a928b1fc7c686919488c9df8fabe3151"
+    },
+    {
+      "bytes": 27992,
+      "path": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/result.npz",
+      "sha256": "c3a6259bfd1568db23058cba063127b61d3448a0a0e9b06e1f21ff0b2bc0fa92"
+    },
+    {
+      "bytes": 104126583,
+      "path": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/checkpoints/cifar/diltcl/seed1.pt",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/checkpoints/cifar/diltcl/seed1.pt",
+      "sha256": "df17cf72a7f00402be0f493fbea7310242eaa22fce5dad409f0409bb81c0e527"
+    },
+    {
+      "bytes": 1940765,
+      "path": "/root/autodl-tmp/runs_v3011/p1_bias/artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/predictions/cifar/diltcl/seed1.npz",
+      "path_relative_to_run_dir": "artifacts/p1_class_entropy_bias__cifar__seed1__diltcl/predictions/cifar/diltcl/seed1.npz",
+      "sha256": "26b34c83740635362e856cdb71e650195ba53ae02869fa90d5a589bf524fa423"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-22T00:38:30.370629+00:00",
+  "state": "succeeded",
+  "wall_seconds": 764.4260612744838
+}

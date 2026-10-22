@@ -1,0 +1,11 @@
+cifar         packnet  seed0 [score-bias]: oracle= 70.18 routed=  9.50 IDENTICAL
+cifar         packnet  seed1 [score-bias]: oracle= 69.37 routed=  8.63 IDENTICAL
+cifar         packnet  seed2 [score-bias]: oracle= 70.38 routed=  8.67 IDENTICAL
+cifar         packnet  seed3 [score-bias]: oracle= 69.98 routed=  9.37 IDENTICAL
+cifar         packnet  seed4 [score-bias]: oracle= 70.37 routed=  8.64 IDENTICAL
+tinyimagenet  packnet  seed0 [score-bias]: oracle= 22.45 routed=  5.90 IDENTICAL
+tinyimagenet  packnet  seed1 [score-bias]: oracle= 22.48 routed=  5.28 IDENTICAL
+tinyimagenet  packnet  seed2 [score-bias]: oracle= 22.82 routed=  5.75 IDENTICAL
+tinyimagenet  packnet  seed3 [score-bias]: oracle= 22.94 routed=  5.46 IDENTICAL
+tinyimagenet  packnet  seed4 [score-bias]: oracle= 21.88 routed=  5.99 IDENTICAL
+10 checkpoint(s) re-evaluated, 0 with errors -> identical

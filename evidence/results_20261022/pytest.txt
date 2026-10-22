@@ -1,0 +1,15 @@
+.................................................................................................................................................................... [ 46%]
+...................................................................................................................................s................................ [ 93%]
+.....................                                                                                                                                                [100%]
+============================================================================= warnings summary =============================================================================
+tests/test_backend_end_to_end.py: 96 warnings
+tests/test_data_backend.py: 10 warnings
+  /root/miniconda3/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=157726) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+tests/test_stats_validation.py::test_constant_differences_give_undefined_not_nan
+  /root/miniconda3/lib/python3.12/site-packages/scipy/stats/_axis_nan_policy.py:431: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+    return hypotest_fun_in(*args, **kwds)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+348 passed, 1 skipped, 107 warnings in 60.95s (0:01:00)

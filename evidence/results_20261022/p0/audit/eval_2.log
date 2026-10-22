@@ -1,0 +1,21 @@
+cifar         packnet  seed0 [none]: oracle= 69.97 routed= 12.81 IDENTICAL
+cifar         diltcl   seed1 [none]: oracle= 77.76 routed= 19.20 IDENTICAL
+cifar         wsn      seed2 [none]: oracle= 79.19 routed= 18.32 IDENTICAL
+cifar         supsup   seed3 [none]: oracle= 78.52 routed= 17.79 IDENTICAL
+cifar         packnet  seed4 [none]: oracle= 69.63 routed= 12.84 IDENTICAL
+tinyimagenet  diltcl   seed0 [none]: oracle= 38.69 routed= 11.99 IDENTICAL
+tinyimagenet  wsn      seed1 [none]: oracle= 43.24 routed= 12.35 IDENTICAL
+tinyimagenet  supsup   seed2 [none]: oracle= 43.13 routed= 15.11 IDENTICAL
+tinyimagenet  packnet  seed3 [none]: oracle= 22.47 routed=  6.46 IDENTICAL
+tinyimagenet  diltcl   seed4 [none]: oracle= 38.67 routed= 12.57 IDENTICAL
+cifar         wsn      seed0 [score-logreg]: oracle= 79.25 routed=  9.97 IDENTICAL
+cifar         supsup   seed1 [score-logreg]: oracle= 78.89 routed= 12.56 IDENTICAL
+cifar         packnet  seed2 [score-logreg]: oracle= 70.38 routed= 10.00 IDENTICAL
+cifar         diltcl   seed3 [score-logreg]: oracle= 77.12 routed= 11.95 IDENTICAL
+cifar         wsn      seed4 [score-logreg]: oracle= 78.87 routed= 10.20 IDENTICAL
+tinyimagenet  supsup   seed0 [score-logreg]: oracle= 42.35 routed= 15.32 IDENTICAL
+tinyimagenet  packnet  seed1 [score-logreg]: oracle= 22.48 routed=  5.11 IDENTICAL
+tinyimagenet  diltcl   seed2 [score-logreg]: oracle= 37.40 routed=  9.07 IDENTICAL
+tinyimagenet  wsn      seed3 [score-logreg]: oracle= 41.78 routed= 10.87 IDENTICAL
+tinyimagenet  supsup   seed4 [score-logreg]: oracle= 42.32 routed= 15.06 IDENTICAL
+20 checkpoint(s) re-evaluated, 0 with errors -> identical

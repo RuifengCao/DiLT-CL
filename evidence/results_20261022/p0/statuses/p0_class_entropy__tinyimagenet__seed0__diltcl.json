@@ -1,0 +1,112 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "0",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_class_il.py",
+    "--benchmark",
+    "tinyimagenet",
+    "--seed-list",
+    "0",
+    "--methods",
+    "diltcl",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/result",
+    "--inference-criterion",
+    "entropy",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/checkpoints",
+    "--predictions-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/predictions"
+  ],
+  "dataset_identity": {
+    "benchmark": "tinyimagenet",
+    "entries": {
+      "tiny-imagenet-200": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-21T17:01:35.529640+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "tinyimagenet",
+    "config_overrides": {},
+    "extra_args": [
+      "--inference-criterion",
+      "entropy"
+    ],
+    "fast": false,
+    "job_id": "p0_class_entropy__tinyimagenet__seed0__diltcl",
+    "methods": "diltcl",
+    "priority": "P0",
+    "purpose": "full-data raw entropy class-IL main rerun",
+    "repeat_of": null,
+    "runner": "run_class_il.py",
+    "seed": 0
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p0/logs/p0_class_entropy__tinyimagenet__seed0__diltcl.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 54080,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/result.json",
+      "sha256": "eedb68561cfd95e720e9ef584ad9ec299cf83ea371d8c5e70b2949b370a9e4fd"
+    },
+    {
+      "bytes": 4440,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/result.npz",
+      "sha256": "8e2839cc9fb5cb558d2240f83c40b86b8d3a99669735a71b46f92a428b44ff0d"
+    },
+    {
+      "bytes": 54881991,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/checkpoints/tinyimagenet/diltcl/seed0.pt",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/checkpoints/tinyimagenet/diltcl/seed0.pt",
+      "sha256": "45617371ffb00993886784ac8064f5f872a5a992d5c0726c289407e8884a58f8"
+    },
+    {
+      "bytes": 418264,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/predictions/tinyimagenet/diltcl/seed0.npz",
+      "path_relative_to_run_dir": "artifacts/p0_class_entropy__tinyimagenet__seed0__diltcl/predictions/tinyimagenet/diltcl/seed0.npz",
+      "sha256": "a23a59a07ed5243dc14266134ae4dc56497484261b2314fe76c302531545d076"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-21T16:32:57.155971+00:00",
+  "state": "succeeded",
+  "wall_seconds": 1718.3263516314328
+}

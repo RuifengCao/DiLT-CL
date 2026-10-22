@@ -1,0 +1,11 @@
+cifar         wsn      seed0 [score-bias-acc]: oracle= 79.25 routed= 18.14 IDENTICAL
+cifar         wsn      seed1 [score-bias-acc]: oracle= 78.48 routed= 18.38 IDENTICAL
+cifar         wsn      seed2 [score-bias-acc]: oracle= 78.82 routed= 18.18 IDENTICAL
+cifar         wsn      seed3 [score-bias-acc]: oracle= 79.34 routed= 18.81 IDENTICAL
+cifar         wsn      seed4 [score-bias-acc]: oracle= 78.87 routed= 18.12 IDENTICAL
+tinyimagenet  wsn      seed0 [score-bias-acc]: oracle= 42.23 routed= 12.72 IDENTICAL
+tinyimagenet  wsn      seed1 [score-bias-acc]: oracle= 42.32 routed= 12.90 IDENTICAL
+tinyimagenet  wsn      seed2 [score-bias-acc]: oracle= 42.29 routed= 12.28 IDENTICAL
+tinyimagenet  wsn      seed3 [score-bias-acc]: oracle= 41.78 routed= 12.29 IDENTICAL
+tinyimagenet  wsn      seed4 [score-bias-acc]: oracle= 42.16 routed= 12.53 IDENTICAL
+10 checkpoint(s) re-evaluated, 0 with errors -> identical

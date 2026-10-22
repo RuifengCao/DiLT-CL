@@ -1,0 +1,104 @@
+{
+  "attempt": 1,
+  "child_environment_controls": {
+    "CUBLASLT_WORKSPACE_SIZE": null,
+    "CUBLAS_EMULATE_DOUBLE_PRECISION": null,
+    "CUBLAS_EMULATE_SINGLE_PRECISION": null,
+    "CUBLAS_EMULATION_SPECIAL_VALUES_SUPPORT_MASK": null,
+    "CUBLAS_EMULATION_STRATEGY": null,
+    "CUBLAS_FIXEDPOINT_EMULATION_MANTISSA_BIT_COUNT": null,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDNN_CONV_WSCAP_DBG": null,
+    "CUDNN_ERRATA_JSON_FILE": null,
+    "DILTCL_CACHE_DIR": "/root/autodl-tmp/data_cache",
+    "DILTCL_NUM_THREADS": "3",
+    "DISABLE_ADDMM_CUDA_LT": null,
+    "NVIDIA_TF32_OVERRIDE": null,
+    "OMP_NUM_THREADS": "3",
+    "PYTHONHASHSEED": "1",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": null,
+    "TORCH_BLAS_PREFER_CUBLASLT": null,
+    "TORCH_CUDNN_USE_HEURISTIC_MODE_B": null,
+    "TORCH_CUDNN_V8_API_DISABLED": null
+  },
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/DiLT-CL/code/run_task_il.py",
+    "--benchmark",
+    "pmnist",
+    "--seed-list",
+    "1",
+    "--methods",
+    "lwf",
+    "--out",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed1__lwf/result",
+    "--head-mode",
+    "multi",
+    "--data-backend",
+    "device",
+    "--numerics",
+    "fast",
+    "--tf32",
+    "default",
+    "--threads",
+    "3",
+    "--data-root",
+    "/root/autodl-tmp/data",
+    "--no-download",
+    "--checkpoint-dir",
+    "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed1__lwf/checkpoints"
+  ],
+  "dataset_identity": {
+    "benchmark": "pmnist",
+    "entries": {
+      "MNIST": "e3280b981c7ef7aa18c79945df00d197ef3ba2274fbb290193cbe87eb1c9a514"
+    },
+    "mode": "full",
+    "root": "/root/autodl-tmp/data",
+    "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2"
+  },
+  "ended_at": "2026-10-21T23:35:45.405353+00:00",
+  "execution_source_sha256": "3ab0ae5aec107024e1176b351680cda431008784b75fa30dfc9ab1975aa6addd",
+  "job": {
+    "benchmark": "pmnist",
+    "config_overrides": {},
+    "extra_args": [
+      "--head-mode",
+      "multi"
+    ],
+    "fast": false,
+    "job_id": "p0_task_il_multi__pmnist__seed1__lwf",
+    "methods": "lwf",
+    "priority": "P0",
+    "purpose": "corrected Task-IL main rerun (multi heads)",
+    "repeat_of": null,
+    "runner": "run_task_il.py",
+    "seed": 1
+  },
+  "log": "/root/autodl-tmp/runs_v3011/p0/logs/p0_task_il_multi__pmnist__seed1__lwf.attempt1.log",
+  "outputs": [
+    {
+      "bytes": 21673,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed1__lwf/result.json",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__pmnist__seed1__lwf/result.json",
+      "sha256": "3e0ada811a3f8f9cb4af4fb73e6ed948a4ddaf834cd7173081ace29643dda092"
+    },
+    {
+      "bytes": 1086,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed1__lwf/result.npz",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__pmnist__seed1__lwf/result.npz",
+      "sha256": "ae7258ca27cd49242cc4a88e121c89e7be048285675bfe25d8d1eb0dc3298b24"
+    },
+    {
+      "bytes": 1176667,
+      "path": "/root/autodl-tmp/runs_v3011/p0/artifacts/p0_task_il_multi__pmnist__seed1__lwf/checkpoints/pmnist/lwf/seed1.pt",
+      "path_relative_to_run_dir": "artifacts/p0_task_il_multi__pmnist__seed1__lwf/checkpoints/pmnist/lwf/seed1.pt",
+      "sha256": "031bf3c480ac8e21aad678db81602b83e7a8daa4c5f04f60463300ad9acc85ed"
+    }
+  ],
+  "returncode": 0,
+  "started_at": "2026-10-21T23:24:29.736279+00:00",
+  "state": "succeeded",
+  "wall_seconds": 675.6638450156897
+}

@@ -1,0 +1,9 @@
+cifar         packnet  seed0: A= 24.60 U= 25.72 V= 95.65 O= 76.90 rho= 69.4% OK
+cifar         supsup   seed0: A= 21.96 U= 23.78 V= 92.35 O= 71.00 rho= 62.8% OK
+cifar         wsn      seed0: A= 26.20 U= 27.88 V= 93.97 O= 75.14 rho= 66.3% OK
+cifar         diltcl   seed0: A= 25.82 U= 27.10 V= 95.28 O= 71.70 rho= 61.8% OK
+cifar         packnet  seed0: A= 26.08 U= 27.84 V= 93.68 O= 75.66 rho= 67.1% stored-router-agreement=1.0000 (near-ties 0) refit-agreement=1.0000 OK
+cifar         supsup   seed0: A= 26.62 U= 28.90 V= 92.11 O= 75.40 rho= 66.5% stored-router-agreement=1.0000 (near-ties 0) refit-agreement=1.0000 OK
+cifar         wsn      seed0: A= 26.20 U= 28.74 V= 91.16 O= 74.66 rho= 65.7% stored-router-agreement=1.0000 (near-ties 0) refit-agreement=1.0000 OK
+cifar         diltcl   seed0: A= 26.40 U= 29.38 V= 89.86 O= 72.54 rho= 62.7% stored-router-agreement=1.0000 (near-ties 0) refit-agreement=1.0000 OK
+8 predictions file(s) checked, 0 with errors -> passed

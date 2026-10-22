@@ -5,7 +5,9 @@ code, tables, or older documentation disagree with it, stop and resolve the
 disagreement before running or reporting results.
 
 > **Result status.** The results used by the accompanying paper are the merged,
-> verified v3 artifacts in `../evidence/results_20260906/`. Earlier v2-line
+> verified artifacts of the v3.0.11 regeneration in
+> `../evidence/results_20261022/`; the original v3 runs (v3.0.0 to v3.0.3) in
+> `../evidence/results_20260906/` agree with them in every reported number. Earlier v2-line
 > artifacts are not part of this repository and are not paper results. No
 > performance result is claimed until the v3 pipeline has been run end to end on
 > the declared hardware, the independent verifier has passed, and

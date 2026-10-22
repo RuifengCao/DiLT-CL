@@ -1,0 +1,41 @@
+{
+  "entries": {
+    "MNIST": {
+      "bytes": 66544770,
+      "files": 8,
+      "sha256": "e3280b981c7ef7aa18c79945df00d197ef3ba2274fbb290193cbe87eb1c9a514"
+    },
+    "cifar-10-python.tar.gz": {
+      "bytes": 170498071,
+      "files": 1,
+      "sha256": "d229ebe260a5da075d57a9e3c30dc7c1901984313ee43dbd3924d55d01bba23b"
+    },
+    "cifar-100-python": {
+      "bytes": 186301098,
+      "files": 4,
+      "sha256": "54c2dc9681ca698f8c5deba2b618e3729c23a165d87b1890cf9d7d5ae2a90c72"
+    },
+    "cifar-100-python.tar.gz": {
+      "bytes": 169001437,
+      "files": 1,
+      "sha256": "fb781af77602fa452bed8ef167a6dd23c428dfe4567abbdbb0a179d8d004c8e2"
+    },
+    "tiny-imagenet-200": {
+      "bytes": 239648330,
+      "files": 120203,
+      "sha256": "e68c3016e8591583d2a39a8326f8de62c0531e5797d84eccf02fe9ce008e7919"
+    },
+    "tiny-imagenet-200.zip": {
+      "bytes": 248100043,
+      "files": 1,
+      "sha256": "187ac5a1bbc5f74252d6f3dff8f8b064006793b625159ac0d599c9063ad7ca24"
+    }
+  },
+  "exists": true,
+  "file_count": 120218,
+  "mode": "full",
+  "root": "/root/autodl-tmp/data",
+  "total_bytes": 1080093749,
+  "tree_sha256": "cc051880bb5d4c129be8836bf0c7123747a5d10cf0922ea3899c90093b275be2",
+  "note": "per-file records removed for the package; the tree_sha256 and entries identify the data exactly"
+}

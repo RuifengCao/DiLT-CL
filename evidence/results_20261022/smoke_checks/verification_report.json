@@ -1,0 +1,84 @@
+{
+  "acknowledged_source_changes": [],
+  "dataset_fingerprint": {
+    "file_count": 120218,
+    "mode": "metadata",
+    "root": "/root/autodl-tmp/data",
+    "total_bytes": 1080093749,
+    "tree_sha256": "93cb1e0c0163a3003677583f0b7072a435db1fdeec2fe208e91d2fea6b0f8ae8"
+  },
+  "determinism": [
+    {
+      "arrays_identical": true,
+      "checkpoint_content_hash_identical": true,
+      "reference": "smoke_task_il__cifar__seed0",
+      "repeat": "smoke_task_il_repeat__cifar__seed0"
+    }
+  ],
+  "errors": [],
+  "jobs_expected": 4,
+  "jobs_under_acknowledged_source": [],
+  "jobs_validated": 4,
+  "prediction_files_checked": 8,
+  "publication_reportable": true,
+  "results": [
+    {
+      "errors": [],
+      "job_id": "smoke_task_il__cifar__seed0",
+      "json": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_task_il__cifar__seed0/result.json",
+      "json_sha256": "f678f0172d0bf093e05443a2f1a234034ea179660f567b510379b8ba419fedae",
+      "npz": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_task_il__cifar__seed0/result.npz",
+      "npz_sha256": "a32fefd34f016f18d87bcd5a94bc8a0c3baa7ffe3bdd43be0853fc3874c35e3c",
+      "passed": true,
+      "predictions_checked": []
+    },
+    {
+      "errors": [],
+      "job_id": "smoke_task_il_repeat__cifar__seed0",
+      "json": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_task_il_repeat__cifar__seed0/result.json",
+      "json_sha256": "065692a2e63c5c3a6dbe62bda07b1d6aae4bb678c29d138c5d3e69ab882da36d",
+      "npz": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_task_il_repeat__cifar__seed0/result.npz",
+      "npz_sha256": "a32fefd34f016f18d87bcd5a94bc8a0c3baa7ffe3bdd43be0853fc3874c35e3c",
+      "passed": true,
+      "predictions_checked": []
+    },
+    {
+      "errors": [],
+      "job_id": "smoke_class_entropy__cifar__seed0",
+      "json": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_class_entropy__cifar__seed0/result.json",
+      "json_sha256": "e5b981d45e3cde3e87471e1f27a2537ce6a6ac2e38442f4345fe4e5da4a0423a",
+      "npz": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_class_entropy__cifar__seed0/result.npz",
+      "npz_sha256": "16433bdfb0bdb6aec43a7f543e31283f08da918a696d634ed85e60a91c36d0f9",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed0",
+        "cifar/supsup/seed0",
+        "cifar/wsn/seed0",
+        "cifar/diltcl/seed0"
+      ]
+    },
+    {
+      "errors": [],
+      "job_id": "smoke_class_entropy_cal__cifar__seed0",
+      "json": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_class_entropy_cal__cifar__seed0/result.json",
+      "json_sha256": "a98055d5c42ccd30e7b577548491de1ab61d8bff0367216ad5232dd5a2306d9e",
+      "npz": "/root/autodl-tmp/runs_v3011/smoke/artifacts/smoke_class_entropy_cal__cifar__seed0/result.npz",
+      "npz_sha256": "e84e0da99360c2f1c44419885928c791a6b67d7603b24fd05658d5a46678e71a",
+      "passed": true,
+      "predictions_checked": [
+        "cifar/packnet/seed0",
+        "cifar/supsup/seed0",
+        "cifar/wsn/seed0",
+        "cifar/diltcl/seed0"
+      ]
+    }
+  ],
+  "run_dir": "/root/autodl-tmp/runs_v3011/smoke",
+  "scope_note": "This verifier establishes artifact arithmetic, structure, hashes, suite completeness, and the declared same-seed repeat. It does not turn the reused-C-head Task-IL shared baselines into standard separate-head baselines and does not certify a compact exporter.",
+  "status": "verified",
+  "verification_schema_version": 1,
+  "verified_at": "2026-10-21T16:30:47.857078+00:00",
+  "warnings": [
+    "dataset fingerprint is not content-hash/full mode; acceptable for smoke but not the publication gate"
+  ]
+}

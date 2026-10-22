@@ -1,0 +1,9 @@
+cifar         packnet  seed0 [none]: oracle= 76.90 routed= 24.60 IDENTICAL
+cifar         supsup   seed0 [none]: oracle= 71.00 routed= 21.96 IDENTICAL
+cifar         wsn      seed0 [none]: oracle= 75.14 routed= 26.20 IDENTICAL
+cifar         diltcl   seed0 [none]: oracle= 71.70 routed= 25.82 IDENTICAL
+cifar         packnet  seed0 [score-logreg]: oracle= 75.66 routed= 26.08 IDENTICAL
+cifar         supsup   seed0 [score-logreg]: oracle= 75.40 routed= 26.62 IDENTICAL
+cifar         wsn      seed0 [score-logreg]: oracle= 74.66 routed= 26.20 IDENTICAL
+cifar         diltcl   seed0 [score-logreg]: oracle= 72.54 routed= 26.40 IDENTICAL
+8 checkpoint(s) re-evaluated, 0 with errors -> identical
